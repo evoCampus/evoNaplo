@@ -1,7 +1,10 @@
+using evoNaplo.Data;
 using evoNaplo.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace evoNaplo.Extensions;
+
 public static class DependencyInjectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
@@ -10,9 +13,11 @@ public static class DependencyInjectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
+    public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // To be implemented
+        services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
         return services;
     }
 }

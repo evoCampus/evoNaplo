@@ -1,18 +1,11 @@
-<<<<<<< HEAD
-using evoNaplo.Data;
-using Microsoft.EntityFrameworkCore;
-=======
 using evoNaplo.Extensions;
->>>>>>> origin/main
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddApplicationServices();
-builder.Services.AddDatabaseServices();
+builder.Services.AddDatabaseServices(builder.Configuration);
 
 
 builder.Services.AddControllers();

@@ -2,11 +2,10 @@
 {
     public class Mentor
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string? PhoneNumber { get; set; }
-        public string? ProfilePptPath { get; set; }
         public ICollection<Team> Teams { get; set; } = new List<Team>();
         public ICollection<Project> Projects { get; set; } = new List<Project>();
     }

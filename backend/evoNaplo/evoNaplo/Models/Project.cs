@@ -2,12 +2,10 @@
 {
     public class Project
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; } = string.Empty;
         public string? ShortDescription { get; set; }
-        public string? GithubUrl { get; set; }
-        public string? TrelloUrl { get; set; }
-        public string? FigmaUrl { get; set; }
+        public ICollection<ProjectLink> ProjectLink { get; set; } = new List<ProjectLink>();
         public ICollection<Team> Teams { get; set; } = new List<Team>();
         public ICollection<Mentor> Mentors { get; set; } = new List<Mentor>();
     }

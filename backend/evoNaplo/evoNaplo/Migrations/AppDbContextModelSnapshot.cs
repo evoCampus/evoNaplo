@@ -34,7 +34,7 @@ namespace evoNaplo.Migrations
 
                     b.HasIndex("ProjectsId");
 
-                    b.ToTable("MentorProject");
+                    b.ToTable("MentorProject", (string)null);
                 });
 
             modelBuilder.Entity("MentorTeam", b =>
@@ -49,7 +49,7 @@ namespace evoNaplo.Migrations
 
                     b.HasIndex("TeamsId");
 
-                    b.ToTable("MentorTeam");
+                    b.ToTable("MentorTeam", (string)null);
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Mentor", b =>
@@ -76,7 +76,7 @@ namespace evoNaplo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Mentors");
+                    b.ToTable("Mentors", (string)null);
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Project", b =>
@@ -105,7 +105,7 @@ namespace evoNaplo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects");
+                    b.ToTable("Projects", (string)null);
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Student", b =>
@@ -170,7 +170,7 @@ namespace evoNaplo.Migrations
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Team", b =>
@@ -195,7 +195,7 @@ namespace evoNaplo.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Teams");
+                    b.ToTable("Teams", (string)null);
                 });
 
             modelBuilder.Entity("MentorProject", b =>

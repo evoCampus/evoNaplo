@@ -2,7 +2,7 @@
 { 
 public class Student
     {
-    public int Id { get; set; }
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
@@ -12,13 +12,13 @@ public class Student
     public string? PersonalGoals { get; set; }
     public bool HasAppliedForScholarship { get; set; }
     public bool HasActiveScholarship { get; set; }
-    public string? ScholarshipDuration { get; set; }
+    public DateTime ScholarshipDuration { get; set; }
     public bool HasAppliedForInternship { get; set; }
     public bool IsCurrentlyIntern { get; set; }
     public bool IsWorkingStudent { get; set; }
-    public string? WorkingStudentDuration { get; set; }
+    public DateTime WorkingStudentDuration { get; set; }
     public bool WantsToStayWithCurrentTeam { get; set; }
-    public int? TeamId { get; set; }
+    public string TeamId { get; set; }
     public Team? Team { get; set; }
     }
 }
