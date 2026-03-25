@@ -1,8 +1,14 @@
 ﻿namespace evoNaplo.Models
 {
+    public enum LinkTypes
+    {
+        GitHub,
+        Trello,
+        Figma
+    }
     public class ProjectLink
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; }
         public LinkTypes LinkType { get; set; }
         public string Url { get; set; } = string.Empty;
         public int ProjectId { get; set; }

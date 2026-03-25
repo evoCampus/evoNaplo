@@ -2,7 +2,7 @@
 {
     public class Project
     {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? ShortDescription { get; set; }
         public ICollection<ProjectLink> ProjectLink { get; set; } = new List<ProjectLink>();
