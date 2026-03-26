@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using evoNaplo.Services.Interface;
-using evoNaplo.Services.Models;
+using evoNaplo.ServiceMappa.Interface;
+using evoNaplo.ServiceMappa.TesztDTO;
 
 namespace evoNaplo.Controllers
 {
@@ -22,7 +22,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Mentor> Get(int id)
+        public ActionResult<Mentor> Get(string id)
         {
             var mentor = _mentorService.GetMentorById(id);
             if (mentor == null) return NotFound();
@@ -37,7 +37,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, Mentor mentor)
+        public ActionResult Update(string id, Mentor mentor)
         {
             if (id != mentor.MentorId) return BadRequest();
             var existing = _mentorService.GetMentorById(id);
@@ -48,7 +48,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch(int id, [FromBody] Mentor updatedFields)
+        public ActionResult Patch(string id, [FromBody] Mentor updatedFields)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -58,7 +58,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/name")]
-        public ActionResult UpdateName(int id, [FromBody] string name)
+        public ActionResult UpdateName(string id, [FromBody] string name)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -68,7 +68,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/email")]
-        public ActionResult UpdateEmail(int id, [FromBody] string email)
+        public ActionResult UpdateEmail(string id, [FromBody] string email)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -78,7 +78,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/phone")]
-        public ActionResult UpdatePhone(int id, [FromBody] string phone)
+        public ActionResult UpdatePhone(string id, [FromBody] string phone)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -88,7 +88,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedTeam")]
-        public ActionResult UpdateAssignedTeam(int id, [FromBody] string team)
+        public ActionResult UpdateAssignedTeam(string id, [FromBody] string team)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -98,7 +98,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedProject")]
-        public ActionResult UpdateAssignedProject(int id, [FromBody] string project)
+        public ActionResult UpdateAssignedProject(string id, [FromBody] string project)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();
@@ -108,7 +108,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
             var existing = _mentorService.GetMentorById(id);
             if (existing == null) return NotFound();

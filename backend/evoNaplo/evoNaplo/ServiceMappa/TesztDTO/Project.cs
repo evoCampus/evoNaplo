@@ -1,9 +1,9 @@
-﻿namespace evoNaplo.Services.Models
+﻿namespace evoNaplo.ServiceMappa.TesztDTO
 {
     public class Project
     {
 
-        public int ProjectID { get; set; }
+        public string ProjectID { get; set; }
         public string ProjectName { get; set; }
         public string ProjectDescription { get; set; }
         public string ProjectLinks { get; set; }

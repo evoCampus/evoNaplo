@@ -1,27 +1,26 @@
-using evoNaplo.Services.Models;
+using evoNaplo.ServiceMappa.TesztDTO;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace evoNaplo.Services.Services
+namespace evoNaplo.ServiceMappa.Services
 {
     public class TeamService : Interface.ITeamService
     {
         private static readonly List<Team> _teams = new List<Team>();
-        private static int _nextId = 1;
 
         public List<Team> GetAllTeams()
         {
             return _teams;
         }
 
-        public Team GetTeamById(int id)
+        public Team GetTeamById(string id)
         {
             return _teams.FirstOrDefault(t => t.TeamID == id);
         }
 
         public void AddTeam(Team team)
         {
-            team.TeamID = _nextId++;
+            if (string.IsNullOrEmpty(team.TeamID)) team.TeamID = System.Guid.NewGuid().ToString();
             _teams.Add(team);
         }
 
@@ -34,7 +33,7 @@ namespace evoNaplo.Services.Services
             existing.TeamAssignedStudents = team.TeamAssignedStudents;
         }
 
-        public void UpdateTeamFields(int id, Team updatedFields)
+        public void UpdateTeamFields(string id, Team updatedFields)
         {
             var existing = _teams.FirstOrDefault(t => t.TeamID == id);
             if (existing == null || updatedFields == null) return;
@@ -43,21 +42,21 @@ namespace evoNaplo.Services.Services
             if (updatedFields.TeamAssignedStudents != null) existing.TeamAssignedStudents = updatedFields.TeamAssignedStudents;
         }
 
-        public void UpdateTeamAssignedMentors(int id, string mentors)
+        public void UpdateTeamAssignedMentors(string id, string mentors)
         {
             var existing = _teams.FirstOrDefault(t => t.TeamID == id);
             if (existing == null) return;
             existing.TeamAssignedMentors = mentors;
         }
 
-        public void UpdateTeamAssignedStudents(int id, string students)
+        public void UpdateTeamAssignedStudents(string id, string students)
         {
             var existing = _teams.FirstOrDefault(t => t.TeamID == id);
             if (existing == null) return;
             existing.TeamAssignedStudents = students;
         }
 
-        public void DeleteTeam(int id)
+        public void DeleteTeam(string id)
         {
             var existing = _teams.FirstOrDefault(t => t.TeamID == id);
             if (existing != null) _teams.Remove(existing);

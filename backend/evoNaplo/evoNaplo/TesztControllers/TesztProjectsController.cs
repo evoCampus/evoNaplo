@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using evoNaplo.Services.Interface;
-using evoNaplo.Services.Models;
+using evoNaplo.ServiceMappa.Interface;
+using evoNaplo.ServiceMappa.TesztDTO;
 
 namespace evoNaplo.Controllers
 {
@@ -22,7 +22,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Project> Get(int id)
+        public ActionResult<Project> Get(string id)
         {
             var project = _projectService.GetProjectById(id);
             if (project == null) return NotFound();
@@ -37,7 +37,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, Project project)
+        public ActionResult Update(string id, Project project)
         {
             if (id != project.ProjectID) return BadRequest();
             var existing = _projectService.GetProjectById(id);
@@ -48,7 +48,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch(int id, [FromBody] Project updatedFields)
+        public ActionResult Patch(string id, [FromBody] Project updatedFields)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -58,7 +58,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/name")]
-        public ActionResult UpdateName(int id, [FromBody] string name)
+        public ActionResult UpdateName(string id, [FromBody] string name)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -68,7 +68,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/description")]
-        public ActionResult UpdateDescription(int id, [FromBody] string description)
+        public ActionResult UpdateDescription(string id, [FromBody] string description)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -78,7 +78,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/links")]
-        public ActionResult UpdateLinks(int id, [FromBody] string links)
+        public ActionResult UpdateLinks(string id, [FromBody] string links)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -88,7 +88,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedMentors")]
-        public ActionResult UpdateAssignedMentors(int id, [FromBody] string mentors)
+        public ActionResult UpdateAssignedMentors(string id, [FromBody] string mentors)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -98,7 +98,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedStudents")]
-        public ActionResult UpdateAssignedStudents(int id, [FromBody] string students)
+        public ActionResult UpdateAssignedStudents(string id, [FromBody] string students)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();
@@ -108,7 +108,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
             var existing = _projectService.GetProjectById(id);
             if (existing == null) return NotFound();

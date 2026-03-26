@@ -1,11 +1,11 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 
-namespace evoNaplo.Services.Models
+namespace evoNaplo.ServiceMappa.TesztDTO
 {
     public class Student
     {
         
-        public int StudID { get; set; }
+        public string StudID { get; set; }
 
 
         //Personal information Stud

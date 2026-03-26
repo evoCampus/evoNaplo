@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using evoNaplo.Services.Interface;
-using evoNaplo.Services.Models;
+using evoNaplo.ServiceMappa.Interface;
+using evoNaplo.ServiceMappa.TesztDTO;
 
 namespace evoNaplo.Controllers
 {
@@ -22,7 +22,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Team> Get(int id)
+        public ActionResult<Team> Get(string id)
         {
             var team = _teamService.GetTeamById(id);
             if (team == null) return NotFound();
@@ -37,7 +37,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPut("{id}")]
-        public ActionResult Update(int id, Team team)
+        public ActionResult Update(string id, Team team)
         {
             if (id != team.TeamID) return BadRequest();
             var existing = _teamService.GetTeamById(id);
@@ -48,7 +48,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}")]
-        public ActionResult Patch(int id, [FromBody] Team updatedFields)
+        public ActionResult Patch(string id, [FromBody] Team updatedFields)
         {
             var existing = _teamService.GetTeamById(id);
             if (existing == null) return NotFound();
@@ -58,7 +58,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedMentors")]
-        public ActionResult UpdateAssignedMentors(int id, [FromBody] string mentors)
+        public ActionResult UpdateAssignedMentors(string id, [FromBody] string mentors)
         {
             var existing = _teamService.GetTeamById(id);
             if (existing == null) return NotFound();
@@ -68,7 +68,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpPatch("{id}/assignedStudents")]
-        public ActionResult UpdateAssignedStudents(int id, [FromBody] string students)
+        public ActionResult UpdateAssignedStudents(string id, [FromBody] string students)
         {
             var existing = _teamService.GetTeamById(id);
             if (existing == null) return NotFound();
@@ -78,7 +78,7 @@ namespace evoNaplo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public ActionResult Delete(string id)
         {
             var existing = _teamService.GetTeamById(id);
             if (existing == null) return NotFound();

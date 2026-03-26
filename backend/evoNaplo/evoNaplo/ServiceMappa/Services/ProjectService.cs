@@ -1,27 +1,29 @@
-using evoNaplo.Services.Models;
+using evoNaplo.ServiceMappa.TesztDTO;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace evoNaplo.Services.Services
+namespace evoNaplo.ServiceMappa.Services
 {
     public class ProjectService : Interface.IProjectService
     {
         private static readonly List<Project> _projects = new List<Project>();
-        private static int _nextId = 1;
 
         public List<Project> GetAllProjects()
         {
             return _projects;
         }
 
-        public Project GetProjectById(int id)
+        public Project GetProjectById(string id)
         {
             return _projects.FirstOrDefault(p => p.ProjectID == id);
         }
 
         public void AddProject(Project project)
         {
-            project.ProjectID = _nextId++;
+            if (string.IsNullOrEmpty(project.ProjectID))
+            {
+                project.ProjectID = System.Guid.NewGuid().ToString();
+            }
             _projects.Add(project);
         }
 
@@ -37,7 +39,7 @@ namespace evoNaplo.Services.Services
             existing.ProjectAssignedStudents = project.ProjectAssignedStudents;
         }
 
-        public void UpdateProjectFields(int id, Project updatedFields)
+        public void UpdateProjectFields(string id, Project updatedFields)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null || updatedFields == null) return;
@@ -49,42 +51,42 @@ namespace evoNaplo.Services.Services
             if (updatedFields.ProjectAssignedStudents != null) existing.ProjectAssignedStudents = updatedFields.ProjectAssignedStudents;
         }
 
-        public void UpdateProjectName(int id, string name)
+        public void UpdateProjectName(string id, string name)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null) return;
             existing.ProjectName = name;
         }
 
-        public void UpdateProjectDescription(int id, string description)
+        public void UpdateProjectDescription(string id, string description)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null) return;
             existing.ProjectDescription = description;
         }
 
-        public void UpdateProjectLinks(int id, string links)
+        public void UpdateProjectLinks(string id, string links)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null) return;
             existing.ProjectLinks = links;
         }
 
-        public void UpdateProjectAssignedMentors(int id, string mentors)
+        public void UpdateProjectAssignedMentors(string id, string mentors)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null) return;
             existing.ProjectAssignedMentors = mentors;
         }
 
-        public void UpdateProjectAssignedStudents(int id, string students)
+        public void UpdateProjectAssignedStudents(string id, string students)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing == null) return;
             existing.ProjectAssignedStudents = students;
         }
 
-        public void DeleteProject(int id)
+        public void DeleteProject(string id)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing != null) _projects.Remove(existing);

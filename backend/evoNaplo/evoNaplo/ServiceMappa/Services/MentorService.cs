@@ -1,29 +1,28 @@
-﻿using evoNaplo.Services.Models;
+﻿using evoNaplo.ServiceMappa.TesztDTO;
 using System.Collections.Generic;
 using System.Linq;
 
 
 
-namespace evoNaplo.Services.Services
+namespace evoNaplo.ServiceMappa.Services
 {
     public class MentorService : Interface.IMentorService
     {
         private static readonly List<Mentor> _mentors = new List<Mentor>();
-        private static int _nextId = 1;
 
         public List<Mentor> GetAllMentors()
         {
             return _mentors;
         }
 
-        public Mentor GetMentorById(int id)
+        public Mentor GetMentorById(string id)
         {
             return _mentors.FirstOrDefault(m => m.MentorId == id);
         }
 
         public void AddMentor(Mentor mentor)
         {
-            mentor.MentorId = _nextId++;
+            if (string.IsNullOrEmpty(mentor.MentorId)) mentor.MentorId = System.Guid.NewGuid().ToString();
             _mentors.Add(mentor);
         }
 
@@ -39,7 +38,7 @@ namespace evoNaplo.Services.Services
             existing.MentorAssignedProject = updatedMentor.MentorAssignedProject;
         }
 
-        public void UpdateMentorFields(int id, Mentor updatedFields)
+        public void UpdateMentorFields(string id, Mentor updatedFields)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null || updatedFields == null) return;
@@ -52,42 +51,42 @@ namespace evoNaplo.Services.Services
         }
 
         // Single-field updates
-        public void UpdateMentorName(int id, string name)
+        public void UpdateMentorName(string id, string name)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null) return;
             existing.MentorName = name;
         }
 
-        public void UpdateMentorEmail(int id, string email)
+        public void UpdateMentorEmail(string id, string email)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null) return;
             existing.MentorEmail = email;
         }
 
-        public void UpdateMentorPhone(int id, string phone)
+        public void UpdateMentorPhone(string id, string phone)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null) return;
             existing.MentorPhoneNumber = phone;
         }
 
-        public void UpdateMentorAssignedTeam(int id, string team)
+        public void UpdateMentorAssignedTeam(string id, string team)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null) return;
             existing.MentorAssignedTeam = team;
         }
 
-        public void UpdateMentorAssignedProject(int id, string project)
+        public void UpdateMentorAssignedProject(string id, string project)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing == null) return;
             existing.MentorAssignedProject = project;
         }
 
-        public void DeleteMentor(int id)
+        public void DeleteMentor(string id)
         {
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing != null) _mentors.Remove(existing);

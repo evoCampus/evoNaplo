@@ -1,8 +1,8 @@
-﻿namespace evoNaplo.Services.Models
+﻿namespace evoNaplo.ServiceMappa.TesztDTO
 {
     public class Team
     {
-        public int TeamID { get; set; }
+        public string TeamID { get; set; }
         public string TeamAssignedMentors { get; set; }
         public string TeamAssignedStudents { get; set; }
 

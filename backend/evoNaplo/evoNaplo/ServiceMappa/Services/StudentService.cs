@@ -1,14 +1,14 @@
-﻿using evoNaplo.Services.Models;
+﻿using evoNaplo.ServiceMappa.TesztDTO;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace evoNaplo.Services.Services
+namespace evoNaplo.ServiceMappa.Services
 {
     public class StudentService : Interface.IStudentService
     {
         // STATIKUS adattagok: Ezek a memóriában maradnak a program leállásáig.
         private static readonly List<Student> _students = new List<Student>();
-        private static int _nextId = 1;
+
 
         // Visszaadja a listában lévő összes entitást
         public List<Student> GetAllStudents()
@@ -17,7 +17,7 @@ namespace evoNaplo.Services.Services
         }
 
         // Keresés ID alapján. Ha nem találja, null értékkel tér vissza.
-        public Student GetStudentById(int id)
+        public Student GetStudentById(string id)
         {
             return _students.FirstOrDefault(s => s.StudID == id);
         }
@@ -25,8 +25,7 @@ namespace evoNaplo.Services.Services
         // Hozzáadás a listához
         public void AddStudent(Student student)
         {
-            // Beállítjuk a következő szabad ID-t, majd megnöveljük a számlálót
-            student.StudID = _nextId++;
+            if (string.IsNullOrEmpty(student.StudID)) student.StudID = System.Guid.NewGuid().ToString();
             _students.Add(student);
         }
 
@@ -36,7 +35,7 @@ namespace evoNaplo.Services.Services
 
 
         // Részleges frissítés: csak a megadott (nem null) mezőket frissítjük
-        public void UpdateStudentFields(int id, Student updatedFields)
+        public void UpdateStudentFields(string id, Student updatedFields)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null || updatedFields == null)
@@ -96,7 +95,7 @@ namespace evoNaplo.Services.Services
         }
 
         // Külön metódusok a boolean mezők frissítésére
-        public void UpdateStudentIsFirstSemester(int id, bool isFirstSemester)
+        public void UpdateStudentIsFirstSemester(string id, bool isFirstSemester)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -104,7 +103,7 @@ namespace evoNaplo.Services.Services
             existingStudent.IsFirstSemester = isFirstSemester;
         }
 
-        public void UpdateStudentStayWithCurrentTeam(int id, bool stayWithCurrentTeam)
+        public void UpdateStudentStayWithCurrentTeam(string id, bool stayWithCurrentTeam)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -113,7 +112,7 @@ namespace evoNaplo.Services.Services
         }
 
         // Single-field update methods
-        public void UpdateStudentName(int id, string name)
+        public void UpdateStudentName(string id, string name)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -121,7 +120,7 @@ namespace evoNaplo.Services.Services
             existingStudent.StudName = name;
         }
 
-        public void UpdateStudentEmail(int id, string email)
+        public void UpdateStudentEmail(string id, string email)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -129,7 +128,7 @@ namespace evoNaplo.Services.Services
             existingStudent.StudEmail = email;
         }
 
-        public void UpdateStudentPhoneNumber(int id, string phoneNumber)
+        public void UpdateStudentPhoneNumber(string id, string phoneNumber)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -137,7 +136,7 @@ namespace evoNaplo.Services.Services
             existingStudent.StudPhoneNumber = phoneNumber;
         }
 
-        public void UpdateStudentCurrentStudies(int id, string currentStudies)
+        public void UpdateStudentCurrentStudies(string id, string currentStudies)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -145,7 +144,7 @@ namespace evoNaplo.Services.Services
             existingStudent.CurrentStudies = currentStudies;
         }
 
-        public void UpdateStudentPersonalGoals(int id, string personalGoals)
+        public void UpdateStudentPersonalGoals(string id, string personalGoals)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -154,7 +153,7 @@ namespace evoNaplo.Services.Services
         }
 
         // evoCampus related
-        public void UpdateStudentAppliedForCampus(int id, bool appliedForCampus)
+        public void UpdateStudentAppliedForCampus(string id, bool appliedForCampus)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -162,7 +161,7 @@ namespace evoNaplo.Services.Services
             existingStudent.AppliedForCampus = appliedForCampus;
         }
 
-        public void UpdateStudentActiveScholarship(int id, bool activeScholarship)
+        public void UpdateStudentActiveScholarship(string id, bool activeScholarship)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -170,7 +169,7 @@ namespace evoNaplo.Services.Services
             existingStudent.ActiveScholarship = activeScholarship;
         }
 
-        public void UpdateStudentScholarshipDuration(int id, int scholarshipDuration)
+        public void UpdateStudentScholarshipDuration(string id, int scholarshipDuration)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -180,7 +179,7 @@ namespace evoNaplo.Services.Services
 
        
         // Internship related
-        public void UpdateStudentInternshipApplied(int id, bool internshipApplied)
+        public void UpdateStudentInternshipApplied(string id, bool internshipApplied)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -188,7 +187,7 @@ namespace evoNaplo.Services.Services
             existingStudent.InternshipApplied = internshipApplied;
         }
 
-        public void UpdateStudentIsAnIntern(int id, bool isAnIntern)
+        public void UpdateStudentIsAnIntern(string id, bool isAnIntern)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -196,7 +195,7 @@ namespace evoNaplo.Services.Services
             existingStudent.IsAnIntern = isAnIntern;
         }
 
-        public void UpdateStudentDoesWork(int id, bool doesWork)
+        public void UpdateStudentDoesWork(string id, bool doesWork)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -204,7 +203,7 @@ namespace evoNaplo.Services.Services
             existingStudent.doeswork = doesWork;
         }
 
-        public void UpdateStudentWorkDuration(int id, string workDuration)
+        public void UpdateStudentWorkDuration(string id, string workDuration)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -213,7 +212,7 @@ namespace evoNaplo.Services.Services
         }
 
         // Assignment related
-        public void UpdateStudentAssignedTeam(int id, string assignedTeam)
+        public void UpdateStudentAssignedTeam(string id, string assignedTeam)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -221,7 +220,7 @@ namespace evoNaplo.Services.Services
             existingStudent.StudAssignedTeam = assignedTeam;
         }
 
-        public void UpdateStudentAssignedProject(int id, string assignedProject)
+        public void UpdateStudentAssignedProject(string id, string assignedProject)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
             if (existingStudent == null) return;
@@ -230,7 +229,7 @@ namespace evoNaplo.Services.Services
         }
 
         // Eltávolítás a listából
-        public void DeleteStudent(int id)
+        public void DeleteStudent(string id)
         {
             // Megkeressük az elemet
             var studentToRemove = _students.FirstOrDefault(s => s.StudID == id);
@@ -239,11 +238,7 @@ namespace evoNaplo.Services.Services
             if (studentToRemove != null)
             {
                 _students.Remove(studentToRemove);
-        }
-
-
-         
-
+            }
         }
     }
 }
