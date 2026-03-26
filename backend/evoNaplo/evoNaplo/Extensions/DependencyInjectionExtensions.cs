@@ -7,6 +7,7 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
+        services.AddScoped<IExcelImportService, ExcelImportService>(); // Injection for Excel support
         return services;
     }
 
