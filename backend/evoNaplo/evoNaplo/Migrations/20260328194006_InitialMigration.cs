@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,12 +15,10 @@ namespace evoNaplo.Migrations
                 name: "Mentors",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProfilePptPath = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -30,13 +29,9 @@ namespace evoNaplo.Migrations
                 name: "Projects",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GithubUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TrelloUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FigmaUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ShortDescription = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -47,8 +42,8 @@ namespace evoNaplo.Migrations
                 name: "MentorProject",
                 columns: table => new
                 {
-                    MentorsId = table.Column<int>(type: "int", nullable: false),
-                    ProjectsId = table.Column<int>(type: "int", nullable: false)
+                    MentorsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProjectsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,14 +63,34 @@ namespace evoNaplo.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProjectLink",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LinkType = table.Column<int>(type: "int", nullable: false),
+                    Url = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProjectId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectLink", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProjectLink_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WeeklyMeetingTime = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    WeeklyMeetingTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    LengthOfMeeting = table.Column<TimeSpan>(type: "time", nullable: false),
+                    DayOfWeek = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -92,8 +107,8 @@ namespace evoNaplo.Migrations
                 name: "MentorTeam",
                 columns: table => new
                 {
-                    MentorsId = table.Column<int>(type: "int", nullable: false),
-                    TeamsId = table.Column<int>(type: "int", nullable: false)
+                    MentorsId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TeamsId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,8 +131,7 @@ namespace evoNaplo.Migrations
                 name: "Students",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -127,13 +141,13 @@ namespace evoNaplo.Migrations
                     PersonalGoals = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     HasAppliedForScholarship = table.Column<bool>(type: "bit", nullable: false),
                     HasActiveScholarship = table.Column<bool>(type: "bit", nullable: false),
-                    ScholarshipDuration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ScholarshipDuration = table.Column<DateTime>(type: "datetime2", nullable: false),
                     HasAppliedForInternship = table.Column<bool>(type: "bit", nullable: false),
                     IsCurrentlyIntern = table.Column<bool>(type: "bit", nullable: false),
                     IsWorkingStudent = table.Column<bool>(type: "bit", nullable: false),
-                    WorkingStudentDuration = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    WorkingStudentDuration = table.Column<DateTime>(type: "datetime2", nullable: false),
                     WantsToStayWithCurrentTeam = table.Column<bool>(type: "bit", nullable: false),
-                    TeamId = table.Column<int>(type: "int", nullable: true)
+                    TeamId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,7 +156,8 @@ namespace evoNaplo.Migrations
                         name: "FK_Students_Teams_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Teams",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -154,6 +169,11 @@ namespace evoNaplo.Migrations
                 name: "IX_MentorTeam_TeamsId",
                 table: "MentorTeam",
                 column: "TeamsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProjectLink_ProjectId",
+                table: "ProjectLink",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Students_TeamId",
@@ -174,6 +194,9 @@ namespace evoNaplo.Migrations
 
             migrationBuilder.DropTable(
                 name: "MentorTeam");
+
+            migrationBuilder.DropTable(
+                name: "ProjectLink");
 
             migrationBuilder.DropTable(
                 name: "Students");

@@ -24,41 +24,38 @@ namespace evoNaplo.Migrations
 
             modelBuilder.Entity("MentorProject", b =>
                 {
-                    b.Property<int>("MentorsId")
-                        .HasColumnType("int");
+                    b.Property<string>("MentorsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ProjectsId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProjectsId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MentorsId", "ProjectsId");
 
                     b.HasIndex("ProjectsId");
 
-                    b.ToTable("MentorProject", (string)null);
+                    b.ToTable("MentorProject");
                 });
 
             modelBuilder.Entity("MentorTeam", b =>
                 {
-                    b.Property<int>("MentorsId")
-                        .HasColumnType("int");
+                    b.Property<string>("MentorsId")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("TeamsId")
-                        .HasColumnType("int");
+                    b.Property<string>("TeamsId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("MentorsId", "TeamsId");
 
                     b.HasIndex("TeamsId");
 
-                    b.ToTable("MentorTeam", (string)null);
+                    b.ToTable("MentorTeam");
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Mentor", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -71,27 +68,15 @@ namespace evoNaplo.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePptPath")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Mentors", (string)null);
+                    b.ToTable("Mentors");
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Project", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FigmaUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GithubUrl")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -100,21 +85,38 @@ namespace evoNaplo.Migrations
                     b.Property<string>("ShortDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TrelloUrl")
+                    b.HasKey("Id");
+
+                    b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("evoNaplo.Models.ProjectLink", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("LinkType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProjectId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Projects", (string)null);
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectLink");
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Student", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("CurrentSemester")
                         .HasColumnType("int");
@@ -151,11 +153,12 @@ namespace evoNaplo.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ScholarshipDuration")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("ScholarshipDuration")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int");
+                    b.Property<string>("TeamId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UniversityProgramme")
                         .HasColumnType("nvarchar(max)");
@@ -163,39 +166,39 @@ namespace evoNaplo.Migrations
                     b.Property<bool>("WantsToStayWithCurrentTeam")
                         .HasColumnType("bit");
 
-                    b.Property<string>("WorkingStudentDuration")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("WorkingStudentDuration")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TeamId");
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("evoNaplo.Models.Team", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<TimeSpan>("LengthOfMeeting")
+                        .HasColumnType("time");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("ProjectId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("WeeklyMeetingTime")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset>("WeeklyMeetingTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Teams", (string)null);
+                    b.ToTable("Teams");
                 });
 
             modelBuilder.Entity("MentorProject", b =>
@@ -228,11 +231,24 @@ namespace evoNaplo.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("evoNaplo.Models.ProjectLink", b =>
+                {
+                    b.HasOne("evoNaplo.Models.Project", "Project")
+                        .WithMany("ProjectLink")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("evoNaplo.Models.Student", b =>
                 {
                     b.HasOne("evoNaplo.Models.Team", "Team")
                         .WithMany("Students")
-                        .HasForeignKey("TeamId");
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Team");
                 });
@@ -250,6 +266,8 @@ namespace evoNaplo.Migrations
 
             modelBuilder.Entity("evoNaplo.Models.Project", b =>
                 {
+                    b.Navigation("ProjectLink");
+
                     b.Navigation("Teams");
                 });
 

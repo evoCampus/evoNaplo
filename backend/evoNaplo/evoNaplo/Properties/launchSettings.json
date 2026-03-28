@@ -16,7 +16,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5152",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "EVONAPLO_DB_HOST": "(localdb)\\mssqllocaldb",
+        "EVONAPLO_DB_NAME": "evoNaploDb"
       }
     },
     "https": {
