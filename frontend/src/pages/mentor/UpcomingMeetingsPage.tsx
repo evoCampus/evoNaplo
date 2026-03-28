@@ -1,3 +1,5 @@
 export default function UpcomingMeetingsPage() {
-  return <>Upcoming Meetings</>;
+  return <>
+    UpcomingMeetingsPage
+  </>;
 }

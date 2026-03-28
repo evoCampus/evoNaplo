@@ -1,3 +1,5 @@
 export default function MentorsPage() {
-  return <></>;
+  return <>
+    MentorsPage
+  </>;
 }

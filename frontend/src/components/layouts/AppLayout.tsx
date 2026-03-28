@@ -1,11 +1,11 @@
 import { Outlet } from "react-router";
 import { Navbar } from "../Navbar";
-import { TooltipProvider } from "../ui/tooltip";
+import { TooltipProvider } from "ui-library/components/ui/tooltip";
 import { ThemeProvider } from "../ThemeProvider";
 
 export default function AppLayout() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider>
       <TooltipProvider>
         <div
           className="flex flex-col h-screen overflow-hidden"

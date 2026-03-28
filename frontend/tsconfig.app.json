@@ -11,6 +11,7 @@
     "paths": {
       "@/*": ["./*"],
       "src/*": ["./src/*"],
+      "ui-library/*": ["./ui-library/*"],
     },
 
     /* Bundler mode */
@@ -29,5 +30,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
   },
-  "include": ["src"],
+  "include": ["src", "ui-library/utils"],
 }

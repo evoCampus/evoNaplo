@@ -1,3 +1,5 @@
 export default function AuthPage() {
-  return <></>
+  return <>
+    AuthPage
+  </>
 }

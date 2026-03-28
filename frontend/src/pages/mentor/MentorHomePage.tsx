@@ -1,3 +1,5 @@
 export default function MentorHomePage() {
-  return <></>
+  return <>
+    MentorHomePage
+  </>;
 }

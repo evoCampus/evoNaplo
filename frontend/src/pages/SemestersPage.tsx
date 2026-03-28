@@ -1,3 +1,5 @@
 export default function SemestersPage() {
-  return <></>;
+  return <>
+    SemestersPage
+  </>;
 }

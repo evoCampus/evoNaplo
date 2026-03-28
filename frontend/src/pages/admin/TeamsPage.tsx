@@ -1,3 +1,5 @@
 export default function TeamsPage() {
-  return <></>;
+  return <>
+    TeamsPage
+  </>;
 }

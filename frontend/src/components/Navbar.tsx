@@ -1,5 +1,5 @@
 import { CircleUser } from "lucide-react";
-import { ModeToggle } from "./ModeToggle";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navbar() {
   return (
@@ -14,7 +14,7 @@ export function Navbar() {
           <a href="/" className="text-sm">
             <CircleUser className="w-6 h-6" />
           </a>
-          <ModeToggle />
+          <ThemeToggle />
         </div>
       </div>
     </nav>

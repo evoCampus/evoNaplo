@@ -1,3 +1,5 @@
 export default function StudentsPage() {
-  return <></>;
+  return <>
+    StudentsPage
+  </>;
 }

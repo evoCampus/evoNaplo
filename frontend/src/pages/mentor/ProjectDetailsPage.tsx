@@ -1,3 +1,5 @@
 export default function ProjectDetailsPage() {
-  return <></>;
+  return <>
+    ProjectDetailsPage
+  </>;
 }

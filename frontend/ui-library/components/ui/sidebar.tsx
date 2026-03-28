@@ -5,23 +5,23 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
 
 import { useIsMobile } from "src/hooks/use-mobile";
-import { cn } from "src/lib/utils";
-import { Button } from "src/components/ui/button";
-import { Input } from "src/components/ui/input";
-import { Separator } from "src/components/ui/separator";
+import { cn } from "ui-library/lib/utils";
+import { Button } from "ui-library/components/ui/button";
+import { Input } from "ui-library/components/ui/input";
+import { Separator } from "ui-library/components/ui/separator";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "src/components/ui/sheet";
-import { Skeleton } from "src/components/ui/skeleton";
+} from "ui-library/components/ui/sheet";
+import { Skeleton } from "ui-library/components/ui/skeleton";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "src/components/ui/tooltip";
+} from "ui-library/components/ui/tooltip";
 import { PanelLeftIcon } from "lucide-react";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
