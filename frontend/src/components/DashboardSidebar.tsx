@@ -1,7 +1,7 @@
 import type { SidebarProps } from "../types";
 import {
   Sidebar,
-} from "ui-library/components/ui/sidebar";
+} from "@evonaplo/ui/components/ui/sidebar";
 
 export function DashboardSidebar({ user }: SidebarProps) {
   return (

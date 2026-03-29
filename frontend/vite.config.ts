@@ -8,8 +8,20 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
-      src: path.resolve(__dirname, "./src"),
-      "ui-library": path.resolve(__dirname, "./ui-library"),
+      "react": path.resolve(__dirname, "node_modules/react"),
+      "react-dom": path.resolve(__dirname, "node_modules/react-dom"),
+      "react/jsx-runtime": path.resolve(__dirname, "node_modules/react/jsx-runtime"),
+
+      "src": path.resolve(__dirname, "./src"),
+      "@/lib": path.resolve(__dirname, "../ui-library/lib"),
+      "@/hooks": path.resolve(__dirname, "../ui-library/hooks"),
+      "@/components": path.resolve(__dirname, "../ui-library/components"),
+      "@evonaplo/ui": path.resolve(__dirname, "../ui-library"),
     },
   },
+  server: { 
+    fs: {
+      allow: [".."],
+    },
+  }
 });

@@ -9,9 +9,12 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
       "src/*": ["./src/*"],
-      "ui-library/*": ["./ui-library/*"],
+      "@/*": ["./src/*"], 
+      "@/lib/*": ["../ui-library/lib/*"],
+      "@/hooks/*": ["../ui-library/hooks/*"],
+      "@/components/*": ["../ui-library/components/*"],
+      "@evonaplo/ui/*": ["../ui-library/*"]
     },
 
     /* Bundler mode */
@@ -30,5 +33,9 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
   },
-  "include": ["src", "ui-library/utils"],
+  "include": [
+    "src", 
+    "../ui-library/**/*.ts", 
+    "../ui-library/**/*.tsx"
+  ],
 }

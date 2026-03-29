@@ -1,5 +1,5 @@
 import { Outlet } from "react-router";
-import { SidebarProvider } from "ui-library/components/ui/sidebar";
+import { SidebarProvider } from "@evonaplo/ui/components/ui/sidebar";
 import { DashboardSidebar } from "../DashboardSidebar";
 import { Navigate } from "react-router";
 import type { User } from "../../types";
