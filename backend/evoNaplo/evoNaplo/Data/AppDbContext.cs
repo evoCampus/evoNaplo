@@ -10,6 +10,7 @@ namespace evoNaplo.Data
         public DbSet<Mentor> Mentors { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Student> Students { get; set; }
-        public DbSet<ProjectLink> ProjectLink { get; set; }
+        public DbSet<ProjectLink> ProjectLinks { get; set; }
+        public DbSet<AttendanceSheet> AttendanceSheets { get; set; }
     }
 }

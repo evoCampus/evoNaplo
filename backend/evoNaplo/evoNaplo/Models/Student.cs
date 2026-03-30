@@ -3,9 +3,10 @@
 public class Student
     {
     public string Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
+    public string Name { get; set; }
+    public string Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public string UniversityName { get; set; }
     public string? UniversityProgramme { get; set; }
     public int? CurrentSemester { get; set; }
     public bool IsFirstEvoCampusSemester { get; set; }

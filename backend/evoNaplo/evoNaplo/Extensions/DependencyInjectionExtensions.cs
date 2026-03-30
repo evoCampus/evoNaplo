@@ -16,24 +16,24 @@ public static class DependencyInjectionExtensions
 
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var Host = configuration["EVONAPLO_DB_HOST"];
-        var DbName = configuration["EVONAPLO_DB_NAME"];
-        var UserName = configuration["EVONAPLO_DB_USER"];
-        var Pass = configuration["EVONAPLO_DB_PASS"];
+        var host = configuration["EVONAPLO_DB_HOST"];
+        var dbName = configuration["EVONAPLO_DB_NAME"];
+        var userName = configuration["EVONAPLO_DB_USER"];
+        var pass = configuration["EVONAPLO_DB_PASS"];
 
         string ConnectionString;
-        if (string.IsNullOrEmpty(Host))
+        if (string.IsNullOrEmpty(host))
         {
-            Host = "(localdb)\\mssqllocaldb";
-            DbName = "evoNaploDb";
+            host = "(localdb)\\mssqllocaldb";
+            dbName = "evoNaploDb";
         }
 
-        if (!string.IsNullOrEmpty(UserName))
+        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(pass))
         {
-            ConnectionString = $"Server={Host};Database={DbName};User Id={UserName};Password={Pass};TrustServerCertificate=True;";
+            ConnectionString = $"Server={host};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
         }
         else {
-            ConnectionString = $"Server={Host};Database={DbName};Trusted_Connection=True;TrustServerCertificate=True;";
+            ConnectionString = $"Server={host};Database={dbName};Trusted_Connection=True;TrustServerCertificate=True;";
         }
 
         services.AddDbContext<AppDbContext>(options =>

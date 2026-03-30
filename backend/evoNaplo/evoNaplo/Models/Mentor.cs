@@ -3,10 +3,13 @@
     public class Mentor
     {
         public string Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string Name { get; set; }
+        public string Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public ICollection<Team> Teams { get; set; } = new List<Team>();
-        public ICollection<Project> Projects { get; set; } = new List<Project>();
+        public int TeamCount { get; set; }
+        public int StudentCount { get; set; }
+        public int ProjecCount { get; set; }
+        public ICollection<Team> Teams { get; set; }
+        public ICollection<Project> Projects { get; set; }
     }
 }
