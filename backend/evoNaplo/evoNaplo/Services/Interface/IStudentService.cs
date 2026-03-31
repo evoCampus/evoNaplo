@@ -1,6 +1,6 @@
-﻿using evoNaplo.ServiceMappa.TesztDTO;
+﻿using evoNaplo.Services;
 
-namespace evoNaplo.ServiceMappa.Interface
+namespace evoNaplo.Services.Interface
 {
     public interface IStudentService
     {

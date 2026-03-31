@@ -1,8 +1,8 @@
-using evoNaplo.ServiceMappa.TesztDTO;
+using evoNaplo.Services;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace evoNaplo.ServiceMappa.Services
+namespace evoNaplo.Services.Services
 {
     public class TeamService : Interface.ITeamService
     {

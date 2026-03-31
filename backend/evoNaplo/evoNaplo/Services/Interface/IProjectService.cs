@@ -1,7 +1,7 @@
-using evoNaplo.ServiceMappa.TesztDTO;
+using evoNaplo.Services;
 using System.Collections.Generic;
 
-namespace evoNaplo.ServiceMappa.Interface
+namespace evoNaplo.Services.Interface
 {
     public interface IProjectService
     {
