@@ -1,44 +1,44 @@
-﻿using evoNaplo.ServiceMappa.TesztDTO;
+﻿using evoNaplo.Services;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace evoNaplo.ServiceMappa.Services
+namespace evoNaplo.Services.Services
 {
     public class StudentService : Interface.IStudentService
     {
-        // STATIKUS adattagok: Ezek a memóriában maradnak a program leállásáig.
+    
         private static readonly List<Student> _students = new List<Student>();
 
 
-        // Visszaadja a listában lévő összes entitást
+      
         public List<Student> GetAllStudents()
         {
             return _students;
         }
 
-        // Keresés ID alapján. Ha nem találja, null értékkel tér vissza.
+       
         public Student GetStudentById(string id)
         {
             return _students.FirstOrDefault(s => s.StudID == id);
         }
 
-        // Hozzáadás a listához
+       
         public void AddStudent(Student student)
         {
             if (string.IsNullOrEmpty(student.StudID)) student.StudID = System.Guid.NewGuid().ToString();
             _students.Add(student);
         }
 
-        // Módosítás
+      
 
 
 
 
-        // Részleges frissítés: csak a megadott (nem null) mezőket frissítjük
+      
         public void UpdateStudentFields(string id, Student updatedFields)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
-            if (existingStudent == null || updatedFields == null)
+            if (existingStudent is null || updatedFields is null)
             {
                 return;
             }
@@ -68,13 +68,13 @@ namespace evoNaplo.ServiceMappa.Services
                 existingStudent.PersonalGoals = updatedFields.PersonalGoals;
             }
 
-            // evoCampus fields
+           
             if (updatedFields.ScholarshipDuration != 0)
             {
                 existingStudent.ScholarshipDuration = updatedFields.ScholarshipDuration;
             }
 
-            // Work duration
+           
             if (updatedFields.WorkDuration != null)
             {
                 existingStudent.WorkDuration = updatedFields.WorkDuration;
@@ -84,8 +84,7 @@ namespace evoNaplo.ServiceMappa.Services
             {
                 existingStudent.StudAssignedTeam = updatedFields.StudAssignedTeam;
             }
-            // Boolean mezők esetén külön metódusokat használunk, mivel a bool nem nullable a modellben
-
+            
             if (updatedFields.StudAssignedProject != null)
             {
 
@@ -93,12 +92,10 @@ namespace evoNaplo.ServiceMappa.Services
             }
 
         }
-
-        // Külön metódusok a boolean mezők frissítésére
         public void UpdateStudentIsFirstSemester(string id, bool isFirstSemester)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
-            if (existingStudent == null) return;
+            if (existingStudent is null) return;
 
             existingStudent.IsFirstSemester = isFirstSemester;
         }
@@ -106,16 +103,16 @@ namespace evoNaplo.ServiceMappa.Services
         public void UpdateStudentStayWithCurrentTeam(string id, bool stayWithCurrentTeam)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
-            if (existingStudent == null) return;
+            if (existingStudent is null) return;
 
             existingStudent.StayWithCurrentTeam = stayWithCurrentTeam;
         }
 
-        // Single-field update methods
+       
         public void UpdateStudentName(string id, string name)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
-            if (existingStudent == null) return;
+            if (existingStudent is null) return;
 
             existingStudent.StudName = name;
         }
@@ -123,7 +120,7 @@ namespace evoNaplo.ServiceMappa.Services
         public void UpdateStudentEmail(string id, string email)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
-            if (existingStudent == null) return;
+            if (existingStudent is null) return;
 
             existingStudent.StudEmail = email;
         }
@@ -152,7 +149,7 @@ namespace evoNaplo.ServiceMappa.Services
             existingStudent.PersonalGoals = personalGoals;
         }
 
-        // evoCampus related
+        
         public void UpdateStudentAppliedForCampus(string id, bool appliedForCampus)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
@@ -178,7 +175,7 @@ namespace evoNaplo.ServiceMappa.Services
         }
 
        
-        // Internship related
+       
         public void UpdateStudentInternshipApplied(string id, bool internshipApplied)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
@@ -211,7 +208,7 @@ namespace evoNaplo.ServiceMappa.Services
             existingStudent.WorkDuration = workDuration;
         }
 
-        // Assignment related
+        
         public void UpdateStudentAssignedTeam(string id, string assignedTeam)
         {
             var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
@@ -227,14 +224,37 @@ namespace evoNaplo.ServiceMappa.Services
 
             existingStudent.StudAssignedProject = assignedProject;
         }
+        
+        public void UpdateStudent(string id, Student updatedStudent)
+        {
+            var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
+            if (existingStudent is null || updatedStudent is null) return;
 
-        // Eltávolítás a listából
+            existingStudent.StudName = updatedStudent.StudName;
+            existingStudent.StudEmail = updatedStudent.StudEmail;
+            existingStudent.StudPhoneNumber = updatedStudent.StudPhoneNumber;
+            existingStudent.CurrentStudies = updatedStudent.CurrentStudies;
+            existingStudent.IsFirstSemester = updatedStudent.IsFirstSemester;
+            existingStudent.PersonalGoals = updatedStudent.PersonalGoals;
+            existingStudent.AppliedForCampus = updatedStudent.AppliedForCampus;
+            existingStudent.ActiveScholarship = updatedStudent.ActiveScholarship;
+            existingStudent.ScholarshipDuration = updatedStudent.ScholarshipDuration;
+            existingStudent.StayWithCurrentTeam = updatedStudent.StayWithCurrentTeam;
+            existingStudent.StudAssignedTeam = updatedStudent.StudAssignedTeam;
+            existingStudent.StudAssignedProject = updatedStudent.StudAssignedProject;
+            existingStudent.InternshipApplied = updatedStudent.InternshipApplied;
+            existingStudent.IsAnIntern = updatedStudent.IsAnIntern;
+            existingStudent.doeswork = updatedStudent.doeswork;
+            existingStudent.WorkDuration = updatedStudent.WorkDuration;
+        }
+
+        
         public void DeleteStudent(string id)
         {
-            // Megkeressük az elemet
+            
             var studentToRemove = _students.FirstOrDefault(s => s.StudID == id);
 
-            // Ha létezik, kitöröljük
+            
             if (studentToRemove != null)
             {
                 _students.Remove(studentToRemove);
