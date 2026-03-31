@@ -9,9 +9,6 @@ namespace evoNaplo.Services.Interface
         Mentor GetMentorById(string id);
         void AddMentor(Mentor mentor);
        
-        void UpdateMentorFields(string id, Mentor updatedFields);
-
-        
         void UpdateMentor(string id, Mentor updatedMentor);
 
         void DeleteMentor(string id);

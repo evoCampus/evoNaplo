@@ -32,23 +32,11 @@ namespace evoNaplo.Services.Services
             var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
             if (existing is null || updatedMentor is null) return;
 
-            existing.MentorName = updatedMentor.MentorName;
-            existing.MentorEmail = updatedMentor.MentorEmail;
-            existing.MentorPhoneNumber = updatedMentor.MentorPhoneNumber;
-            existing.MentorAssignedTeam = updatedMentor.MentorAssignedTeam;
-            existing.MentorAssignedProject = updatedMentor.MentorAssignedProject;
-        }
-
-        public void UpdateMentorFields(string id, Mentor updatedFields)
-        {
-            var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
-            if (existing is null || updatedFields is null) return;
-
-            if (updatedFields.MentorName != null) existing.MentorName = updatedFields.MentorName;
-            if (updatedFields.MentorEmail != null) existing.MentorEmail = updatedFields.MentorEmail;
-            if (updatedFields.MentorPhoneNumber != null) existing.MentorPhoneNumber = updatedFields.MentorPhoneNumber;
-            if (updatedFields.MentorAssignedTeam != null) existing.MentorAssignedTeam = updatedFields.MentorAssignedTeam;
-            if (updatedFields.MentorAssignedProject != null) existing.MentorAssignedProject = updatedFields.MentorAssignedProject;
+            if (updatedMentor.MentorName is not null) existing.MentorName = updatedMentor.MentorName;
+            if (updatedMentor.MentorEmail is not null) existing.MentorEmail = updatedMentor.MentorEmail;
+            if (updatedMentor.MentorPhoneNumber is not null) existing.MentorPhoneNumber = updatedMentor.MentorPhoneNumber;
+            if (updatedMentor.MentorAssignedTeam is not null) existing.MentorAssignedTeam = updatedMentor.MentorAssignedTeam;
+            if (updatedMentor.MentorAssignedProject is not null) existing.MentorAssignedProject = updatedMentor.MentorAssignedProject;
         }
 
         

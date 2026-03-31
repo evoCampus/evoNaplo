@@ -30,17 +30,8 @@ namespace evoNaplo.Services.Services
             var existing = _teams.FirstOrDefault(t => t.TeamID == id);
             if (existing is null || updatedTeam is null) return;
 
-            existing.TeamAssignedMentors = updatedTeam.TeamAssignedMentors;
-            existing.TeamAssignedStudents = updatedTeam.TeamAssignedStudents;
-        }
-
-        public void UpdateTeamFields(string id, Team updatedFields)
-        {
-            var existing = _teams.FirstOrDefault(t => t.TeamID == id);
-            if (existing is null || updatedFields is null) return;
-
-            if (updatedFields.TeamAssignedMentors != null) existing.TeamAssignedMentors = updatedFields.TeamAssignedMentors;
-            if (updatedFields.TeamAssignedStudents != null) existing.TeamAssignedStudents = updatedFields.TeamAssignedStudents;
+            if (updatedTeam.TeamAssignedMentors is not null) existing.TeamAssignedMentors = updatedTeam.TeamAssignedMentors;
+            if (updatedTeam.TeamAssignedStudents is not null) existing.TeamAssignedStudents = updatedTeam.TeamAssignedStudents;
         }
 
         

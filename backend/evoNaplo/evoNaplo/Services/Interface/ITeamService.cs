@@ -9,7 +9,6 @@ namespace evoNaplo.Services.Interface
         Team GetTeamById(string id);
         void AddTeam(Team team);
         void UpdateTeam(string id, Team updatedTeam);
-        void UpdateTeamFields(string id, Team updatedFields);
         void DeleteTeam(string id);
     }
 }

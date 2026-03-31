@@ -33,26 +33,12 @@ namespace evoNaplo.Services.Services
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
             if (existing is null || updatedProject is null) return;
 
-            existing.ProjectName = updatedProject.ProjectName;
-            existing.ProjectDescription = updatedProject.ProjectDescription;
-            existing.ProjectLinks = updatedProject.ProjectLinks;
-            existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
-            existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
+            if (updatedProject.ProjectName is not null) existing.ProjectName = updatedProject.ProjectName;
+            if (updatedProject.ProjectDescription is not null) existing.ProjectDescription = updatedProject.ProjectDescription;
+            if (updatedProject.ProjectLinks is not null) existing.ProjectLinks = updatedProject.ProjectLinks;
+            if (updatedProject.ProjectAssignedMentors is not null) existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
+            if (updatedProject.ProjectAssignedStudents is not null) existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
         }
-
-        public void UpdateProjectFields(string id, Project updatedFields)
-        {
-            var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
-            if (existing is null || updatedFields is null) return;
-
-            if (updatedFields.ProjectName != null) existing.ProjectName = updatedFields.ProjectName;
-            if (updatedFields.ProjectDescription != null) existing.ProjectDescription = updatedFields.ProjectDescription;
-            if (updatedFields.ProjectLinks != null) existing.ProjectLinks = updatedFields.ProjectLinks;
-            if (updatedFields.ProjectAssignedMentors != null) existing.ProjectAssignedMentors = updatedFields.ProjectAssignedMentors;
-            if (updatedFields.ProjectAssignedStudents != null) existing.ProjectAssignedStudents = updatedFields.ProjectAssignedStudents;
-        }
-
-       
 
         public void DeleteProject(string id)
         {
