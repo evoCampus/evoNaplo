@@ -18,26 +18,28 @@ public static class DependencyInjectionExtensions
     {
         var host = configuration["EVONAPLO_DB_HOST"];
         var dbName = configuration["EVONAPLO_DB_NAME"];
+        var port = configuration["EVONAPLO_DB_PORT"];
         var userName = configuration["EVONAPLO_DB_USER"];
         var pass = configuration["EVONAPLO_DB_PASS"];
 
-        string ConnectionString;
-        if (string.IsNullOrEmpty(host))
+        string connectionString;
+
+        if (string.IsNullOrEmpty(host)) throw new Exception("Host was not found!");
+        if (string.IsNullOrEmpty(dbName)) throw new Exception("Database name was not found!");
+        if (string.IsNullOrEmpty(userName)) throw new Exception("User was not found!");
+        if (string.IsNullOrEmpty(pass)) throw new Exception("Password was not found!");
+
+
+        if (string.IsNullOrEmpty(port))
         {
-            host = "(localdb)\\mssqllocaldb";
-            dbName = "evoNaploDb";
+            port = "1433";
         }
 
-        if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(pass))
-        {
-            ConnectionString = $"Server={host};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
-        }
-        else {
-            ConnectionString = $"Server={host};Database={dbName};Trusted_Connection=True;TrustServerCertificate=True;";
-        }
+            connectionString = $"Server={host};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
+
 
         services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(ConnectionString));
+                options.UseSqlServer(connectionString));
 
         return services;
     }
