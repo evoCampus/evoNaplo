@@ -6,13 +6,12 @@ using evoNaplo.DTO;
 public class TeamsController : ControllerBase
 {
     private static List<TeamDTO> _teams = new List<TeamDTO>();
-    private static long _nextId = 1;
 
     /// <summary>
     /// Retrieves all teams as data transfer objects.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of team
-    /// data transfer objects. The collection is empty if no teams are available.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
+    /// cref="TeamDTO"/> objects representing all teams. The collection is empty if no teams are available.</returns>
     [HttpGet]
     public Task<IEnumerable<TeamDTO>> GetTeams()
     {
@@ -22,64 +21,59 @@ public class TeamsController : ControllerBase
     /// <summary>
     /// Retrieves the team with the specified identifier.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to retrieve.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an <see
-    /// cref="ActionResult{TeamDTO}"/> with the team data if found; otherwise, a NotFound result.</returns>
+    /// <param name="id">The unique identifier of the team to retrieve. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="TeamDTO"/> representing
+    /// the requested team.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if a team with the specified <paramref name="id"/> does not exist.</exception>
     [HttpGet("{id}")]
-    public Task<ActionResult<TeamDTO>> GetTeam(long id)
+    public Task<TeamDTO> GetTeam(string id)
     {
         var team = _teams.FirstOrDefault(s => s.Id == id);
         if (team == null)
-            return Task.FromResult<ActionResult<TeamDTO>>(NotFound());
-        return Task.FromResult<ActionResult<TeamDTO>>(Ok(team));
+            throw new KeyNotFoundException($"Team with id {id} not found.");
+        return Task.FromResult<TeamDTO>(team);
     }
 
     /// <summary>
     /// Creates a new team and adds it to the collection.
     /// </summary>
-    /// <param name="team">The team data to create. Must not be null. The team identifier is assigned by the server.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an ActionResult that includes the
-    /// created team data and a location header for retrieving the team by its identifier.</returns>
+    /// <param name="team">The team to add. Must not be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the created team.</returns>
     [HttpPost]
-    public Task<ActionResult<TeamDTO>> CreateTeam(TeamDTO team)
+    public Task<TeamDTO> CreateTeam(TeamDTO team)
     {
-        team.Id = _nextId++;
         _teams.Add(team);
-        return Task.FromResult<ActionResult<TeamDTO>>(CreatedAtAction(nameof(GetTeam), new { id = team.Id }, team));
+        return Task.FromResult<TeamDTO>(team);
     }
 
     /// <summary>
     /// Updates the details of an existing team with the specified identifier.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to update.</param>
-    /// <param name="updatedTeam">An object containing the updated team information to apply.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> that
-    /// is <see cref="NotFoundResult"/> if the team does not exist, or <see cref="NoContentResult"/> if the update is
-    /// successful.</returns>
+    /// <param name="id">The unique identifier of the team to update. Cannot be null or empty.</param>
+    /// <param name="updatedTeam">An object containing the updated team information. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update
+    /// is successful; otherwise, an HTTP 404 response if the team is not found.</returns>
     [HttpPut("{id}")]
-    public Task<IActionResult> UpdateTeam(long id, TeamDTO updatedTeam)
+    public Task UpdateTeam(string id, TeamDTO updatedTeam)
     {
         var index = _teams.FindIndex(s => s.Id == id);
         if (index == -1)
-            return Task.FromResult<IActionResult>(NotFound());
+            return Task.FromResult(NotFound());
         _teams[index] = updatedTeam;
-        return Task.FromResult<IActionResult>(NoContent());
+        return Task.FromResult(NoContent());
     }
 
     /// <summary>
     /// Deletes the team with the specified identifier.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to delete.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/> that
-    /// is <see cref="NotFoundResult"/> if the team does not exist; otherwise, <see cref="NoContentResult"/> if the
-    /// deletion is successful.</returns>
+    /// <param name="id">The unique identifier of the team to delete. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous delete operation. The task result contains an HTTP 204 No Content
+    /// response if the deletion is successful.</returns>
     [HttpDelete("{id}")]
-    public Task<IActionResult> DeleteTeam(long id)
+    public Task DeleteTeam(string id)
     {
         var team = _teams.FirstOrDefault(s => s.Id == id);
-        if (team == null)
-            return Task.FromResult<IActionResult>(NotFound());
         _teams.Remove(team);
-        return Task.FromResult<IActionResult>(NoContent());
+        return Task.FromResult(NoContent());
     }
 }

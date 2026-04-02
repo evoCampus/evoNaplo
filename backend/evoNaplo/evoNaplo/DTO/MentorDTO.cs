@@ -7,7 +7,7 @@ public class MentorDTO
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public string? MentorProfile { get; set; }
-    public List<string>? Teams { get; set; }
-    public List<string>? Projects { get; set; }
+    public IEnumerable<string>? Teams { get; set; }
+    public IEnumerable<string>? Projects { get; set; }
 
 }
