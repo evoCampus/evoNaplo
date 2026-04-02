@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using evoNaplo.Models;
+using evoNaplo.DTO;
 using ClosedXML.Excel;
 
 namespace evoNaplo.Services;
@@ -29,11 +29,12 @@ public class ExcelImportService : IExcelImportService
                     currentApplication.Timestamp = row.Cell(1).Value.ToString();
                     currentApplication.Name = row.Cell(2).Value.ToString();
                     currentApplication.Email = row.Cell(3).Value.ToString();
-                    currentApplication.Phone = row.Cell(4).Value.ToString();
+                    currentApplication.PhoneNumber = row.Cell(4).Value.ToString();
                     currentApplication.Major = row.Cell(5).Value.ToString();
                     currentApplication.IsFirstTime = row.Cell(6).Value.ToString();
                     currentApplication.Goals = row.Cell(7).Value.ToString();
-                    currentApplication.OtherCommets = row.Cell(8).Value.ToString();
+                    //currentApplication.StayInTeam = row.Cell(8).Value.ToString();
+                    currentApplication.OtherComments = row.Cell(8).Value.ToString();
                     
                     applications.Add(currentApplication);
                 }
