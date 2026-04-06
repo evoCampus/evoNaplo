@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace evoNaplo.Services.Interface
 {
-    public interface IProjectService
+    internal interface IProjectService
     {
-        List<Project> GetAllProjects();
+        IEnumerable<Project> GetAllProjects();
         Project GetProjectById(string id);
         void AddProject(Project project);
         void UpdateProject(string id, Project updatedProject);

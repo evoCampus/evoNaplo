@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace evoNaplo.Services.Services
 {
-    public class TeamService : Interface.ITeamService
+    internal class TeamService : Interface.ITeamService
     {
         private static readonly List<Team> _teams = new List<Team>();
 
-        public List<Team> GetAllTeams()
+        public IEnumerable<Team> GetAllTeams()
         {
             return _teams;
         }
@@ -43,3 +43,5 @@ namespace evoNaplo.Services.Services
         }
     }
 }
+
+

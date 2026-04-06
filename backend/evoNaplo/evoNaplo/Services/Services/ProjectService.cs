@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace evoNaplo.Services.Services
 {
-    public class ProjectService : Interface.IProjectService
+    internal class ProjectService : Interface.IProjectService
     {
         private static readonly List<Project> _projects = new List<Project>();
 
-        public List<Project> GetAllProjects()
+        public IEnumerable<Project> GetAllProjects()
         {
             return _projects;
         }
@@ -26,8 +26,6 @@ namespace evoNaplo.Services.Services
             }
             _projects.Add(project);
         }
-
-       
         public void UpdateProject(string id, Project updatedProject)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
@@ -39,7 +37,6 @@ namespace evoNaplo.Services.Services
             if (updatedProject.ProjectAssignedMentors is not null) existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
             if (updatedProject.ProjectAssignedStudents is not null) existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
         }
-
         public void DeleteProject(string id)
         {
             var existing = _projects.FirstOrDefault(p => p.ProjectID == id);

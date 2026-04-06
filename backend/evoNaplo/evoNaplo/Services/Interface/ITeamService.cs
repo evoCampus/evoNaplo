@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace evoNaplo.Services.Interface
 {
-    public interface ITeamService
+    internal interface ITeamService
     {
-        List<Team> GetAllTeams();
+        IEnumerable<Team> GetAllTeams();
         Team GetTeamById(string id);
         void AddTeam(Team team);
         void UpdateTeam(string id, Team updatedTeam);

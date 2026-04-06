@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace evoNaplo.Services.Services
 {
-    public class MentorService : Interface.IMentorService
+    internal class MentorService : Interface.IMentorService
     {
         private static readonly List<Mentor> _mentors = new List<Mentor>();
 
-        public List<Mentor> GetAllMentors()
+        public IEnumerable<Mentor> GetAllMentors()
         {
             return _mentors;
         }
@@ -38,8 +38,6 @@ namespace evoNaplo.Services.Services
             if (updatedMentor.MentorAssignedTeam is not null) existing.MentorAssignedTeam = updatedMentor.MentorAssignedTeam;
             if (updatedMentor.MentorAssignedProject is not null) existing.MentorAssignedProject = updatedMentor.MentorAssignedProject;
         }
-
-        
 
         public void DeleteMentor(string id)
         {

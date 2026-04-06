@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace evoNaplo.Services.Interface
 {
-    public interface IMentorService
+    internal interface IMentorService
     {
-        List<Mentor> GetAllMentors();
+        IEnumerable<Mentor> GetAllMentors();
         Mentor GetMentorById(string id);
         void AddMentor(Mentor mentor);
        

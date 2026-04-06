@@ -4,14 +4,14 @@ using System.Linq;
 
 namespace evoNaplo.Services.Services
 {
-    public class StudentService : Interface.IStudentService
+    internal class StudentService : Interface.IStudentService
     {
     
         private static readonly List<Student> _students = new List<Student>();
 
 
       
-        public List<Student> GetAllStudents()
+        public IEnumerable<Student> GetAllStudents()
         {
             return _students;
         }

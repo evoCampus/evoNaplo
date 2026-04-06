@@ -2,13 +2,13 @@
 
 namespace evoNaplo.Services.Interface
 {
-    public interface IStudentService
+    internal interface IStudentService
     {
        
 
             
 
-            List<Student> GetAllStudents();
+            IEnumerable<Student> GetAllStudents();
             Student GetStudentById(string id);
             void AddStudent(Student student);
             void UpdateStudent(string id, Student updatedStudent);
