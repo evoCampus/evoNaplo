@@ -1,13 +1,12 @@
 ﻿using evoNaplo.Services;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace evoNaplo.Services.Interface
+
+namespace evoNaplo.Services
 {
     internal interface IStudentService
     {
-       
-
-            
-
             IEnumerable<Student> GetAllStudents();
             Student GetStudentById(string id);
             void AddStudent(Student student);

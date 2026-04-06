@@ -1,13 +1,14 @@
+using evoNaplo.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddApplicationServices();
+builder.Services.AddDatabaseServices();
+
 
 builder.Services.AddControllers();
-// Register service
-builder.Services.AddScoped<evoNaplo.Services.Interface.IStudentService, evoNaplo.Services.Services.StudentService>();
-builder.Services.AddScoped<evoNaplo.Services.Interface.IMentorService, evoNaplo.Services.Services.MentorService>();
-builder.Services.AddScoped<evoNaplo.Services.Interface.IProjectService, evoNaplo.Services.Services.ProjectService>();
-builder.Services.AddScoped<evoNaplo.Services.Interface.ITeamService, evoNaplo.Services.Services.TeamService>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

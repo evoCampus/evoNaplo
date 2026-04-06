@@ -1,10 +1,9 @@
-using evoNaplo.Services;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace evoNaplo.Services.Services
+using evoNaplo.Services;
+namespace evoNaplo.Services
 {
-    internal class TeamService : Interface.ITeamService
+    internal class TeamService : ITeamService
     {
         private static readonly List<Team> _teams = new List<Team>();
 

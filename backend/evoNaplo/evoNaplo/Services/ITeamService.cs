@@ -1,7 +1,7 @@
-using evoNaplo.Services;
 using System.Collections.Generic;
-
-namespace evoNaplo.Services.Interface
+using System.Linq;
+using evoNaplo.Services;
+namespace evoNaplo.Services
 {
     internal interface ITeamService
     {

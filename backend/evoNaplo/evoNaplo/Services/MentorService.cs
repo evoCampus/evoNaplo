@@ -1,12 +1,11 @@
-﻿using evoNaplo.Services;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using evoNaplo.Services;
 
 
-
-namespace evoNaplo.Services.Services
+namespace evoNaplo.Services
 {
-    internal class MentorService : Interface.IMentorService
+    internal class MentorService : IMentorService
     {
         private static readonly List<Mentor> _mentors = new List<Mentor>();
 
@@ -15,7 +14,7 @@ namespace evoNaplo.Services.Services
             return _mentors;
         }
 
-        public Mentor GetMentorById(string id)
+        public Mentor? GetMentorById(string id)
         {
             return _mentors.FirstOrDefault(m => m.MentorId == id);
         }

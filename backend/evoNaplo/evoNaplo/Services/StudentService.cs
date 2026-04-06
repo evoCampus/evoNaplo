@@ -1,10 +1,9 @@
-﻿using evoNaplo.Services;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
-namespace evoNaplo.Services.Services
+using evoNaplo.Services;
+namespace evoNaplo.Services
 {
-    internal class StudentService : Interface.IStudentService
+    internal class StudentService : IStudentService
     {
     
         private static readonly List<Student> _students = new List<Student>();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using evoNaplo.Services;
 
 namespace evoNaplo.Controllers
 {
@@ -6,6 +7,15 @@ namespace evoNaplo.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
+        // ExampleService test
+        private readonly IExampleService _exampleService;
+
+        [HttpGet("ExampleServiceTest")]
+        public IActionResult ExampleServiceTest()
+        {
+            return Ok(_exampleService.GetMessage());
+        }
+        
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -13,9 +23,10 @@ namespace evoNaplo.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IExampleService exampleService)
         {
             _logger = logger;
+            _exampleService = exampleService;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
