@@ -16,11 +16,11 @@ public static class DependencyInjectionExtensions
 
     public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var host = configuration["EVONAPLO_DB_HOST"];
-        var dbName = configuration["EVONAPLO_DB_NAME"];
-        var port = configuration["EVONAPLO_DB_PORT"];
-        var userName = configuration["EVONAPLO_DB_USER"];
-        var pass = configuration["EVONAPLO_DB_PASS"];
+        var host = configuration["EVONAPLO_DATABASE_HOST"];
+        var dbName = configuration["EVONAPLO_DATABASE_PORT"];
+        var port = configuration["EVONAPLO_DATABASE_NAME"];
+        var userName = configuration["EVONAPLO_DATABASE_USER"];
+        var pass = configuration["EVONAPLO_DATABASE_PASS"];
 
         string connectionString;
 
@@ -35,7 +35,7 @@ public static class DependencyInjectionExtensions
             port = "1433";
         }
 
-            connectionString = $"Server={host};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
+            connectionString = $"Server={host},{port};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
 
 
         services.AddDbContext<AppDbContext>(options =>
