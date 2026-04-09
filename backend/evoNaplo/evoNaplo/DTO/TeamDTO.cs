@@ -7,5 +7,6 @@ public class TeamDTO
     public IEnumerable<string>? Students { get; set; }
     public DayOfWeek WeeklyMeetingDay { get; set; }
     public TimeSpan WeeklyMeetingTime { get; set; }
+    public IEnumerable<IEnumerable<string>>? Attendance {  get; set; }
 
 }
