@@ -1,0 +1,19 @@
+services:
+  frontend:
+    build: ../frontend
+
+  backend:
+    build: ../backend/evoNaplo/evoNaplo/
+
+  nginx-proxy:
+    build: ../nginx
+    ports:
+      - "80:80"
+    environment:
+      - FRONTEND_URL=http://frontend:5173
+      - BACKEND_URL=http://backend:7210
+      - AUTH_USER=sa
+      - AUTH_PASSWORD=Admin123!
+    depends_on:
+      - frontend
+      - backend
