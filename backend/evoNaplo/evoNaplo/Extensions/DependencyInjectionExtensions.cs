@@ -29,14 +29,12 @@ public static class DependencyInjectionExtensions
         if (string.IsNullOrEmpty(userName)) throw new Exception("User was not found!");
         if (string.IsNullOrEmpty(pass)) throw new Exception("Password was not found!");
 
-
         if (string.IsNullOrEmpty(port))
         {
             port = "1433";
         }
 
-            connectionString = $"Server={host},{port};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
-
+        connectionString = $"Server={host},{port};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
 
         services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(connectionString));
