@@ -11,6 +11,10 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
+        services.AddScoped<IMentorService, MentorService>();
+        services.AddScoped<ITeamService, TeamService>();
+        services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IStudentService, StudentService>();
         return services;
     }
 
