@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using evoNaplo.Services;
 
 namespace evoNaplo.Controllers
