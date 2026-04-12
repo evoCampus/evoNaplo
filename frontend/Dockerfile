@@ -1,10 +1,10 @@
 FROM node:24.14.0-alpine3.23 AS builder
 WORKDIR /source
 COPY . .
-RUN npm install
+RUN npm ci
 RUN npm run build
 
-FROM nginx:1.29.6-alpine3.23
+FROM nginx:1.29.6-alpine3.23 AS runner
 WORKDIR /app
 COPY --from=builder /source/dist /app
 COPY nginx.conf /etc/nginx/conf.d/default.conf
