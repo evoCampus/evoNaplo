@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using evoNaplo.Services;
+using evoNaplo.Models;
 namespace evoNaplo.Services
 {
     internal class ProjectService : IProjectService
@@ -14,37 +15,37 @@ namespace evoNaplo.Services
 
         public Project GetProjectById(string id)
         {
-            return _projects.FirstOrDefault(p => p.ProjectID == id);
+            return _projects.FirstOrDefault(p => p.Id == id);
         }
 
         public void AddProject(Project project)
         {
-            if (string.IsNullOrEmpty(project.ProjectID))
+            if (string.IsNullOrEmpty(project.Id))
             {
-                project.ProjectID = System.Guid.NewGuid().ToString();
+                project.Id = System.Guid.NewGuid().ToString();
             }
             _projects.Add(project);
         }
         public void UpdateProject(string id, Project updatedProject)
         {
-            var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
+            var existing = _projects.FirstOrDefault(p => p.Id == id);
             if (existing is null || updatedProject is null) return;
 
-            if (updatedProject.ProjectName is not null) existing.ProjectName = updatedProject.ProjectName;
-            if (updatedProject.ProjectDescription is not null) existing.ProjectDescription = updatedProject.ProjectDescription;
+            if (updatedProject.Name is not null) existing.Name = updatedProject.Name;
+            if (updatedProject.ShortDescription is not null) existing.ShortDescription = updatedProject.ShortDescription;
             if (updatedProject.ProjectLinks is not null) existing.ProjectLinks = updatedProject.ProjectLinks;
-            if (updatedProject.ProjectAssignedMentors is not null) existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
-            if (updatedProject.ProjectAssignedStudents is not null) existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
+            //If needed later or used in the DB-s can be used again otherwise, if not needed , can be removed from the model and the service
+            //if (updatedProject.ProjectAssignedMentors is not null) existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
+            //if (updatedProject.ProjectAssignedStudents is not null) existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
             if (updatedProject.Teams is not null) 
             {
-                // Replace the project's teams with the provided collection
                 existing.Teams = updatedProject.Teams;
             }
         }
 
         public void AddTeamsToProject(string projectId, IEnumerable<Team> teams)
         {
-            var existing = _projects.FirstOrDefault(p => p.ProjectID == projectId);
+            var existing = _projects.FirstOrDefault(p => p.Id == projectId);
             if (existing is null || teams is null) return;
 
             if (existing.Teams == null) existing.Teams = new List<Team>();
@@ -53,7 +54,7 @@ namespace evoNaplo.Services
             {
                 if (team is null) continue;
                 // avoid duplicates by Team Id
-                if (!existing.Teams.Any(t => t.TeamID == team.TeamID))
+                if (!existing.Teams.Any(t => t.Id == team.Id))
                 {
                     existing.Teams.Add(team);
                 }
@@ -62,15 +63,15 @@ namespace evoNaplo.Services
 
         public void RemoveTeamsFromProject(string projectId, IEnumerable<Team> teams)
         {
-            var existing = _projects.FirstOrDefault(p => p.ProjectID == projectId);
+            var existing = _projects.FirstOrDefault(p => p.Id == projectId);
             if (existing is null || teams is null || existing.Teams is null) return;
 
-            var idsToRemove = teams.Where(t => t is not null).Select(t => t.TeamID).ToHashSet();
-            existing.Teams = existing.Teams.Where(t => !idsToRemove.Contains(t.TeamID)).ToList();
+            var idsToRemove = teams.Where(t => t is not null).Select(t => t.Id).ToHashSet();
+            existing.Teams = existing.Teams.Where(t => !idsToRemove.Contains(t.Id)).ToList();
         }
         public void DeleteProject(string id)
         {
-            var existing = _projects.FirstOrDefault(p => p.ProjectID == id);
+            var existing = _projects.FirstOrDefault(p => p.Id == id);
             if (existing is not null) _projects.Remove(existing);
         }
     }
