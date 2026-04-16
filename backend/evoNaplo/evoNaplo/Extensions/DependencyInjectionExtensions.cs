@@ -1,5 +1,4 @@
 using evoNaplo.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace evoNaplo.Extensions;
 public static class DependencyInjectionExtensions
@@ -7,8 +6,12 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
-        services.AddScoped<IExcelImportService, ExcelImportService>(); // Injection for Excel Import support
-        services.AddScoped<IExcelExportService, ExcelExportService>(); // Injection for Excel Export support
+        
+        // Injections for spreadsheet import and export (.xlsx and .csv)
+        services.AddScoped<IExcelImportService, ExcelImportService>();
+        services.AddScoped<IExcelExportService, ExcelExportService>();
+        services.AddScoped<ICsvImportService, CsvImportService>();
+        services.AddScoped<ICsvExportService, CsvExportService>();
         return services;
     }
 

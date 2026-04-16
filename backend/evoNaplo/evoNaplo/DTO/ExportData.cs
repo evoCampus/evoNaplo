@@ -1,5 +1,11 @@
 namespace evoNaplo.DTO;
 
+public enum ExportFormat
+{
+    xlsx,
+    csv
+}
+
 public class ExportData
 {
     public bool includeTimestamp { get; set; } = false;
@@ -30,4 +36,5 @@ public class ExportData
     public string? filterOtherComments { get; set; } = null;
     
     public int? rowCount { get; set; }
+    public ExportFormat Format { get; set; } = ExportFormat.xlsx;
 }
