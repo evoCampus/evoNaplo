@@ -34,9 +34,6 @@ namespace evoNaplo.Services
             if (updatedProject.Name is not null) existing.Name = updatedProject.Name;
             if (updatedProject.ShortDescription is not null) existing.ShortDescription = updatedProject.ShortDescription;
             if (updatedProject.ProjectLinks is not null) existing.ProjectLinks = updatedProject.ProjectLinks;
-            //If needed later or used in the DB-s can be used again otherwise, if not needed , can be removed from the model and the service
-            //if (updatedProject.ProjectAssignedMentors is not null) existing.ProjectAssignedMentors = updatedProject.ProjectAssignedMentors;
-            //if (updatedProject.ProjectAssignedStudents is not null) existing.ProjectAssignedStudents = updatedProject.ProjectAssignedStudents;
             if (updatedProject.Teams is not null) 
             {
                 existing.Teams = updatedProject.Teams;
