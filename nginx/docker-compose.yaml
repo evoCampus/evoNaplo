@@ -1,12 +1,49 @@
 services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: mssql
+    hostname: mssql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=MSSQL_password
+      - MSSQL_PID=Express
+      - MSSQL_DB=evoNaploDb
+      - MSSQL_USER=sa
+      - MSSQL_PASSWORD=Admin123!
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "MSSQL_password", "-C", "-Q", "SELECT 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
   frontend:
     build: ../frontend
+    image: evonaplo:frontend-latest
+    container_name: frontend
+    hostname: frontend
 
   backend:
     build: ../backend/evoNaplo/evoNaplo/
+    image: evonaplo:backend-latest
+    container_name: backend
+    hostname: backend
+    environment:
+      - EVONAPLO_DATABASE_HOST=mssql
+      - EVONAPLO_DATABASE_PORT=1433
+      - EVONAPLO_DATABASE_NAME=evoNaploDb
+      - EVONAPLO_DATABASE_USER=evoNaploUser
+      - EVONAPLO_DATABASE_PASS=Admin123!
+    depends_on:
+      mssql:
+        condition: service_healthy
 
   nginx-proxy:
     build: ../nginx
+    image: evonaplo:nginx-proxy-latest
+    container_name: nginx
+    hostname: nginx
     ports:
       - "80:80"
     environment:

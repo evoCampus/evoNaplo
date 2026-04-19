@@ -9,12 +9,12 @@ RUN mkdir /app
 COPY nginx.conf.template /app/nginx.conf.template
 
 COPY auth.sh /docker-entrypoint.d/auth.sh
-RUN chmod -x /docker-entrypoint.d/auth.sh
+RUN chmod +x /docker-entrypoint.d/auth.sh
 
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD [ "/healthz" ]
 
-ENTRYPOINT [ "/docker-entrypoint.d" ]
+ENTRYPOINT [ "/docker-entrypoint.sh" ]
 
-RUN nginx -g daemon off;
+CMD [ "nginx", "-g", "daemon off;" ]
