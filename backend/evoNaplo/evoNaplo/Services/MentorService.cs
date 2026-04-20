@@ -35,7 +35,7 @@ namespace evoNaplo.Services
             if (updatedMentor.Email is not null) existing.Email = updatedMentor.Email;
             if (updatedMentor.PhoneNumber is not null) existing.PhoneNumber = updatedMentor.PhoneNumber;
             if (updatedMentor.TeamCount != 0) existing.TeamCount = updatedMentor.TeamCount;
-            if (updatedMentor.ProjecCount != 0) existing.ProjecCount = updatedMentor.ProjecCount;
+            if (updatedMentor.ProjectCount != 0) existing.ProjectCount = updatedMentor.ProjectCount;
             if (updatedMentor.StudentCount != 0) existing.StudentCount = updatedMentor.StudentCount;
             if (updatedMentor.Teams is not null) existing.Teams = updatedMentor.Teams;
             if (updatedMentor.Projects is not null) existing.Projects = updatedMentor.Projects;
