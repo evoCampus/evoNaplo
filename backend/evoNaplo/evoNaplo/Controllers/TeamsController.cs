@@ -1,79 +1,119 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
+using evoNaplo.Services;
+using evoNaplo.Models;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TeamsController : ControllerBase
+internal class TeamsController : ControllerBase
 {
-    private static List<TeamDTO> _teams = new List<TeamDTO>();
+    private readonly ITeamService _teamService;
+
+    public TeamsController(ITeamService teamService)
+    {
+        _teamService = teamService;
+    }
 
     /// <summary>
-    /// Retrieves all teams as data transfer objects.
+    /// Retrieves a list of all teams in the system, returning their details as TeamDTO objects.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see
-    /// cref="TeamDTO"/> objects representing all teams. The collection is empty if no teams are available.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see cref="TeamDTO"/> objects.</returns>
     [HttpGet]
     public Task<IEnumerable<TeamDTO>> GetTeams()
     {
-        return Task.FromResult((IEnumerable<TeamDTO>)_teams);
+        return Task.FromResult(_teamService.GetAllTeams().Select(team => new TeamDTO
+        {
+            Id = team.Id,
+            Mentors = team.Mentors ?? Enumerable.Empty<string>(),
+            Students = team.Students ?? Enumerable.Empty<string>(),
+            WeeklyMeetingDay = team.WeeklyMeetingDay,
+            WeeklyMeetingTime = team.WeeklyMeetingTime,
+            Attendance = team.Attendance ?? Enumerable.Empty<IEnumerable<string>>()
+        }));
     }
 
     /// <summary>
-    /// Retrieves the team with the specified identifier.
+    /// Retrieves the details of a specific team based on the provided identifier. If no team with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to retrieve. Cannot be null.</param>
+    /// <param name="teamId">The unique identifier of the team to retrieve. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="TeamDTO"/> representing
     /// the requested team.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if a team with the specified <paramref name="id"/> does not exist.</exception>
+    /// <exception cref="KeyNotFoundException">Thrown if a team with the specified <paramref name="teamId"/> does not exist.</exception>
     [HttpGet("{id}")]
-    public Task<TeamDTO> GetTeam(string id)
+    public async Task<ActionResult<TeamDTO>> GetTeam(string teamId)
     {
-        var team = _teams.FirstOrDefault(s => s.Id == id);
-        if (team == null)
-            throw new KeyNotFoundException($"Team with id {id} not found.");
-        return Task.FromResult<TeamDTO>(team);
+        Team? team = _teamService.GetTeamById(teamId);
+        if (team is null)
+            return NotFound($"Team with id {teamId} not found.");
+        return Ok(new TeamDTO
+        {
+            Id = team.Id,
+            Mentors = team.Mentors ?? Enumerable.Empty<string>(),
+            Students = team.Students ?? Enumerable.Empty<string>(),
+            WeeklyMeetingDay = team.WeeklyMeetingDay,
+            WeeklyMeetingTime = team.WeeklyMeetingTime,
+            Attendance = team.Attendance ?? Enumerable.Empty<IEnumerable<string>>()
+        });
     }
 
     /// <summary>
-    /// Creates a new team and adds it to the collection.
+    /// Creates a new team in the system based on the provided team details. If a team with the same identifier already exists, a Conflict response is returned.
     /// </summary>
-    /// <param name="team">The team to add. Must not be null.</param>
+    /// <param name="teamToCreate">The details of the team to create.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created team.</returns>
     [HttpPost]
-    public Task<TeamDTO> CreateTeam(TeamDTO team)
+    public async Task<ActionResult<Team>> CreateTeam(TeamDTO teamToCreate)
     {
-        _teams.Add(team);
-        return Task.FromResult<TeamDTO>(team);
+        if (_teamService.GetTeamById(teamToCreate.Id) is not null)
+            return Conflict($"Team with ID {teamToCreate.Id} already exists.");
+        Team newTeam = new Team
+        {
+            Id = teamToCreate.Id,
+            Mentors = teamToCreate.Mentors ?? new List<string>(),
+            Students = teamToCreate.Students ?? new List<string>(),
+            WeeklyMeetingDay = teamToCreate.WeeklyMeetingDay,
+            WeeklyMeetingTime = teamToCreate.WeeklyMeetingTime,
+            Attendance = teamToCreate.Attendance ?? new List<IEnumerable<string>>()
+        };
+        _teamService.AddTeam(newTeam);
+        return Ok(newTeam);
     }
 
     /// <summary>
-    /// Updates the details of an existing team with the specified identifier.
+    /// Updates the details of an existing team in the system based on the provided identifier and updated team data. If no team with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to update. Cannot be null or empty.</param>
+    /// <param name="teamId">The unique identifier of the team to update. Cannot be null or empty.</param>
     /// <param name="updatedTeam">An object containing the updated team information. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update
-    /// is successful; otherwise, an HTTP 404 response if the team is not found.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update is successful; otherwise, an HTTP 404 response if the team is not found.</returns>
     [HttpPut("{id}")]
-    public Task UpdateTeam(string id, TeamDTO updatedTeam)
+    public async Task<ActionResult> UpdateTeam(string teamId, TeamDTO updatedTeam)
     {
-        var index = _teams.FindIndex(s => s.Id == id);
-        if (index == -1)
-            return Task.FromResult(NotFound());
-        _teams[index] = updatedTeam;
-        return Task.FromResult(NoContent());
+        if (_teamService.GetTeamById(teamId) is null)
+            return NotFound($"Team with ID {teamId} not found.");
+        Team newTeam = new Team
+        {
+            Id = updatedTeam.Id,
+            Mentors = updatedTeam.Mentors ?? new List<string>(),
+            Students = updatedTeam.Students ?? new List<string>(),
+            WeeklyMeetingDay = updatedTeam.WeeklyMeetingDay,
+            WeeklyMeetingTime = updatedTeam.WeeklyMeetingTime,
+            Attendance = updatedTeam.Attendance ?? new List<IEnumerable<string>>()
+        };
+        _teamService.UpdateTeam(teamId, newTeam);
+        return NoContent();
     }
 
     /// <summary>
-    /// Deletes the team with the specified identifier.
+    /// Deletes an existing team from the system based on the provided identifier. If no team with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the team to delete. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous delete operation. The task result contains an HTTP 204 No Content
-    /// response if the deletion is successful.</returns>
+    /// <param name="teamId">The unique identifier of the team to delete. Cannot be null or empty.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 No Content response if the deletion is successful; otherwise, an HTTP 404 Not Found response if the team is not found.</returns>
     [HttpDelete("{id}")]
-    public Task DeleteTeam(string id)
+    public async Task<ActionResult> DeleteTeam(string teamId)
     {
-        var team = _teams.FirstOrDefault(s => s.Id == id);
-        _teams.Remove(team);
-        return Task.FromResult(NoContent());
+        if (_teamService.GetTeamById(teamId) is null)
+            return NotFound($"Team with ID {teamId} not found.");
+        _teamService.DeleteTeam(teamId);
+        return NoContent();
     }
 }

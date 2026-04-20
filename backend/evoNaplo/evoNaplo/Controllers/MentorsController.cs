@@ -1,78 +1,131 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
+using evoNaplo.Services;
+using evoNaplo.Models;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MentorsController : ControllerBase
+internal class MentorsController : ControllerBase
 {
-    private static List<MentorDTO> _mentors = new List<MentorDTO>();
+    private readonly IMentorService _mentorService;
+
+    public MentorsController(IMentorService mentorService)
+    {
+        _mentorService = mentorService;
+    }
 
     /// <summary>
-    /// Retrieves a collection of mentors.
+    /// Retrieves a list of all mentors in the system, returning their details as MentorDTO objects.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of mentor
-    /// data transfer objects. The collection is empty if no mentors are available.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see cref="MentorDTO"/> objects.</returns>
     [HttpGet]
     public Task<IEnumerable<MentorDTO>> GetMentors()
     {
-        return Task.FromResult((IEnumerable<MentorDTO>)_mentors);
+        return Task.FromResult(_mentorService.GetAllMentors().Select(mentor => new MentorDTO 
+        { 
+            Id = mentor.Id, 
+            Name = mentor.Name ?? "N/A", 
+            Email = mentor.Email ?? "N/A",
+            PhoneNumber = mentor.PhoneNumber ?? "N/A",
+            MentorProfile = mentor.MentorProfile ?? "N/A",
+            Teams = mentor.Teams?.Select(team => team.Name).ToList() ?? Enumerable.Empty<string>(),
+            Projects = mentor.Projects?.Select(project => project.Name).ToList() ?? Enumerable.Empty<string>(),
+            SemesterNumber = mentor.SemesterNumber,
+            IsActive = mentor.IsActive
+        }));
     }
 
     /// <summary>
-    /// Retrieves the mentor with the specified identifier.
+    /// Retrieves the details of a specific mentor based on the provided identifier. If no mentor with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the mentor to retrieve. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the mentor data as a MentorDTO.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if a mentor with the specified identifier does not exist.</exception>
+    /// <param name="mentorId">The unique identifier of the mentor to retrieve. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="MentorDTO"/> representing
+    /// the requested mentor.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if a mentor with the specified <paramref name="mentorId"/> does not exist.</exception>
     [HttpGet("{id}")]
-    public Task<MentorDTO> GetMentor(string id)
+    public async Task<ActionResult<MentorDTO>> GetMentor(string mentorId)
     {
-        var mentor = _mentors.FirstOrDefault(s => s.Id == id);
+        Mentor? mentor = _mentorService.GetMentorById(mentorId);
         if (mentor is null)
-            throw new KeyNotFoundException($"Mentor with id {id} not found.");
-        return Task.FromResult<MentorDTO>(mentor);
+            return NotFound($"Mentor with id {mentorId} not found.");
+        return Ok(new MentorDTO 
+        {
+            Id = mentor.Id, 
+            Name = mentor.Name ?? "N/A",
+            Email = mentor.Email ?? "N/A",
+            PhoneNumber = mentor.PhoneNumber ?? "N/A",
+            MentorProfile = mentor.MentorProfile ?? "N/A",
+            Teams = mentor.Teams?.Select(team => team.Name).ToList() ?? Enumerable.Empty<string>(),
+            Projects = mentor.Projects?.Select(project => project.Name).ToList() ?? Enumerable.Empty<string>(),
+            SemesterNumber = mentor.SemesterNumber,
+            IsActive = mentor.IsActive
+        });
     }
 
     /// <summary>
-    /// Creates a new mentor and adds it to the collection.
+    /// Creates a new mentor in the system using the provided mentor data. If a mentor with the same identifier already exists, a Conflict response is returned.
     /// </summary>
-    /// <param name="mentor">A data transfer object containing the details of the mentor to create. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor data.</returns>
+    /// <param name="mentorToCreate">The mentor data to create. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor.</returns>
     [HttpPost]
-    public Task<MentorDTO> CreateMentor(MentorDTO mentor)
+    public async Task<ActionResult<Mentor>> CreateMentor(MentorDTO mentorToCreate)
     {
-        _mentors.Add(mentor);
-        return Task.FromResult<MentorDTO>(mentor);
+        if (_mentorService.GetMentorById(mentorToCreate.Id) is not null)
+            return Conflict($"Mentor with ID {mentorToCreate.Id} already exists.");
+        Mentor newMentor = new Mentor
+        {
+            Id = mentorToCreate.Id,
+            Name = mentorToCreate.Name ?? "N/A",
+            Email = mentorToCreate.Email ?? "N/A",
+            PhoneNumber = mentorToCreate.PhoneNumber ?? "N/A",
+            MentorProfile = mentorToCreate.MentorProfile ?? "N/A",
+            Teams = mentorToCreate.Teams ?? new List<string>(),
+            Projects = mentorToCreate.Projects ?? new List<string>(),
+            SemesterNumber = mentorToCreate.SemesterNumber,
+            IsActive = mentorToCreate.IsActive
+        };
+        _mentorService.AddMentor(newMentor);
+        return Ok(newMentor);
     }
 
     /// <summary>
-    /// Updates the details of an existing mentor with the specified identifier.
+    /// Updates the details of an existing mentor in the system based on the provided identifier and updated mentor data. If no mentor with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the mentor to update. Cannot be null or empty.</param>
+    /// <param name="mentorId">The unique identifier of the mentor to update. Cannot be null or empty.</param>
     /// <param name="updatedMentor">An object containing the updated mentor information. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that is NoContent
-    /// if the update is successful, or NotFound if no mentor with the specified identifier exists.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update is successful; otherwise, an HTTP 404 response if the mentor is not found.</returns>
     [HttpPut("{id}")]
-    public Task UpdateMentor(string id, MentorDTO updatedMentor)
+    public async Task<ActionResult> UpdateMentor(string mentorId, MentorDTO updatedMentor)
     {
-        var index = _mentors.FindIndex(s => s.Id == id);
-        if (index == -1)
-            return Task.FromResult(NotFound());
-        _mentors[index] = updatedMentor;
-        return Task.FromResult(NoContent());
+        if (_mentorService.GetMentorById(mentorId) is null)
+            return NotFound($"Mentor with ID {mentorId} not found.");
+        Mentor mentor = new Mentor
+        {
+            Id = updatedMentor.Id,
+            Name = updatedMentor.Name ?? "N/A",
+            Email = updatedMentor.Email ?? "N/A",
+            PhoneNumber = updatedMentor.PhoneNumber ?? "N/A",
+            MentorProfile = updatedMentor.MentorProfile ?? "N/A",
+            Teams = updatedMentor.Teams ?? new List<string>(),
+            Projects = updatedMentor.Projects ?? new List<string>(),
+            SemesterNumber = updatedMentor.SemesterNumber,
+            IsActive = updatedMentor.IsActive
+        };
+        _mentorService.UpdateMentor(mentorId, mentor);
+        return NoContent();
     }
 
     /// <summary>
-    /// Deletes the mentor with the specified identifier from the collection.
+    /// Deletes an existing mentor from the system based on the provided identifier. If no mentor with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the mentor to delete. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a NoContent result if the mentor is
-    /// successfully deleted.</returns>
+    /// <param name="mentorId">The unique identifier of the mentor to delete. Cannot be null or empty.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the deletion is successful; otherwise, an HTTP 404 response if the mentor is not found.</returns>
     [HttpDelete("{id}")]
-    public Task DeleteMentor(string id)
+    public async Task<ActionResult> DeleteMentor(string mentorId)
     {
-        var mentor = _mentors.FirstOrDefault(s => s.Id == id);
-        _mentors.Remove(mentor);
-        return Task.FromResult(NoContent());
+        if (_mentorService.GetMentorById(mentorId) is null)
+            return NotFound($"Mentor with ID {mentorId} not found.");
+        _mentorService.DeleteMentor(mentorId);
+        return NoContent();
     }
 }
