@@ -2,21 +2,34 @@
   "name": "@evonaplo/ui-library",
   "version": "1.0.0",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "exports:gen": "node ./scripts/generate-index.mjs",
+    "shadcn": "shadcn",
+    "shadcn:add": "shadcn add",
+    "prebuild": "npm run exports:gen",
+    "build": "tsdown --config tsdown.config.ts",
+    "predev": "npm run exports:gen",
+    "dev": "tsdown --watch --config tsdown.config.ts",
+    "clean": "rm -rf dist"
+  },
   "exports": {
-    "./components/*": "./components/*",
-    "./lib/*": "./lib/*",
-    "./hooks/*": "./hooks/*"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
   },
   "files": [
-    "components",
-    "lib",
-    "hooks"
+    "dist"
   ],
   "dependencies": {
-    "radix-ui": "^1.1.0",
-    "lucide-react": "^0.475.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "radix-ui": "^1.1.0",
     "tailwind-merge": "^3.0.0",
     "tw-animate-css": "^1.0.0"
   },
@@ -24,5 +37,10 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "shadcn": "^4.4.0",
+    "tsdown": "^0.15.2",
+    "typescript": "^5.9.3"
   }
 }
