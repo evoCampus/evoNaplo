@@ -1,20 +1,22 @@
+include /usr/local/nginx/conf/auth_*.conf;
+
 server {
     listen 80;
 
     location /healthz {
         access_log off;
+        auth_basic off;
         return 200 "OK\n";
     }
 
-    include /usr/local/nginx/conf/auth_*.conf;
     
-    location /api{
+    location /api/ {
         proxy_pass ${BACKEND_URL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
 
-    location /{
+    location / {
         proxy_pass ${FRONTEND_URL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

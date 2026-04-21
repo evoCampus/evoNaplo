@@ -4,12 +4,9 @@ RUN apk add apache2-utils curl
 
 ENV NGINX_ENVSUBST_TEMPLATE_DIR=/app
 
-RUN mkdir /app
-
 COPY nginx.conf.template /app/nginx.conf.template
 
 COPY auth.sh /docker-entrypoint.d/auth.sh
-RUN chmod +x /docker-entrypoint.d/auth.sh
 
 EXPOSE 80
 
