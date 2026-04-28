@@ -6,6 +6,6 @@ public class ProjectDTO
     public string? Name { get; set; }
     public string? Description { get; set; }
     public Dictionary<string, string>? ProjectLinks { get; set; }
-    public IEnumerable<string>? Teams { get; set; }
+    public IEnumerable<string>? TeamIds { get; set; }
 
 }
