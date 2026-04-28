@@ -1,79 +1,114 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
+using evoNaplo.Services;
+using evoNaplo.Models;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController : ControllerBase
+internal class ProjectsController : ControllerBase
 {
-    private static List<ProjectDTO> _projects = new List<ProjectDTO>();
+    private readonly IProjectService _projectService;
+    private readonly ITeamService _teamService;
+
+    public ProjectsController(IProjectService projectService, ITeamService teamService)
+    {
+        _projectService = projectService;
+        _teamService = teamService;
+    }
 
     /// <summary>
-    /// Retrieves a collection of all available projects.
+    /// Retrieves a list of all projects in the system, returning their details as ProjectDTO objects.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of project
-    /// data transfer objects. The collection is empty if no projects are available.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of <see cref="ProjectDTO"/> objects.</returns>
     [HttpGet]
     public Task<IEnumerable<ProjectDTO>> GetProjects()
     {
-        return Task.FromResult((IEnumerable<ProjectDTO>)_projects);
+        return Task.FromResult(_projectService.GetAllProjects().Select(project => new ProjectDTO
+        {
+            Id = project.Id,
+            Name = project.Name ?? "N/A",
+            Description = project.ShortDescription ?? "N/A",
+            ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+            TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>(),
+        }));
     }
 
     /// <summary>
-    /// Retrieves the project with the specified identifier.
+    /// Retrieves the details of a specific project based on the provided identifier. If no project with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the project to retrieve. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the project data as a ProjectDTO.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if a project with the specified identifier is not found.</exception>
+    /// <param name="projectId">The unique identifier of the project to retrieve. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ProjectDTO"/> representing
+    /// the requested project.</returns>
     [HttpGet("{id}")]
-    public Task<ProjectDTO> GetProject(string id)
+    public async Task<ActionResult<ProjectDTO>> GetProject(string projectId)
     {
-        var project = _projects.FirstOrDefault(s => s.Id == id);
+        Project? project = _projectService.GetProjectById(projectId);
         if (project is null)
-            throw new KeyNotFoundException($"Project with id {id} not found.");
-        return Task.FromResult<ProjectDTO>(project);
+            return NotFound($"Project with id {projectId} not found.");
+        return Ok(new ProjectDTO 
+        { 
+            Id = project.Id,
+            Name = project.Name ?? "N/A",
+            Description = project.ShortDescription ?? "N/A",
+            ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+            TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>()
+        });
     }
 
     /// <summary>
-    /// Creates a new project and adds it to the collection.
+    /// Creates a new project in the system based on the provided project data. If a project with the same identifier already exists, a Conflict response is returned.
     /// </summary>
-    /// <param name="project">The project to add. Must not be null.</param>
+    /// <param name="projectToCreate">The project data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created project.</returns>
     [HttpPost]
-    public Task<ProjectDTO> CreateProject(ProjectDTO project)
+    public async Task<ActionResult<Project>> CreateProject(ProjectDTO projectToCreate)
     {
-        _projects.Add(project);
-        return Task.FromResult<ProjectDTO>(project);
+        if (_projectService.GetProjectById(projectToCreate.Id) is not null)
+            return Conflict($"Project with ID {projectToCreate.Id} already exists.");
+        Project newProject = new Project
+        {
+            Id = projectToCreate.Id,
+            Name = projectToCreate.Name ?? "N/A",
+            ShortDescription = projectToCreate.Description ?? "N/A",
+            Teams = projectToCreate.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>()
+        };
+        _projectService.AddProject(newProject);
+        return Ok(newProject);
     }
 
     /// <summary>
-    /// Updates an existing project with the specified identifier using the provided project data.
+    /// Updates the details of an existing project in the system based on the provided identifier and updated project data. If no project with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <param name="id">The unique identifier of the project to update. Cannot be null or empty.</param>
-    /// <param name="updatedProject">The updated project data to apply. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. Returns a 204 No Content response if the update is
-    /// successful; otherwise, returns a 404 Not Found response if the project does not exist.</returns>
+    /// <param name="projectId">The unique identifier of the project to update. Cannot be null or empty.</param>
+    /// <param name="updatedProject">An object containing the updated project information. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update is successful; otherwise, an HTTP 404 response if the project is not found.</returns>
     [HttpPut("{id}")]
-    public Task UpdateProject(string id, ProjectDTO updatedProject)
+    public async Task<ActionResult> UpdateProject(string projectId, ProjectDTO updatedProject)
     {
-        var index = _projects.FindIndex(s => s.Id == id);
-        if (index == -1)
-            return Task.FromResult(NotFound());
-        _projects[index] = updatedProject;
-        return Task.FromResult(NoContent());
+        if (_projectService.GetProjectById(projectId) is null)
+            return NotFound($"Project with ID {projectId} not found.");
+        Project project = new Project
+        {
+            Id = updatedProject.Id,
+            Name = updatedProject.Name ?? "N/A",
+            ShortDescription = updatedProject.Description ?? "N/A",
+            Teams = updatedProject.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>()
+        };
+        _projectService.UpdateProject(projectId, project);
+        return NoContent();
     }
 
     /// <summary>
-    /// Deletes the project with the specified identifier.
+    /// Deletes an existing project from the system based on the provided identifier. If no project with the given identifier exists, a NotFound response is returned.
     /// </summary>
-    /// <remarks>If the specified project does not exist, the operation completes without error and no action
-    /// is taken. This method is typically used in response to an HTTP DELETE request.</remarks>
-    /// <param name="id">The unique identifier of the project to delete. Cannot be null or empty.</param>
-    /// <returns>A task that represents the asynchronous delete operation.</returns>
+    /// <param name="projectId">The unique identifier of the project to delete. Cannot be null or empty.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the deletion is successful; otherwise, an HTTP 404 response if the project is not found.</returns>
     [HttpDelete("{id}")]
-    public Task DeleteProject(string id)
+    public async Task<ActionResult> DeleteProject(string projectId)
     {
-        var project = _projects.FirstOrDefault(s => s.Id == id);
-        _projects.Remove(project);
-        return Task.FromResult(NoContent());
+        if (_projectService.GetProjectById(projectId) is null)
+            return NotFound($"Project with ID {projectId} not found.");
+        _projectService.DeleteProject(projectId);
+        return NoContent();
     }
 }
