@@ -29,15 +29,14 @@ internal class StudentsController : ControllerBase
             PhoneNumber = student.PhoneNumber ?? "N/A",
             UniversityProgramme = student.UniversityProgramme ?? "N/A",
             CurrentSemester = student.CurrentSemester,
-            IsInTheirFirstSemester = student.IsInTheirFirstSemester,
+            IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
             PersonalGoals = student.PersonalGoals ?? "N/A",
             HasAppliedForScholarship = student.HasAppliedForScholarship,
-            HasScholarship = student.HasScholarship,
-            ScholarshipDurationInSemesters = student.ScholarshipDurationInSemesters,
+            HasScholarship = student.HasActiveScholarship,
+            ScholarshipDuration = student.ScholarshipDuration,
             HasAppliedForInternship = student.HasAppliedForInternship,
-            HasInternship = student.HasInternship,
+            HasInternship = student.IsCurrentlyIntern,
             IsWorkingStudent = student.IsWorkingStudent,
-            WorkExperienceInSemesters = student.WorkExperienceInSemesters,
             WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
         }));
     }
@@ -63,25 +62,23 @@ internal class StudentsController : ControllerBase
             PhoneNumber = student.PhoneNumber ?? "N/A",
             UniversityProgramme = student.UniversityProgramme ?? "N/A",
             CurrentSemester = student.CurrentSemester,
-            IsInTheirFirstSemester = student.IsInTheirFirstSemester,
+            IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
             PersonalGoals = student.PersonalGoals ?? "N/A",
             HasAppliedForScholarship = student.HasAppliedForScholarship,
-            HasScholarship = student.HasScholarship,
-            ScholarshipDurationInSemesters = student.ScholarshipDurationInSemesters,
+            HasScholarship = student.HasActiveScholarship,
+            ScholarshipDuration = student.ScholarshipDuration,
             HasAppliedForInternship = student.HasAppliedForInternship,
-            HasInternship = student.HasInternship,
+            HasInternship = student.IsCurrentlyIntern,
             IsWorkingStudent = student.IsWorkingStudent,
-            WorkExperienceInSemesters = student.WorkExperienceInSemesters,
             WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
         });
     }
 
     /// <summary>
     /// Creates a new student in the system based on the provided student data. If a student with the same identifier already exists, a Conflict response is returned.
-    /// </summary>
+    /// </summary> 
     /// <param name="studentToCreate">The student data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created student.</returns>
-    /// <exception cref="ConflictException">Thrown if a student with the specified ID already exists.</exception>
     [HttpPost]
     public async Task<ActionResult<Student>> CreateStudent(StudentDTO studentToCreate)
     {
@@ -95,15 +92,14 @@ internal class StudentsController : ControllerBase
             PhoneNumber = studentToCreate.PhoneNumber ?? "N/A",
             UniversityProgramme = studentToCreate.UniversityProgramme ?? "N/A",
             CurrentSemester = studentToCreate.CurrentSemester,
-            IsInTheirFirstSemester = studentToCreate.IsInTheirFirstSemester,
+            IsFirstEvoCampusSemester = studentToCreate.IsInTheirFirstSemester,
             PersonalGoals = studentToCreate.PersonalGoals ?? "N/A",
             HasAppliedForScholarship = studentToCreate.HasAppliedForScholarship,
-            HasScholarship = studentToCreate.HasScholarship,
-            ScholarshipDurationInSemesters = studentToCreate.ScholarshipDurationInSemesters,
+            HasActiveScholarship = studentToCreate.HasScholarship,
+            ScholarshipDuration = studentToCreate.ScholarshipDuration,
             HasAppliedForInternship = studentToCreate.HasAppliedForInternship,
-            HasInternship = studentToCreate.HasInternship,
+            IsCurrentlyIntern = studentToCreate.HasInternship,
             IsWorkingStudent = studentToCreate.IsWorkingStudent,
-            WorkExperienceInSemesters = studentToCreate.WorkExperienceInSemesters,
             WantsToStayWithCurrentTeam = studentToCreate.WantsToStayWithCurrentTeam
         };
         _studentService.AddStudent(newStudent);
@@ -111,7 +107,7 @@ internal class StudentsController : ControllerBase
     }
 
     /// <summary>
-    /// Updates the details of an existing student in the system based on the provided identifier and updated student data. If no student with the given identifier exists, a NotFound response is returned.
+    /// Updates the details of an existing student in the system based on the provided identifier and updated student data. If no student with the given identifier exists, a NotFound response is returned. Upon successful update, an HTTP 204 No Content response is returned.
     /// </summary>
     /// <param name="studentId">The unique identifier of the student to update. Cannot be null or empty.</param>
     /// <param name="updatedStudent">An object containing the updated student information. Cannot be null.</param>
@@ -129,15 +125,14 @@ internal class StudentsController : ControllerBase
             PhoneNumber = updatedStudent.PhoneNumber ?? "N/A",
             UniversityProgramme = updatedStudent.UniversityProgramme ?? "N/A",
             CurrentSemester = updatedStudent.CurrentSemester,
-            IsInTheirFirstSemester = updatedStudent.IsInTheirFirstSemester,
+            IsFirstEvoCampusSemester = updatedStudent.IsInTheirFirstSemester,
             PersonalGoals = updatedStudent.PersonalGoals ?? "N/A",
             HasAppliedForScholarship = updatedStudent.HasAppliedForScholarship,
-            HasScholarship = updatedStudent.HasScholarship,
-            ScholarshipDurationInSemesters = updatedStudent.ScholarshipDurationInSemesters,
+            HasActiveScholarship = updatedStudent.HasScholarship,
+            ScholarshipDuration = updatedStudent.ScholarshipDuration,
             HasAppliedForInternship = updatedStudent.HasAppliedForInternship,
-            HasInternship = updatedStudent.HasInternship,
+            IsCurrentlyIntern = updatedStudent.HasInternship,
             IsWorkingStudent = updatedStudent.IsWorkingStudent,
-            WorkExperienceInSemesters = updatedStudent.WorkExperienceInSemesters,
             WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam
         };
         _studentService.UpdateStudent(studentId, student);

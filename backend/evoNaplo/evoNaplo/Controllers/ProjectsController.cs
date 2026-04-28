@@ -8,10 +8,12 @@ using evoNaplo.Models;
 internal class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
+    private readonly ITeamService _teamService;
 
-    public ProjectsController(IProjectService projectService)
+    public ProjectsController(IProjectService projectService, ITeamService teamService)
     {
         _projectService = projectService;
+        _teamService = teamService;
     }
 
     /// <summary>
@@ -25,9 +27,9 @@ internal class ProjectsController : ControllerBase
         {
             Id = project.Id,
             Name = project.Name ?? "N/A",
-            Description = project.Description ?? "N/A",
-            ProjectLinks = project.ProjectLinks ?? new Dictionary<string, string>(),
-            Teams = project.Teams?.Select(team => team.Name).ToList() ?? Enumerable.Empty<string>()
+            Description = project.ShortDescription ?? "N/A",
+            ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+            TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>(),
         }));
     }
 
@@ -37,7 +39,6 @@ internal class ProjectsController : ControllerBase
     /// <param name="projectId">The unique identifier of the project to retrieve. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="ProjectDTO"/> representing
     /// the requested project.</returns>
-    /// <exception cref="KeyNotFoundException">Thrown if a project with the specified <paramref name="projectId"/> does not exist.</exception>
     [HttpGet("{id}")]
     public async Task<ActionResult<ProjectDTO>> GetProject(string projectId)
     {
@@ -48,9 +49,9 @@ internal class ProjectsController : ControllerBase
         { 
             Id = project.Id,
             Name = project.Name ?? "N/A",
-            Description = project.Description ?? "N/A",
-            ProjectLinks = project.ProjectLinks ?? new Dictionary<string, string>(),
-            Teams = project.Teams?.Select(team => team.Name).ToList() ?? Enumerable.Empty<string>()
+            Description = project.ShortDescription ?? "N/A",
+            ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+            TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>()
         });
     }
 
@@ -68,9 +69,8 @@ internal class ProjectsController : ControllerBase
         {
             Id = projectToCreate.Id,
             Name = projectToCreate.Name ?? "N/A",
-            Description = projectToCreate.Description ?? "N/A",
-            ProjectLinks = projectToCreate.ProjectLinks ?? new Dictionary<string, string>(),
-            Teams = projectToCreate.Teams ?? new List<string>()
+            ShortDescription = projectToCreate.Description ?? "N/A",
+            Teams = projectToCreate.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>()
         };
         _projectService.AddProject(newProject);
         return Ok(newProject);
@@ -91,9 +91,8 @@ internal class ProjectsController : ControllerBase
         {
             Id = updatedProject.Id,
             Name = updatedProject.Name ?? "N/A",
-            Description = updatedProject.Description ?? "N/A",
-            ProjectLinks = updatedProject.ProjectLinks ?? new Dictionary<string, string>(),
-            Teams = updatedProject.Teams ?? new List<string>()
+            ShortDescription = updatedProject.Description ?? "N/A",
+            Teams = updatedProject.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>()
         };
         _projectService.UpdateProject(projectId, project);
         return NoContent();
