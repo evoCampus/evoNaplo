@@ -2,42 +2,71 @@ using System.Collections.Generic;
 using System.Linq;
 using evoNaplo.Services;
 using evoNaplo.Models;
+using evoNaplo.DTO;
+
 namespace evoNaplo.Services
 {
     internal class ProjectService : IProjectService
     {
         private static readonly List<Project> _projects = new List<Project>();
+        private readonly ITeamService _teamService;
 
-        public IEnumerable<Project> GetAllProjects()
+        public ProjectService(ITeamService teamService)
         {
-            return _projects;
+            _teamService = teamService;
         }
 
-        public Project GetProjectById(string id)
+        public IEnumerable<ProjectDTO> GetAllProjects()
         {
-            return _projects.FirstOrDefault(p => p.Id == id);
-        }
-
-        public void AddProject(Project project)
-        {
-            if (string.IsNullOrEmpty(project.Id))
+            return _projects.Select(project => new ProjectDTO
             {
-                project.Id = System.Guid.NewGuid().ToString();
-            }
-            _projects.Add(project);
+                Id = project.Id,
+                Name = project.Name ?? "N/A",
+                Description = project.ShortDescription ?? "N/A",
+                ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+                TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>(),
+            });
         }
-        public void UpdateProject(string id, Project updatedProject)
+
+        public ProjectDTO? GetProjectById(string id)
+        {
+            Project? project = _projects.FirstOrDefault(p => p.Id == id);
+            if (project is not null) 
+                return new ProjectDTO 
+                {
+                    Id = project.Id,
+                    Name = project.Name ?? "N/A",
+                    Description = project.ShortDescription ?? "N/A",
+                    ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
+                    TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>()
+                };
+            else
+                return null;
+        }
+
+        public void AddProject(ProjectDTO projectToCreate)
+        {
+            if (string.IsNullOrEmpty(projectToCreate.Id)) 
+                projectToCreate.Id = System.Guid.NewGuid().ToString();
+            Project newProject = new Project
+            {
+                Id = projectToCreate.Id,
+                Name = projectToCreate.Name ?? "N/A",
+                ShortDescription = projectToCreate.Description ?? "N/A",
+                Teams = projectToCreate.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>()
+            };
+            _projects.Add(newProject);
+        }
+        public void UpdateProject(string id, ProjectDTO updatedProject)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == id);
             if (existing is null || updatedProject is null) return;
 
-            if (updatedProject.Name is not null) existing.Name = updatedProject.Name;
-            if (updatedProject.ShortDescription is not null) existing.ShortDescription = updatedProject.ShortDescription;
-            if (updatedProject.ProjectLinks is not null) existing.ProjectLinks = updatedProject.ProjectLinks;
-            if (updatedProject.Teams is not null) 
-            {
-                existing.Teams = updatedProject.Teams;
-            }
+            if (updatedProject.Id is not null) existing.Id = updatedProject.Id;
+            if (updatedProject.Name is not null) existing.Name = updatedProject.Name ?? "N/A";
+            if (updatedProject.Description is not null) existing.ShortDescription = updatedProject.Description ?? "N/A";
+            if (updatedProject.TeamIds is not null) existing.Teams = updatedProject.TeamIds?.Select(id => _teamService.GetTeamById(id)).OfType<Team>().ToList() ?? new List<Team>();
+            //if (updatedProject.ProjectLinks is not null) existing.ProjectLinks = updatedProject.ProjectLinks;
         }
 
         public void AddTeamsToProject(string projectId, IEnumerable<Team> teams)
