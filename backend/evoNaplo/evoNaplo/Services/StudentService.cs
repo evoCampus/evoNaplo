@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using evoNaplo.Services;
-using evoNaplo.Models;
+﻿using evoNaplo.Models;
 using evoNaplo.DTO;
 
 namespace evoNaplo.Services
@@ -10,6 +7,20 @@ namespace evoNaplo.Services
     {
         private static readonly List<Student> _students = new List<Student>();
 
+        /// <summary>
+        /// Gets the student model by their ID. This is used internally for operations that require the full student model, such as updates or deletions.
+        /// </summary>
+        /// <param name="id">The ID of the student to retrieve.</param>
+        /// <returns>The Student model if found, otherwise null.</returns>
+        public Student? GetStudentModelById(string id)
+        {
+            return _students.FirstOrDefault(s => s.Id == id);
+        }
+
+        /// <summary>
+        /// Gets all students in the system and maps them to StudentDTOs for external use, such as API responses. This method ensures that only the necessary information is exposed while keeping the internal student model encapsulated.
+        /// </summary>
+        /// <returns>A list of StudentDTOs representing all students in the system.</returns>
         public IEnumerable<StudentDTO> GetAllStudents()
         {
             return _students.Select(student => new StudentDTO 
@@ -31,7 +42,12 @@ namespace evoNaplo.Services
             WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
         });
         }
-       
+
+        /// <summary>
+        /// Gets a single student by their ID and maps it to a StudentDTO for external use. This method is useful for retrieving specific student information without exposing the internal model directly.
+        /// </summary>
+        /// <param name="id">The ID of the student to retrieve.</param>
+        /// <returns>The StudentDTO if found, otherwise null.</returns>
         public StudentDTO? GetStudentById(string id)
         {
             Student? student = _students.FirstOrDefault(s => s.Id == id);
@@ -57,7 +73,11 @@ namespace evoNaplo.Services
             else
                 return null;
         }
-       
+
+        /// <summary>
+        /// Adds a new student to the system based on the provided StudentDTO. This method maps the DTO to the internal Student model and adds it to the in-memory list of students. If the DTO does not contain an ID, a new GUID will be generated for the student.
+        /// </summary>
+        /// <param name="student">The StudentDTO containing the student's information.</param>
         public void AddStudent(StudentDTO student)
         {
             if (string.IsNullOrEmpty(student.Id)) 
@@ -82,7 +102,12 @@ namespace evoNaplo.Services
             };
             _students.Add(newStudent);
         }
-      
+
+        /// <summary>
+        /// Updates an existing student's information based on the provided StudentDTO. This method first retrieves the existing student model by ID, then updates its properties with the values from the DTO if they are different and not null. This allows for partial updates where only certain fields need to be changed without affecting others.
+        /// </summary>
+        /// <param name="id">The ID of the student to update.</param>
+        /// <param name="updatedStudent">The updated student DTO.</param>
         public void UpdateStudent(string id, StudentDTO updatedStudent)
         {
             Student? existingStudent = _students.FirstOrDefault(s => s.Id == id);
@@ -118,16 +143,15 @@ namespace evoNaplo.Services
                 existingStudent.WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam;
         }
 
+        /// <summary>
+        /// Deletes a student from the system based on their ID. This method first retrieves the student model by ID and then removes it from the in-memory list of students if it exists. If the student with the specified ID does not exist, the method simply returns without performing any action.
+        /// </summary>
+        /// <param name="id">The ID of the student to delete.</param>
         public void DeleteStudent(string id)
         {
-            
             var studentToRemove = _students.FirstOrDefault(s => s.Id == id);
-
-            
             if (studentToRemove != null)
-            {
                 _students.Remove(studentToRemove);
-            }
         }
     }
 }

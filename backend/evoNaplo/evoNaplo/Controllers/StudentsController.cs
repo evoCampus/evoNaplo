@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
-using evoNaplo.Models;
 using evoNaplo.Services;
 
 [ApiController]
@@ -47,7 +46,7 @@ internal class StudentsController : ControllerBase
     /// <param name="studentToCreate">The student data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created student.</returns>
     [HttpPost]
-    public async Task<ActionResult<Student>> CreateStudent(StudentDTO studentToCreate)
+    public async Task<ActionResult<StudentDTO>> CreateStudent(StudentDTO studentToCreate)
     {
         if (_studentService.GetStudentById(studentToCreate.Id) is null)
         {

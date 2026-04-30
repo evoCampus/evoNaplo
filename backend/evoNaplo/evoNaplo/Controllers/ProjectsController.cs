@@ -1,19 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
 using evoNaplo.Services;
-using evoNaplo.Models;
 
 [ApiController]
 [Route("api/[controller]")]
 internal class ProjectsController : ControllerBase
 {
     private readonly IProjectService _projectService;
-    private readonly ITeamService _teamService;
 
-    public ProjectsController(IProjectService projectService, ITeamService teamService)
+    public ProjectsController(IProjectService projectService)
     {
         _projectService = projectService;
-        _teamService = teamService;
     }
 
     /// <summary>
@@ -47,7 +44,7 @@ internal class ProjectsController : ControllerBase
     /// <param name="projectToCreate">The project data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created project.</returns>
     [HttpPost]
-    public async Task<ActionResult<Project>> CreateProject(ProjectDTO projectToCreate)
+    public async Task<ActionResult<ProjectDTO>> CreateProject(ProjectDTO projectToCreate)
     {
         if (_projectService.GetProjectById(projectToCreate.Id) is null)
         {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
 using evoNaplo.Services;
-using evoNaplo.Models;
 
 [ApiController]
 [Route("api/[controller]")]

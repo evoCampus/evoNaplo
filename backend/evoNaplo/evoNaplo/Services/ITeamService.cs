@@ -1,15 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
-using evoNaplo.Services;
 using evoNaplo.Models;
+using evoNaplo.DTO;
+
 namespace evoNaplo.Services
 {
     internal interface ITeamService
     {
-        IEnumerable<Team> GetAllTeams();
-        Team GetTeamById(string id);
-        void AddTeam(Team team);
-        void UpdateTeam(string id, Team updatedTeam);
+        Team? GetTeamModelById(string id);
+        IEnumerable<TeamDTO> GetAllTeams();
+        TeamDTO? GetTeamById(string id);
+        void AddTeam(TeamDTO team);
+        void UpdateTeam(string id, TeamDTO updatedTeam);
         void DeleteTeam(string id);
+
     }
 }
