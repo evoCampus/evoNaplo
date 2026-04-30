@@ -15,30 +15,13 @@ internal class StudentsController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a list of all students in the system, returning their details as StudentDTO objects.
+    /// Retrieves a list of all students in the system. Each student is represented as a <see cref="StudentDTO"/> object containing relevant information about the student. If no students are found, an empty list is returned.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of student data transfer objects.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of <see cref="StudentDTO"/> objects representing all students in the system.</returns>
     [HttpGet]
     public Task<IEnumerable<StudentDTO>> GetStudents()
     {
-        return Task.FromResult(_studentService.GetAllStudents().Select(student => new StudentDTO
-        {
-            Id = student.Id,
-            Name = student.Name ?? "N/A",
-            Email = student.Email ?? "N/A",
-            PhoneNumber = student.PhoneNumber ?? "N/A",
-            UniversityProgramme = student.UniversityProgramme ?? "N/A",
-            CurrentSemester = student.CurrentSemester,
-            IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
-            PersonalGoals = student.PersonalGoals ?? "N/A",
-            HasAppliedForScholarship = student.HasAppliedForScholarship,
-            HasScholarship = student.HasActiveScholarship,
-            ScholarshipDuration = student.ScholarshipDuration,
-            HasAppliedForInternship = student.HasAppliedForInternship,
-            HasInternship = student.IsCurrentlyIntern,
-            IsWorkingStudent = student.IsWorkingStudent,
-            WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
-        }));
+        return Task.FromResult(_studentService.GetAllStudents());
     }
 
     /// <summary>
@@ -51,63 +34,32 @@ internal class StudentsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<StudentDTO>> GetStudent(string studentId)
     {
-        Student? student = _studentService.GetStudentById(studentId);
-        if (student is null)
+        StudentDTO? student = _studentService.GetStudentById(studentId);
+        if (student is not null)
+            return Ok(student);
+        else
             return NotFound($"Student with id {studentId} not found.");
-        return Ok(new StudentDTO
-        {
-            Id = student.Id,
-            Name = student.Name ?? "N/A",
-            Email = student.Email ?? "N/A",
-            PhoneNumber = student.PhoneNumber ?? "N/A",
-            UniversityProgramme = student.UniversityProgramme ?? "N/A",
-            CurrentSemester = student.CurrentSemester,
-            IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
-            PersonalGoals = student.PersonalGoals ?? "N/A",
-            HasAppliedForScholarship = student.HasAppliedForScholarship,
-            HasScholarship = student.HasActiveScholarship,
-            ScholarshipDuration = student.ScholarshipDuration,
-            HasAppliedForInternship = student.HasAppliedForInternship,
-            HasInternship = student.IsCurrentlyIntern,
-            IsWorkingStudent = student.IsWorkingStudent,
-            WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
-        });
     }
 
     /// <summary>
     /// Creates a new student in the system based on the provided student data. If a student with the same identifier already exists, a Conflict response is returned.
-    /// </summary> 
+    /// </summary>
     /// <param name="studentToCreate">The student data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created student.</returns>
     [HttpPost]
     public async Task<ActionResult<Student>> CreateStudent(StudentDTO studentToCreate)
     {
-        if (_studentService.GetStudentById(studentToCreate.Id) is not null)
-            return Conflict($"Student with ID {studentToCreate.Id} already exists.");
-        Student newStudent = new Student
+        if (_studentService.GetStudentById(studentToCreate.Id) is null)
         {
-            Id = studentToCreate.Id,
-            Name = studentToCreate.Name ?? "N/A",
-            Email = studentToCreate.Email ?? "N/A",
-            PhoneNumber = studentToCreate.PhoneNumber ?? "N/A",
-            UniversityProgramme = studentToCreate.UniversityProgramme ?? "N/A",
-            CurrentSemester = studentToCreate.CurrentSemester,
-            IsFirstEvoCampusSemester = studentToCreate.IsInTheirFirstSemester,
-            PersonalGoals = studentToCreate.PersonalGoals ?? "N/A",
-            HasAppliedForScholarship = studentToCreate.HasAppliedForScholarship,
-            HasActiveScholarship = studentToCreate.HasScholarship,
-            ScholarshipDuration = studentToCreate.ScholarshipDuration,
-            HasAppliedForInternship = studentToCreate.HasAppliedForInternship,
-            IsCurrentlyIntern = studentToCreate.HasInternship,
-            IsWorkingStudent = studentToCreate.IsWorkingStudent,
-            WantsToStayWithCurrentTeam = studentToCreate.WantsToStayWithCurrentTeam
-        };
-        _studentService.AddStudent(newStudent);
-        return Ok(newStudent);
+            _studentService.AddStudent(studentToCreate);
+            return Ok(studentToCreate);
+        }
+        else
+            return Conflict($"Student with ID {studentToCreate.Id} already exists.");
     }
 
     /// <summary>
-    /// Updates the details of an existing student in the system based on the provided identifier and updated student data. If no student with the given identifier exists, a NotFound response is returned. Upon successful update, an HTTP 204 No Content response is returned.
+    /// Updates the details of an existing student based on the provided identifier and updated student data. If no student with the given identifier exists, a NotFound response is returned.
     /// </summary>
     /// <param name="studentId">The unique identifier of the student to update. Cannot be null or empty.</param>
     /// <param name="updatedStudent">An object containing the updated student information. Cannot be null.</param>
@@ -115,28 +67,13 @@ internal class StudentsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateStudent(string studentId, StudentDTO updatedStudent)
     {
-        if (_studentService.GetStudentById(studentId) is null)
-            return NotFound($"Student with ID {studentId} not found.");
-        Student student = new Student
+        if (_studentService.GetStudentById(studentId) is not null)
         {
-            Id = updatedStudent.Id,
-            Name = updatedStudent.Name ?? "N/A",
-            Email = updatedStudent.Email ?? "N/A",
-            PhoneNumber = updatedStudent.PhoneNumber ?? "N/A",
-            UniversityProgramme = updatedStudent.UniversityProgramme ?? "N/A",
-            CurrentSemester = updatedStudent.CurrentSemester,
-            IsFirstEvoCampusSemester = updatedStudent.IsInTheirFirstSemester,
-            PersonalGoals = updatedStudent.PersonalGoals ?? "N/A",
-            HasAppliedForScholarship = updatedStudent.HasAppliedForScholarship,
-            HasActiveScholarship = updatedStudent.HasScholarship,
-            ScholarshipDuration = updatedStudent.ScholarshipDuration,
-            HasAppliedForInternship = updatedStudent.HasAppliedForInternship,
-            IsCurrentlyIntern = updatedStudent.HasInternship,
-            IsWorkingStudent = updatedStudent.IsWorkingStudent,
-            WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam
-        };
-        _studentService.UpdateStudent(studentId, student);
-        return NoContent();
+            _studentService.UpdateStudent(studentId, updatedStudent);
+            return NoContent();
+        }
+        else
+            return NotFound($"Student with ID {studentId} not found.");
     }
 
     /// <summary>
