@@ -2,26 +2,22 @@ import axios from 'axios';
 import { Configuration } from './configuration';
 import { WeatherForecastApi } from './api';
 
-const BASE_URL = 'http://localhost:5152';
-
-const configuration = new Configuration({
-    basePath: BASE_URL,
-    baseOptions: {
-        withCredentials: true,
-    },
-});
-
-const axiosInstance = axios.create({
-    baseURL: BASE_URL,
-    withCredentials: true,
-});
-
-class ApiClient {
+export default class ApiClient {
     public weatherForecast: WeatherForecastApi;
 
-    constructor() {
-        this.weatherForecast = new WeatherForecastApi(configuration, BASE_URL, axiosInstance);
+    constructor(baseUrl: string = import.meta.env.API_URL || 'http://localhost:5152') {
+        const configuration = new Configuration({
+            basePath: baseUrl,
+            baseOptions: {
+                withCredentials: true,
+            },
+        });
+
+        const axiosInstance = axios.create({
+            baseURL: baseUrl,
+            withCredentials: true,
+        });
+
+        this.weatherForecast = new WeatherForecastApi(configuration, baseUrl, axiosInstance);
     }
 }
-
-export default new ApiClient();
