@@ -92,7 +92,10 @@ namespace evoNaplo.Services
         public void UpdateProject(string id, ProjectDTO updatedProject)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == id);
-            if (existing is null || updatedProject is null) {return;}
+            if (existing is null || updatedProject is null) 
+            {
+                return;
+            }
 
             if (updatedProject.Id is not null) 
             {
@@ -115,7 +118,10 @@ namespace evoNaplo.Services
         public void AddTeamsToProject(string projectId, IEnumerable<Team> teams)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == projectId);
-            if (existing is null || teams is null) {return;}
+            if (existing is null || teams is null) 
+            {
+                return;
+            }
 
             if (existing.Teams == null) 
             {
@@ -124,7 +130,10 @@ namespace evoNaplo.Services
 
             foreach (var team in teams)
             {
-                if (team is null) {continue;}
+                if (team is null) 
+                {
+                    continue;
+                }
                 // avoid duplicates by Team Id
                 if (!existing.Teams.Any(t => t.Id == team.Id))
                 {
@@ -136,7 +145,10 @@ namespace evoNaplo.Services
         public void RemoveTeamsFromProject(string projectId, IEnumerable<Team> teams)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == projectId);
-            if (existing is null || teams is null || existing.Teams is null) {return;}
+            if (existing is null || teams is null || existing.Teams is null) 
+            {
+                return;
+            }
 
             var idsToRemove = teams.Where(t => t is not null).Select(t => t.Id).ToHashSet();
             existing.Teams = existing.Teams.Where(t => !idsToRemove.Contains(t.Id)).ToList();

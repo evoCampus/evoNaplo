@@ -98,7 +98,10 @@ namespace evoNaplo.Services
         public void UpdateMentor(string id, MentorDTO updatedMentor)
         {
             var existing = _mentors.FirstOrDefault(m => m.Id == id);
-            if (existing is null || updatedMentor is null) {return;}
+            if (existing is null || updatedMentor is null) 
+            {
+                return;
+            }
 
             if (updatedMentor.Name is not null) 
             {

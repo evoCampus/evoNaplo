@@ -117,7 +117,10 @@ namespace evoNaplo.Services
         public void UpdateStudent(string id, StudentDTO updatedStudent)
         {
             Student? existingStudent = _students.FirstOrDefault(s => s.Id == id);
-            if (existingStudent is null || updatedStudent is null) {return;}
+            if (existingStudent is null || updatedStudent is null) 
+            {
+                return;
+            }
 
             if (updatedStudent.Name != existingStudent.Name && updatedStudent.Name is not null) 
             {

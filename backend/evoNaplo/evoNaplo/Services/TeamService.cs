@@ -84,7 +84,10 @@ namespace evoNaplo.Services
         public void UpdateTeam(string id, TeamDTO updatedTeam)
         {
             var existing = _teams.FirstOrDefault(t => t.Id == id);
-            if (existing is null || updatedTeam is null) {return;}
+            if (existing is null || updatedTeam is null) 
+            {
+                return;
+            }
 
             if (updatedTeam.MentorIds is not null) 
             {
