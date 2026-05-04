@@ -70,8 +70,8 @@ namespace evoNaplo.Services
             Team newTeam = new Team
             {
                 Id = team.Id,
-                Mentors = team.MentorIds?.Select(id => _mentorService.GetMentorModelById(id)).OfType<Mentor>().ToList() ?? new List<Mentor>(),
-                Students = team.StudentIds?.Select(id => _studentService.GetStudentModelById(id)).OfType<Student>().ToList() ?? new List<Student>(),
+                Mentors = team.MentorIds?.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>(),
+                Students = team.StudentIds?.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>(),
             };
             _teams.Add(newTeam);
         }
@@ -91,11 +91,11 @@ namespace evoNaplo.Services
 
             if (updatedTeam.MentorIds is not null) 
             {
-                existing.Mentors = updatedTeam.MentorIds?.Select(id => _mentorService.GetMentorModelById(id)).OfType<Mentor>().ToList() ?? new List<Mentor>();
+                existing.Mentors = updatedTeam.MentorIds?.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>();
             }
             if (updatedTeam.StudentIds is not null) 
             {
-                existing.Students = updatedTeam.StudentIds?.Select(id => _studentService.GetStudentModelById(id)).OfType<Student>().ToList() ?? new List<Student>();
+                existing.Students = updatedTeam.StudentIds?.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>();
             }
         }
 

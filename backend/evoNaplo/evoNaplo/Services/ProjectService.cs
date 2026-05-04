@@ -79,7 +79,7 @@ namespace evoNaplo.Services
                 Id = projectToCreate.Id,
                 Name = projectToCreate.Name ?? "N/A",
                 ShortDescription = projectToCreate.Description ?? "N/A",
-                Teams = projectToCreate.TeamIds?.Select(id => _teamService.GetTeamModelById(id)).OfType<Team>().ToList() ?? new List<Team>()
+                Teams = projectToCreate.TeamIds?.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>()
             };
             _projects.Add(newProject);
         }
@@ -111,7 +111,7 @@ namespace evoNaplo.Services
             }
             if (updatedProject.TeamIds is not null) 
             {
-                existing.Teams = updatedProject.TeamIds?.Select(id => _teamService.GetTeamModelById(id)).OfType<Team>().ToList() ?? new List<Team>();
+                existing.Teams = updatedProject.TeamIds?.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
             }
         }
 
