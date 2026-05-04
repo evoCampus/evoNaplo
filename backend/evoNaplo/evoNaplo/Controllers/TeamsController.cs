@@ -34,7 +34,9 @@ internal class TeamsController : ControllerBase
     {
         TeamDTO? team = _teamService.GetTeamById(teamId);
         if (team is null)
+        {
             return NotFound($"Team with id {teamId} not found.");
+        }
         return Ok(team);
     }
 
@@ -52,7 +54,9 @@ internal class TeamsController : ControllerBase
             return Ok(teamToCreate);
         }
         else
+        {
             return Conflict($"Team with ID {teamToCreate.Id} already exists.");
+        }
     }
 
     /// <summary>
@@ -70,7 +74,9 @@ internal class TeamsController : ControllerBase
             return NoContent();
         }
         else
+        {
             return NotFound($"Team with ID {teamId} not found.");
+        }
     }
 
     /// <summary>
@@ -82,7 +88,9 @@ internal class TeamsController : ControllerBase
     public async Task<ActionResult> DeleteTeam(string teamId)
     {
         if (_teamService.GetTeamById(teamId) is null)
+        {
             return NotFound($"Team with ID {teamId} not found.");
+        }
         _teamService.DeleteTeam(teamId);
         return NoContent();
     }

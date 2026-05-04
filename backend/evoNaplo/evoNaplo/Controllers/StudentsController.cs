@@ -35,9 +35,13 @@ internal class StudentsController : ControllerBase
     {
         StudentDTO? student = _studentService.GetStudentById(studentId);
         if (student is not null)
+        {
             return Ok(student);
+        }
         else
+        {
             return NotFound($"Student with id {studentId} not found.");
+        }
     }
 
     /// <summary>
@@ -54,7 +58,9 @@ internal class StudentsController : ControllerBase
             return Ok(studentToCreate);
         }
         else
+        {
             return Conflict($"Student with ID {studentToCreate.Id} already exists.");
+        }
     }
 
     /// <summary>
@@ -72,7 +78,9 @@ internal class StudentsController : ControllerBase
             return NoContent();
         }
         else
+        {
             return NotFound($"Student with ID {studentId} not found.");
+        }
     }
 
     /// <summary>
@@ -84,7 +92,9 @@ internal class StudentsController : ControllerBase
     public async Task<ActionResult> DeleteStudent(string studentId)
     {
         if (_studentService.GetStudentById(studentId) is null)
+        {
             return NotFound($"Student with ID {studentId} not found.");
+        }
         _studentService.DeleteStudent(studentId);
         return NoContent();
     }

@@ -64,7 +64,9 @@ namespace evoNaplo.Services
         public void AddTeam(TeamDTO team)
         {
             if (string.IsNullOrEmpty(team.Id)) 
+            {
                 team.Id = System.Guid.NewGuid().ToString();
+            }
             Team newTeam = new Team
             {
                 Id = team.Id,
@@ -82,12 +84,16 @@ namespace evoNaplo.Services
         public void UpdateTeam(string id, TeamDTO updatedTeam)
         {
             var existing = _teams.FirstOrDefault(t => t.Id == id);
-            if (existing is null || updatedTeam is null) return;
+            if (existing is null || updatedTeam is null) {return;}
 
             if (updatedTeam.MentorIds is not null) 
+            {
                 existing.Mentors = updatedTeam.MentorIds?.Select(id => _mentorService.GetMentorModelById(id)).OfType<Mentor>().ToList() ?? new List<Mentor>();
+            }
             if (updatedTeam.StudentIds is not null) 
+            {
                 existing.Students = updatedTeam.StudentIds?.Select(id => _studentService.GetStudentModelById(id)).OfType<Student>().ToList() ?? new List<Student>();
+            }
         }
 
         /// <summary>
@@ -98,7 +104,9 @@ namespace evoNaplo.Services
         {
             var existing = _teams.FirstOrDefault(t => t.Id == id);
             if (existing is not null) 
+            {
                 _teams.Remove(existing);
+            }
         }
     }
 }

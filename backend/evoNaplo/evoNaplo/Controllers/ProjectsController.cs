@@ -33,9 +33,13 @@ internal class ProjectsController : ControllerBase
     {
         ProjectDTO? project = _projectService.GetProjectById(projectId);
         if (project is not null)
+        {
             return Ok(project);
+        }
         else
+        {
             return NotFound($"Project with id {projectId} not found.");
+        }
     }
 
     /// <summary>
@@ -52,7 +56,9 @@ internal class ProjectsController : ControllerBase
             return Ok(projectToCreate);
         }
         else
+        {
             return Conflict($"Project with ID {projectToCreate.Id} already exists.");
+        }
     }
 
     /// <summary>
@@ -70,7 +76,9 @@ internal class ProjectsController : ControllerBase
             return NoContent();
         }
         else
+        {
             return NotFound($"Project with ID {projectId} not found.");
+        }
     }
 
     /// <summary>
@@ -82,7 +90,9 @@ internal class ProjectsController : ControllerBase
     public async Task<ActionResult> DeleteProject(string projectId)
     {
         if (_projectService.GetProjectById(projectId) is null)
+        {
             return NotFound($"Project with ID {projectId} not found.");
+        }
         _projectService.DeleteProject(projectId);
         return NoContent();
     }

@@ -33,9 +33,13 @@ internal class MentorsController : ControllerBase
     {
         MentorDTO? mentor = _mentorService.GetMentorById(mentorId);
         if (mentor is not null)
+        {
             return Ok(mentor);
+        }
         else
+        {
             return NotFound($"Mentor with id {mentorId} not found.");
+        }
     }
 
     /// <summary>
@@ -52,7 +56,9 @@ internal class MentorsController : ControllerBase
             return Ok(mentorToCreate);
         }
         else
+        {
             return Conflict($"Mentor with ID {mentorToCreate.Id} already exists.");
+        }
     }
 
     /// <summary>
@@ -70,7 +76,9 @@ internal class MentorsController : ControllerBase
             return NoContent();
         }
         else
+        {
             return NotFound($"Mentor with ID {mentorId} not found.");
+        }
     }
 
     /// <summary>
@@ -87,6 +95,8 @@ internal class MentorsController : ControllerBase
             return NoContent();
         }
         else
+        {
             return NotFound($"Mentor with ID {mentorId} not found.");
+        }
     }
 }

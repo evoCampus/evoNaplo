@@ -51,6 +51,7 @@ namespace evoNaplo.Services
         {
             var mentor = _mentors.FirstOrDefault(m => m.Id == id);
             if (mentor is not null) 
+            {
                 return new MentorDTO 
                 {
                     Id = mentor.Id, 
@@ -60,8 +61,11 @@ namespace evoNaplo.Services
                     TeamIds = mentor.Teams?.Select(team => team.Id).ToList() ?? Enumerable.Empty<string>(),
                     ProjectIds = mentor.Projects?.Select(project => project.Id).ToList() ?? Enumerable.Empty<string>(),
                 };
+            }
             else
+            {
                 return null;
+            }
         }
 
         /// <summary>
@@ -71,7 +75,9 @@ namespace evoNaplo.Services
         public void AddMentor(MentorDTO mentor)
         {
             if (string.IsNullOrEmpty(mentor.Id)) 
+            {
                 mentor.Id = System.Guid.NewGuid().ToString();
+            }
             Mentor newMentor = new Mentor
             {
                 Id = mentor.Id,
@@ -92,18 +98,28 @@ namespace evoNaplo.Services
         public void UpdateMentor(string id, MentorDTO updatedMentor)
         {
             var existing = _mentors.FirstOrDefault(m => m.Id == id);
-            if (existing is null || updatedMentor is null) return;
+            if (existing is null || updatedMentor is null) {return;}
 
             if (updatedMentor.Name is not null) 
+            {
                 existing.Name = updatedMentor.Name ?? "N/A";
+            }
             if (updatedMentor.Email is not null) 
+            {
                 existing.Email = updatedMentor.Email ?? "N/A";
+            }
             if (updatedMentor.PhoneNumber is not null) 
+            {
                 existing.PhoneNumber = updatedMentor.PhoneNumber ?? "N/A";
+            }
             if (updatedMentor.TeamIds is not null) 
+            {
                 existing.Teams = updatedMentor.TeamIds?.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
+            }
             if (updatedMentor.ProjectIds is not null) 
+            {
                 existing.Projects = updatedMentor.ProjectIds?.Select(_projectService.GetProjectModelById).OfType<Project>().ToList() ?? new List<Project>();
+            }
         }
 
         /// <summary>
@@ -114,7 +130,9 @@ namespace evoNaplo.Services
         {
             var existing = _mentors.FirstOrDefault(m => m.Id == id);
             if (existing is not null) 
+            {
                 _mentors.Remove(existing);
+            }
         }
     }
 }
