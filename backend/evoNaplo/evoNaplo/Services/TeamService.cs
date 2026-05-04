@@ -77,7 +77,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Updates an existing team with the provided DTO.
+        /// Updates an existing team with the provided values.
         /// </summary>
         /// <param name="id">The ID of the team to update.</param>
         /// <param name="updatedTeam">The updated team DTO.</param>
