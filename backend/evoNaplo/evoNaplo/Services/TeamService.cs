@@ -58,7 +58,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Adds a new team to the system based on the provided TeamDTO. If the DTO does not have an ID, a new one will be generated. The method also resolves mentor and student IDs to their respective models and associates them with the new team.
+        /// Adds a new team to the database based on the provided TeamDTO. If the DTO does not have an ID, a new one will be generated. The method also resolves mentor and student IDs to their respective models and associates them with the new team.
         /// </summary>
         /// <param name="team">The TeamDTO representing the team to add.</param>
         public void AddTeam(TeamDTO team)
@@ -97,7 +97,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Deletes a team from the system by its ID.
+        /// Deletes a team from the database by its ID.
         /// </summary>
         /// <param name="id">The ID of the team to delete.</param>
         public void DeleteTeam(string id)

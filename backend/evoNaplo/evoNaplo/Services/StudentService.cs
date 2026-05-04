@@ -18,9 +18,9 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Gets all students in the system and maps them to StudentDTOs for external use, such as API responses. This method ensures that only the necessary information is exposed while keeping the internal student model encapsulated.
+        /// Gets all students in the database and maps them to StudentDTOs for external use, such as API responses. This method ensures that only the necessary information is exposed while keeping the internal student model encapsulated.
         /// </summary>
-        /// <returns>A list of StudentDTOs representing all students in the system.</returns>
+        /// <returns>A list of StudentDTOs representing all students in the database.</returns>
         public IEnumerable<StudentDTO> GetAllStudents()
         {
             return _students.Select(student => new StudentDTO 
@@ -79,7 +79,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Adds a new student to the system based on the provided StudentDTO. This method maps the DTO to the internal Student model and adds it to the in-memory list of students. If the DTO does not contain an ID, a new GUID will be generated for the student.
+        /// Adds a new student to the database based on the provided StudentDTO. This method maps the DTO to the internal Student model and adds it to the in-memory list of students. If the DTO does not contain an ID, a new GUID will be generated for the student.
         /// </summary>
         /// <param name="student">The StudentDTO containing the student's information.</param>
         public void AddStudent(StudentDTO student)
@@ -178,7 +178,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Deletes a student from the system based on their ID. This method first retrieves the student model by ID and then removes it from the in-memory list of students if it exists. If the student with the specified ID does not exist, the method simply returns without performing any action.
+        /// Deletes a student from the database based on their ID. This method first retrieves the student model by ID and then removes it from the in-memory list of students if it exists. If the student with the specified ID does not exist, the method simply returns without performing any action.
         /// </summary>
         /// <param name="id">The ID of the student to delete.</param>
         public void DeleteStudent(string id)
