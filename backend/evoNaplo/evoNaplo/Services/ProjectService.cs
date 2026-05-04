@@ -72,7 +72,7 @@ namespace evoNaplo.Services
         {
             if (string.IsNullOrEmpty(projectToCreate.Id)) 
             {
-                projectToCreate.Id = System.Guid.NewGuid().ToString();
+                projectToCreate.Id = Guid.NewGuid().ToString();
             }
             Project newProject = new Project
             {

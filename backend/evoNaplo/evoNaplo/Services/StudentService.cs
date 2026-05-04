@@ -86,7 +86,7 @@ namespace evoNaplo.Services
         {
             if (string.IsNullOrEmpty(student.Id)) 
             {
-                student.Id = System.Guid.NewGuid().ToString();
+                student.Id = Guid.NewGuid().ToString();
             }
             Student newStudent = new Student
             {

@@ -65,7 +65,7 @@ namespace evoNaplo.Services
         {
             if (string.IsNullOrEmpty(team.Id)) 
             {
-                team.Id = System.Guid.NewGuid().ToString();
+                team.Id = Guid.NewGuid().ToString();
             }
             Team newTeam = new Team
             {

@@ -76,7 +76,7 @@ namespace evoNaplo.Services
         {
             if (string.IsNullOrEmpty(mentor.Id)) 
             {
-                mentor.Id = System.Guid.NewGuid().ToString();
+                mentor.Id = Guid.NewGuid().ToString();
             }
             Mentor newMentor = new Mentor
             {
