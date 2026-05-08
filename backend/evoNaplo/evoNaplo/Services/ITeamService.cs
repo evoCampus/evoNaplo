@@ -8,7 +8,7 @@ namespace evoNaplo.Services
         Team? GetTeamModelById(string id);
         Task<IEnumerable<TeamDTO>> GetAllTeamsAsync();
         Task<TeamDTO> GetTeamByIdAsync(string id);
-        Task<TeamDTO> AddTeamAsync(TeamDTO team);
+        Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd);
         Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeam);
         Task<bool> DeleteTeamAsync(string id);
 
