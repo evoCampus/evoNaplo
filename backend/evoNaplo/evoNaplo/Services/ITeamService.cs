@@ -6,11 +6,11 @@ namespace evoNaplo.Services
     internal interface ITeamService
     {
         Team? GetTeamModelById(string id);
-        IEnumerable<TeamDTO> GetAllTeams();
-        TeamDTO? GetTeamById(string id);
-        void AddTeam(TeamDTO team);
-        void UpdateTeam(string id, TeamDTO updatedTeam);
-        void DeleteTeam(string id);
+        Task<IEnumerable<TeamDTO>> GetAllTeamsAsync();
+        Task<TeamDTO> GetTeamByIdAsync(string id);
+        Task<TeamDTO> AddTeamAsync(TeamDTO team);
+        Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeam);
+        Task<bool> DeleteTeamAsync(string id);
 
     }
 }
