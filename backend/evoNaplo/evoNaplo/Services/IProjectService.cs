@@ -3,7 +3,7 @@ using evoNaplo.DTO;
 
 namespace evoNaplo.Services
 {
-    internal interface IProjectService
+    public interface IProjectService
     {
         Project? GetProjectModelById(string id);
         Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();

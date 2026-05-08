@@ -3,7 +3,7 @@ using evoNaplo.DTO;
 
 namespace evoNaplo.Services
 {
-    internal interface ITeamService
+    public interface ITeamService
     {
         Team? GetTeamModelById(string id);
         Task<IEnumerable<TeamDTO>> GetAllTeamsAsync();

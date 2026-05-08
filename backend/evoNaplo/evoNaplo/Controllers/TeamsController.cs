@@ -4,7 +4,7 @@ using evoNaplo.Services;
 
 [ApiController]
 [Route("api/[controller]")]
-internal class TeamsController : ControllerBase
+public class TeamsController : ControllerBase
 {
     private readonly ITeamService _teamService;
 

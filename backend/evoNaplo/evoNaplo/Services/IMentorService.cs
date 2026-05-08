@@ -3,7 +3,7 @@ using evoNaplo.DTO;
 
 namespace evoNaplo.Services
 {
-    internal interface IMentorService
+    public interface IMentorService
     {
         public Mentor? GetMentorModelById(string id);
         Task<IEnumerable<MentorDTO>> GetAllMentorsAsync();

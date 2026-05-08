@@ -4,7 +4,7 @@ using evoNaplo.Services;
 
 [ApiController]
 [Route("api/[controller]")]
-internal class StudentsController : ControllerBase
+public class StudentsController : ControllerBase
 {
     private readonly IStudentService _studentService;
 

@@ -3,7 +3,7 @@ using evoNaplo.DTO;
 
 namespace evoNaplo.Services
 {
-    internal interface IStudentService
+    public interface IStudentService
     {
         public Student? GetStudentModelById(string id);
         Task<IEnumerable<StudentDTO>> GetAllStudentsAsync();

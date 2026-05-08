@@ -16,10 +16,10 @@ public class TeamDTO
     public TeamDTO(Team team)
     {
         Id = team.Id;
-        MentorIds = team.Mentors.Select(m => m.Id);
-        StudentIds = team.Students.Select(s => s.Id);
+        MentorIds = team.Mentors.Select(m => m.Id).ToList();
+        StudentIds = team.Students.Select(s => s.Id).ToList();
         //WeeklyMeetingDay = team.WeeklyMeetingDay;
         //WeeklyMeetingTime = team.WeeklyMeetingTime;
-        AttendanceSheetIds = team.AttendanceSheets.Select(a => a.Id);
+        AttendanceSheetIds = team.AttendanceSheets.Select(a => a.Id).ToList();
     }
 }
