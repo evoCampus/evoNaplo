@@ -8,7 +8,7 @@ namespace evoNaplo.Services
         private static readonly List<Student> _students = new List<Student>();
 
         /// <summary>
-        /// Gets the student model by their ID. This is used internally for operations that require the full student model, such as updates or deletions.
+        /// This method is used internally by the service to retrieve the Student model for operations that require it, such as adding or updating students. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
         /// </summary>
         /// <param name="id">The ID of the student to retrieve.</param>
         /// <returns>The Student model if found, otherwise null.</returns>
@@ -18,179 +18,158 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Gets all students in the database and maps them to StudentDTOs for external use, such as API responses. This method ensures that only the necessary information is exposed while keeping the internal student model encapsulated.
+        /// Retrieves a list of all students in the database. If no students are found, a StudentNotFoundException is thrown with an appropriate message. Each student is returned as a StudentDTO.
         /// </summary>
-        /// <returns>A list of StudentDTOs representing all students in the database.</returns>
-        public IEnumerable<StudentDTO> GetAllStudents()
+        /// <returns>A list of StudentDTOs if students are found.</returns>
+        /// <exception cref="StudentNotFoundException"></exception>
+        public async Task<IEnumerable<StudentDTO>> GetAllStudentsAsync()
         {
-            return _students.Select(student => new StudentDTO 
-        { 
-            Id = student.Id,
-            Name = student.Name ?? "N/A",
-            Email = student.Email ?? "N/A",
-            PhoneNumber = student.PhoneNumber ?? "N/A",
-            UniversityProgramme = student.UniversityProgramme ?? "N/A",
-            CurrentSemester = student.CurrentSemester,
-            IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
-            PersonalGoals = student.PersonalGoals ?? "N/A",
-            HasAppliedForScholarship = student.HasAppliedForScholarship,
-            HasScholarship = student.HasActiveScholarship,
-            ScholarshipDuration = student.ScholarshipDuration,
-            HasAppliedForInternship = student.HasAppliedForInternship,
-            HasInternship = student.IsCurrentlyIntern,
-            IsWorkingStudent = student.IsWorkingStudent,
-            WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
-        });
+            IEnumerable<StudentDTO> students = _students.Select(s => new StudentDTO(s));
+            if (students.Any())
+            {
+                return students;
+            }
+            else
+            {
+                throw new StudentNotFoundException("No students found.");
+            }
         }
 
         /// <summary>
-        /// Gets a single student by their ID and maps it to a StudentDTO for external use. This method is useful for retrieving specific student information without exposing the internal model directly.
+        /// Retrieves a specific student by their ID. If a student with the specified ID is found, it is returned as a StudentDTO. If no student is found with the given ID, a StudentNotFoundException is thrown with an appropriate message.
         /// </summary>
         /// <param name="id">The ID of the student to retrieve.</param>
-        /// <returns>The StudentDTO if found, otherwise null.</returns>
-        public StudentDTO? GetStudentById(string id)
+        /// <returns>The StudentDTO if found.</returns>
+        /// <exception cref="StudentNotFoundException"></exception>
+        public async Task<StudentDTO> GetStudentByIdAsync(string id)
         {
             Student? student = _students.FirstOrDefault(s => s.Id == id);
             if (student is not null) 
             {
-                return new StudentDTO 
-                {
-                    Id = student.Id,
-                    Name = student.Name ?? "N/A",
-                    Email = student.Email ?? "N/A",
-                    PhoneNumber = student.PhoneNumber ?? "N/A",
-                    UniversityProgramme = student.UniversityProgramme ?? "N/A",
-                    CurrentSemester = student.CurrentSemester,
-                    IsInTheirFirstSemester = student.IsFirstEvoCampusSemester,
-                    PersonalGoals = student.PersonalGoals ?? "N/A",
-                    HasAppliedForScholarship = student.HasAppliedForScholarship,
-                    HasScholarship = student.HasActiveScholarship,
-                    ScholarshipDuration = student.ScholarshipDuration,
-                    HasAppliedForInternship = student.HasAppliedForInternship,
-                    HasInternship = student.IsCurrentlyIntern,
-                    IsWorkingStudent = student.IsWorkingStudent,
-                    WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
-                };
+                return new StudentDTO(student);
             }
             else
             {
-                return null;
+                throw new StudentNotFoundException($"Student with ID {id} not found.");
             }
         }
 
         /// <summary>
-        /// Adds a new student to the database based on the provided StudentDTO. This method maps the DTO to the internal Student model and adds it to the in-memory list of students. If the DTO does not contain an ID, a new GUID will be generated for the student.
+        /// Adds a new student to the list. If a student with the same ID already exists, a StudentAlreadyExistsException is thrown with an appropriate message. If the student is added successfully, the provided StudentDTO is returned. If the ID of the student to add is null or empty, a new GUID will be generated and assigned as the ID.
         /// </summary>
-        /// <param name="student">The StudentDTO containing the student's information.</param>
-        public void AddStudent(StudentDTO student)
+        /// <param name="studentToAdd">The StudentDTO to add.</param>
+        /// <returns>The added StudentDTO if successful.</returns>
+        /// <exception cref="StudentAlreadyExistsException"></exception>
+        public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd)
         {
-            if (string.IsNullOrEmpty(student.Id)) 
+            if (string.IsNullOrEmpty(studentToAdd.Id)) 
             {
-                student.Id = Guid.NewGuid().ToString();
+                studentToAdd.Id = Guid.NewGuid().ToString();
             }
-            Student newStudent = new Student
+            if (_students.FirstOrDefault(s => s.Id == studentToAdd.Id) is null)
             {
-                Id = student.Id,
-                Name = student.Name ?? "N/A",
-                Email = student.Email ?? "N/A",
-                PhoneNumber = student.PhoneNumber ?? "N/A",
-                UniversityProgramme = student.UniversityProgramme ?? "N/A",
-                CurrentSemester = student.CurrentSemester,
-                IsFirstEvoCampusSemester = student.IsInTheirFirstSemester,
-                PersonalGoals = student.PersonalGoals ?? "N/A",
-                HasAppliedForScholarship = student.HasAppliedForScholarship,
-                HasActiveScholarship = student.HasScholarship,
-                ScholarshipDuration = student.ScholarshipDuration,
-                HasAppliedForInternship = student.HasAppliedForInternship,
-                IsCurrentlyIntern = student.HasInternship,
-                IsWorkingStudent = student.IsWorkingStudent,
-                WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam
-            };
-            _students.Add(newStudent);
+                _students.Add(new Student
+                {
+                    Id = studentToAdd.Id,
+                    Name = studentToAdd.Name,
+                    Email = studentToAdd.Email,
+                    PhoneNumber = studentToAdd.PhoneNumber,
+                    UniversityProgramme = studentToAdd.UniversityProgramme,
+                    CurrentSemester = studentToAdd.CurrentSemester,
+                    IsFirstEvoCampusSemester = studentToAdd.IsInTheirFirstSemester,
+                    PersonalGoals = studentToAdd.PersonalGoals,
+                    HasAppliedForScholarship = studentToAdd.HasAppliedForScholarship,
+                    HasActiveScholarship = studentToAdd.HasScholarship,
+                    ScholarshipDuration = studentToAdd.ScholarshipDuration,
+                    HasAppliedForInternship = studentToAdd.HasAppliedForInternship,
+                    IsCurrentlyIntern = studentToAdd.HasInternship,
+                    IsWorkingStudent = studentToAdd.IsWorkingStudent,
+                    WantsToStayWithCurrentTeam = studentToAdd.WantsToStayWithCurrentTeam,
+                });
+                return studentToAdd;
+            }
+            else
+            {
+                throw new StudentAlreadyExistsException($"A student with the ID {studentToAdd.Id} already exists.");
+            }
         }
 
         /// <summary>
-        /// Updates an existing student's information based on the provided StudentDTO. This method first retrieves the existing student model by ID, then updates its properties with the values from the DTO if they are different and not null. This allows for partial updates where only certain fields need to be changed without affecting others.
+        /// Updates an existing student with the specified ID using the provided updated student data. If a student with the given ID is found, it is updated with the new data and the updated StudentDTO is returned. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message.
         /// </summary>
         /// <param name="id">The ID of the student to update.</param>
         /// <param name="updatedStudent">The updated student DTO.</param>
-        public void UpdateStudent(string id, StudentDTO updatedStudent)
+        /// <returns>The updated StudentDTO if successful.</returns>
+        /// <exception cref="StudentNotFoundException"></exception>
+        public async Task<StudentDTO> UpdateStudentAsync(string id, StudentDTO updatedStudent)
         {
-            Student? existingStudent = _students.FirstOrDefault(s => s.Id == id);
-            if (existingStudent is null || updatedStudent is null) 
+            var existing = _students.FirstOrDefault(s => s.Id == id);
+            if (existing is not null) 
             {
-                return;
+                existing.Id = updatedStudent.Id;
+                existing.Name = updatedStudent.Name;
+                existing.Email = updatedStudent.Email;
+                existing.PhoneNumber = updatedStudent.PhoneNumber;
+                existing.UniversityProgramme = updatedStudent.UniversityProgramme;
+                existing.CurrentSemester = updatedStudent.CurrentSemester;
+                existing.IsFirstEvoCampusSemester = updatedStudent.IsInTheirFirstSemester;
+                existing.PersonalGoals = updatedStudent.PersonalGoals;
+                existing.HasAppliedForScholarship = updatedStudent.HasAppliedForScholarship;
+                existing.HasActiveScholarship = updatedStudent.HasScholarship;
+                existing.ScholarshipDuration = updatedStudent.ScholarshipDuration;
+                existing.HasAppliedForInternship = updatedStudent.HasAppliedForInternship;
+                existing.IsCurrentlyIntern = updatedStudent.HasInternship;
+                existing.IsWorkingStudent = updatedStudent.IsWorkingStudent;
+                existing.WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam;
+                return updatedStudent;
             }
-
-            if (updatedStudent.Name != existingStudent.Name && updatedStudent.Name is not null) 
+            else
             {
-                existingStudent.Name = updatedStudent.Name ?? "N/A";
-            }
-            if (updatedStudent.Email != existingStudent.Email && updatedStudent.Email is not null) 
-            {
-                existingStudent.Email = updatedStudent.Email ?? "N/A";
-            }
-            if (updatedStudent.PhoneNumber != existingStudent.PhoneNumber && updatedStudent.PhoneNumber is not null) 
-            {
-                existingStudent.PhoneNumber = updatedStudent.PhoneNumber ?? "N/A";
-            }
-            if (updatedStudent.UniversityProgramme != existingStudent.UniversityProgramme && updatedStudent.UniversityProgramme is not null) 
-            {
-                existingStudent.UniversityProgramme = updatedStudent.UniversityProgramme ?? "N/A";
-            }
-            if (updatedStudent.CurrentSemester != existingStudent.CurrentSemester && updatedStudent.CurrentSemester is not null) 
-            {
-                existingStudent.CurrentSemester = updatedStudent.CurrentSemester;
-            }
-            if (updatedStudent.PersonalGoals != existingStudent.PersonalGoals && updatedStudent.PersonalGoals is not null) 
-            {
-                existingStudent.PersonalGoals = updatedStudent.PersonalGoals;
-            }
-            if (updatedStudent.IsInTheirFirstSemester != existingStudent.IsFirstEvoCampusSemester) 
-            {
-                existingStudent.IsFirstEvoCampusSemester = updatedStudent.IsInTheirFirstSemester;
-            }
-            if (updatedStudent.HasAppliedForScholarship != existingStudent.HasAppliedForScholarship) 
-            {
-                existingStudent.HasAppliedForScholarship = updatedStudent.HasAppliedForScholarship;
-            }
-            if (updatedStudent.HasScholarship != existingStudent.HasActiveScholarship) 
-            {
-                existingStudent.HasActiveScholarship = updatedStudent.HasScholarship;
-            }
-            if (updatedStudent.ScholarshipDuration != existingStudent.ScholarshipDuration) 
-            {
-                existingStudent.ScholarshipDuration = updatedStudent.ScholarshipDuration;
-            }
-            if (updatedStudent.HasAppliedForInternship != existingStudent.HasAppliedForInternship) 
-            {
-                existingStudent.HasAppliedForInternship = updatedStudent.HasAppliedForInternship;
-            }
-            if (updatedStudent.HasInternship != existingStudent.IsCurrentlyIntern) 
-            {
-                existingStudent.IsCurrentlyIntern = updatedStudent.HasInternship;
-            }
-            if (updatedStudent.IsWorkingStudent != existingStudent.IsWorkingStudent) 
-            {
-                existingStudent.IsWorkingStudent = updatedStudent.IsWorkingStudent;
-            }
-            if (updatedStudent.WantsToStayWithCurrentTeam != existingStudent.WantsToStayWithCurrentTeam) 
-            {
-                existingStudent.WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam;
+                throw new StudentNotFoundException($"Student with ID {id} not found.");
             }
         }
 
         /// <summary>
-        /// Deletes a student from the database based on their ID. This method first retrieves the student model by ID and then removes it from the in-memory list of students if it exists. If the student with the specified ID does not exist, the method simply returns without performing any action.
+        /// Deletes a student with the specified ID. If a student with the given ID is found, it is removed from the list of students and the method returns true. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message and the method returns false.
         /// </summary>
         /// <param name="id">The ID of the student to delete.</param>
-        public void DeleteStudent(string id)
+        /// <returns>A boolean indicating whether the student was deleted.</returns>
+        /// <exception cref="StudentNotFoundException"></exception>
+        public async Task<bool> DeleteStudentAsync(string id)
         {
-            var studentToRemove = _students.FirstOrDefault(s => s.Id == id);
-            if (studentToRemove != null)
+            var existing = _students.FirstOrDefault(s => s.Id == id);
+            if (existing is not null) 
             {
-                _students.Remove(studentToRemove);
+                _students.Remove(existing);
+                return true;
+            }
+            else
+            {
+                throw new StudentNotFoundException($"Student with ID {id} not found.");
+                return false;
             }
         }
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a student was not found in the database. This exception is thrown when an operation attempts to access a student that does not exist, such as retrieving, updating, or deleting a student by its ID. The exception message provides details about the specific student that was not found, allowing for better error handling and debugging in the application.
+/// </summary>
+public class StudentNotFoundException : Exception
+{
+    public StudentNotFoundException(string message) : base(message)
+    {
+        
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a student with the same attributes already exists in the database. This exception is thrown when an attempt is made to add a new student that has the same ID as an existing student, or when the provided student data conflicts with existing students in a way that violates uniqueness constraints. The exception message provides details about the specific conflict, allowing for better error handling and debugging in the application.
+/// </summary>
+public class StudentAlreadyExistsException : Exception
+{
+    public StudentAlreadyExistsException(string message) : base(message)
+    {
+        
     }
 }

@@ -16,100 +16,150 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Gets the Team model by its ID, including all related entities (mentors, students, attendance sheets).
+        /// This method is used internally by the service to retrieve the Team model for operations that require it, such as adding or updating teams. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
         /// </summary>
         /// <param name="id">The ID of the team to retrieve.</param>
-        /// <returns>The team model if found, otherwise null.</returns>
+        /// <returns>The Team model if found, otherwise null.</returns>
         public Team? GetTeamModelById(string id)
         {
             return _teams.FirstOrDefault(t => t.Id == id);
         }
 
         /// <summary>
-        /// Retrieves all teams as DTOs, including their related mentor and student IDs, and attendance sheet IDs.
+        /// Retrieves a list of all teams in the database. If no teams are found, a TeamNotFoundException is thrown with an appropriate message. Each team is returned as a TeamDTO.
         /// </summary>
-        /// <returns>An enumerable of TeamDTOs representing all teams.</returns>
-        public IEnumerable<TeamDTO> GetAllTeams()
+        /// <returns>A list of TeamDTOs if teams are found.</returns>
+        /// <exception cref="TeamNotFoundException"></exception>
+        public async Task<IEnumerable<TeamDTO>> GetAllTeamsAsync()
         {
-            return _teams.Select(team => new TeamDTO
+            IEnumerable<TeamDTO> teams = _teams.Select(t => new TeamDTO(t));
+            if (teams.Any())
             {
-                Id = team.Id,
-                MentorIds = team.Mentors?.Select(mentor => mentor.Id) ?? Enumerable.Empty<string>(),
-                StudentIds = team.Students?.Select(student => student.Id) ?? Enumerable.Empty<string>(),
-                AttendanceSheetIds = team.AttendanceSheets?.Select(sheet => sheet.Id) ?? Enumerable.Empty<string>()
-            });
+                return teams;
+            }
+            else
+            {
+                throw new TeamNotFoundException("No teams found.");
+            }
         }
 
         /// <summary>
-        /// Gets a specific team by its ID and returns it as a DTO, including related mentor and student IDs, and attendance sheet IDs.
+        /// Retrieves a specific team by its ID and returns it as a DTO, including related mentor and student IDs, and attendance sheet IDs.
         /// </summary>
         /// <param name="id">The ID of the team to retrieve.</param>
-        /// <returns>The team DTO if found, otherwise null.</returns>
-        public TeamDTO? GetTeamById(string id)
+        /// <returns>The team DTO if found.</returns>
+        /// <exception cref="TeamNotFoundException"></exception>
+        public async Task<TeamDTO> GetTeamByIdAsync(string id)
         {
-            var team = _teams.FirstOrDefault(t => t.Id == id);
-            return team is null ? null : new TeamDTO
+            Team? team = _teams.FirstOrDefault(t => t.Id == id);
+            if (team is not null) 
             {
-                Id = team.Id,
-                MentorIds = team.Mentors?.Select(mentor => mentor.Id) ?? Enumerable.Empty<string>(),
-                StudentIds = team.Students?.Select(student => student.Id) ?? Enumerable.Empty<string>(),
-                AttendanceSheetIds = team.AttendanceSheets?.Select(sheet => sheet.Id) ?? Enumerable.Empty<string>()
-            };
-        }
-
-        /// <summary>
-        /// Adds a new team to the database based on the provided TeamDTO. If the DTO does not have an ID, a new one will be generated. The method also resolves mentor and student IDs to their respective models and associates them with the new team.
-        /// </summary>
-        /// <param name="team">The TeamDTO representing the team to add.</param>
-        public void AddTeam(TeamDTO team)
-        {
-            if (string.IsNullOrEmpty(team.Id)) 
-            {
-                team.Id = Guid.NewGuid().ToString();
+                return new TeamDTO(team);
             }
-            Team newTeam = new Team
+            else
             {
-                Id = team.Id,
-                Mentors = team.MentorIds?.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>(),
-                Students = team.StudentIds?.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>(),
-            };
-            _teams.Add(newTeam);
+                throw new TeamNotFoundException($"Team with ID {id} not found.");
+            }
         }
 
         /// <summary>
-        /// Updates an existing team with the provided values.
+        /// Adds a new team to the list. If a team with the same ID already exists, a TeamAlreadyExistsException is thrown with an appropriate message. If the team is added successfully, the provided TeamDTO is returned. If the ID of the team to add is null or empty, a new GUID will be generated and assigned as the ID.
+        /// </summary>
+        /// <param name="teamToAdd">The TeamDTO to add.</param>
+        /// <returns>The added TeamDTO if successful.</returns>
+        /// <exception cref="TeamAlreadyExistsException"></exception>
+        public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd)
+        {
+            if (string.IsNullOrEmpty(teamToAdd.Id)) 
+            {
+                teamToAdd.Id = Guid.NewGuid().ToString();
+            }
+            if (_teams.FirstOrDefault(t => t.Id == teamToAdd.Id) is null)
+            {
+                _teams.Add(new Team
+                {
+                    Id = teamToAdd.Id,
+                    Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>(),
+                    Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>(),
+                    //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
+                    //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
+                    AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList() ?? new List<AttendanceSheet>(),
+                });
+                return teamToAdd;
+            }
+            else
+            {
+                throw new TeamAlreadyExistsException($"A team with the ID {teamToAdd.Id} already exists.");
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing team with the specified ID using the provided updated team data. If a team with the given ID is found, it is updated with the new data and the updated TeamDTO is returned. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message.
         /// </summary>
         /// <param name="id">The ID of the team to update.</param>
         /// <param name="updatedTeam">The updated team DTO.</param>
-        public void UpdateTeam(string id, TeamDTO updatedTeam)
+        /// <returns>The updated TeamDTO if successful.</returns>
+        /// <exception cref="TeamNotFoundException"></exception>
+        public async Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeam)
         {
             var existing = _teams.FirstOrDefault(t => t.Id == id);
-            if (existing is null || updatedTeam is null) 
+            if (existing is not null) 
             {
-                return;
+                existing.Id = updatedTeam.Id;
+                existing.Mentors = updatedTeam.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>();
+                existing.Students = updatedTeam.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>();
+                //existing.WeeklyMeetingDay = updatedTeam.WeeklyMeetingDay;
+                //existing.WeeklyMeetingTime = updatedTeam.WeeklyMeetingTime;
+                existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList() ?? new List<AttendanceSheet>();
+                return updatedTeam;
             }
-
-            if (updatedTeam.MentorIds is not null) 
+            else
             {
-                existing.Mentors = updatedTeam.MentorIds?.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>();
-            }
-            if (updatedTeam.StudentIds is not null) 
-            {
-                existing.Students = updatedTeam.StudentIds?.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>();
+                throw new TeamNotFoundException($"Team with ID {id} not found.");
             }
         }
 
         /// <summary>
-        /// Deletes a team from the database by its ID.
+        /// Deletes a team with the specified ID. If a team with the given ID is found, it is removed from the list of teams and the method returns true. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message and the method returns false.
         /// </summary>
         /// <param name="id">The ID of the team to delete.</param>
-        public void DeleteTeam(string id)
+        /// <returns>A boolean indicating whether the team was deleted.</returns>
+        /// <exception cref="TeamNotFoundException"></exception>
+        public async Task<bool> DeleteTeamAsync(string id)
         {
             var existing = _teams.FirstOrDefault(t => t.Id == id);
             if (existing is not null) 
             {
                 _teams.Remove(existing);
+                return true;
+            }
+            else
+            {
+                throw new TeamNotFoundException($"Team with ID {id} not found.");
+                return false;
             }
         }
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a team was not found in the database. This exception is thrown when an operation attempts to access a team that does not exist, such as retrieving, updating, or deleting a team by its ID. The exception message provides details about the specific team that was not found, allowing for better error handling and debugging in the application.
+/// </summary>
+public class TeamNotFoundException : Exception
+{
+    public TeamNotFoundException(string message) : base(message)
+    {
+        
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a team with the same attributes already exists in the database. This exception is thrown when an attempt is made to add a new team that has the same ID as an existing team, or when the provided team data conflicts with existing teams in a way that violates uniqueness constraints. The exception message provides details about the specific conflict, allowing for better error handling and debugging in the application.
+/// </summary>
+public class TeamAlreadyExistsException : Exception
+{
+    public TeamAlreadyExistsException(string message) : base(message)
+    {
+        
     }
 }

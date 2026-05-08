@@ -30,7 +30,7 @@ namespace evoNaplo.Services
         /// <exception cref="ProjectNotFoundException"></exception>
         public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
         {
-            IEnumerable<ProjectDTO> projects = _projects.Select(project => new ProjectDTO(project));
+            IEnumerable<ProjectDTO> projects = _projects.Select(p => new ProjectDTO(p));
             if (projects.Any())
             {
                 return projects;
@@ -150,7 +150,7 @@ public class ProjectNotFoundException : Exception
 }
 
 /// <summary>
-/// Custom exception class to indicate that a project with the same name already exists in the database. This exception is thrown when an attempt is made to add a new project with a name that is already in use by another project. The exception message provides details about the conflicting project name, allowing for better error handling and debugging in the application.
+/// Custom exception class to indicate that a project with the same attributes already exists in the database. This exception is thrown when an attempt is made to add a new project that has the same ID as an existing project, or when the provided project data conflicts with existing projects in a way that violates uniqueness constraints. The exception message provides details about the specific conflict, allowing for better error handling and debugging in the application.
 /// </summary>
 public class ProjectAlreadyExistsException : Exception
 {
