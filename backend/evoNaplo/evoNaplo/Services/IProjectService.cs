@@ -6,13 +6,11 @@ namespace evoNaplo.Services
     internal interface IProjectService
     {
         Project? GetProjectModelById(string id);
-        IEnumerable<ProjectDTO> GetAllProjects();
-        ProjectDTO? GetProjectById(string id);
-        void AddProject(ProjectDTO project);
-        void UpdateProject(string id, ProjectDTO updatedProject);
-        void AddTeamsToProject(string projectId, IEnumerable<Team> teams);
-        void RemoveTeamsFromProject(string projectId, IEnumerable<Team> teams);
-        void DeleteProject(string id);
+        Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
+        Task<ProjectDTO> GetProjectByIdAsync(string id);
+        Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd);
+        Task<ProjectDTO> UpdateProjectAsync(string id, ProjectDTO updatedProject);
+        Task<bool> DeleteProjectAsync(string id);
 
     }
 }

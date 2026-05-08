@@ -14,7 +14,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Returns the Project model by its Id, or null if not found.
+        /// This method is used internally by the service to retrieve the Project model for operations that require it, such as adding or updating projects. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
         /// </summary>
         /// <param name="id">The ID of the project to retrieve.</param>
         /// <returns>The Project model if found, otherwise null.</returns>
@@ -24,147 +24,138 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Returns a list of all projects as ProjectDTOs. If a project has null properties, they are replaced with "N/A" or empty collections in the DTO.
+        /// Retrieves a list of all projects in the database. If no projects are found, a ProjectNotFoundException is thrown with an appropriate message. Each project is returned as a ProjectDTO.
         /// </summary>
-        /// <returns>A list of ProjectDTOs.</returns>
-        public IEnumerable<ProjectDTO> GetAllProjects()
+        /// <returns>A list of ProjectDTOs if projects are found.</returns>
+        /// <exception cref="ProjectNotFoundException"></exception>
+        public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
         {
-            return _projects.Select(project => new ProjectDTO
+            IEnumerable<ProjectDTO> projects = _projects.Select(project => new ProjectDTO(project));
+            if (projects.Any())
             {
-                Id = project.Id,
-                Name = project.Name ?? "N/A",
-                Description = project.ShortDescription ?? "N/A",
-                ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
-                TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>(),
-            });
+                return projects;
+            }
+            else
+            {
+                throw new ProjectNotFoundException("No projects found.");
+            }
         }
 
         /// <summary>
-        /// Returns a single project as a ProjectDTO by its ID. If the project is not found, returns null. If the project has null properties, they are replaced with "N/A" or empty collections in the DTO.
+        /// Retrieves a specific project by its ID. If a project with the specified ID is found, it is returned as a ProjectDTO. If no project is found with the given ID, a ProjectNotFoundException is thrown with an appropriate message.
         /// </summary>
         /// <param name="id">The ID of the project to retrieve.</param>
-        /// <returns>The ProjectDTO if found, otherwise null.</returns>
-        public ProjectDTO? GetProjectById(string id)
+        /// <returns>The ProjectDTO if found.</returns>
+        /// <exception cref="ProjectNotFoundException"></exception>
+        public async Task<ProjectDTO> GetProjectByIdAsync(string id)
         {
             Project? project = _projects.FirstOrDefault(p => p.Id == id);
             if (project is not null) 
             {
-                return new ProjectDTO 
-                {
-                    Id = project.Id,
-                    Name = project.Name ?? "N/A",
-                    Description = project.ShortDescription ?? "N/A",
-                    ProjectLinks = project.ProjectLinks?.ToDictionary(link => link.LinkType.ToString(), link => link.Url) ?? new Dictionary<string, string>(),
-                    TeamIds = project.Teams?.Select(team => team.Id).ToList() ?? new List<string>()
-                };
+                return new ProjectDTO(project);
             }
             else
             {
-                return null;
+                throw new ProjectNotFoundException($"Project with ID {id} not found.");
             }
         }
 
         /// <summary>
-        /// Adds a new project to the list. If the provided ProjectDTO does not have an ID, a new GUID is generated for it. The project is created with the provided name, description, and associated teams (if any). If any of the properties in the DTO are null, they are replaced with "N/A" or empty collections in the created Project model.
+        /// Adds a new project to the list of projects. If a project with the same name already exists, a ProjectAlreadyExistsException is thrown with an appropriate message. If the project is added successfully, the provided ProjectDTO is returned. If the ID of the project to add is null or empty, a new GUID will be generated and assigned as the ID.
         /// </summary>
-        /// <param name="projectToCreate">The ProjectDTO to add.</param>
-        public void AddProject(ProjectDTO projectToCreate)
+        /// <param name="projectToAdd">The ProjectDTO to add.</param>
+        /// <returns>The added ProjectDTO if successful.</returns>
+        /// <exception cref="ProjectAlreadyExistsException"></exception>
+        public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd)
         {
-            if (string.IsNullOrEmpty(projectToCreate.Id)) 
+            if (string.IsNullOrEmpty(projectToAdd.Id)) 
             {
-                projectToCreate.Id = Guid.NewGuid().ToString();
+                projectToAdd.Id = Guid.NewGuid().ToString();
             }
-            Project newProject = new Project
+            if (_projects.FirstOrDefault(p => p.Name == projectToAdd.Name) is null)
             {
-                Id = projectToCreate.Id,
-                Name = projectToCreate.Name ?? "N/A",
-                ShortDescription = projectToCreate.Description ?? "N/A",
-                Teams = projectToCreate.TeamIds?.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>()
-            };
-            _projects.Add(newProject);
+                _projects.Add(new Project
+                {
+                    Id = projectToAdd.Id,
+                    Name = projectToAdd.Name,
+                    ShortDescription = projectToAdd.Description,
+                    //ProjectLinks are to be implemented in the future
+                    Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>()
+                });
+                return projectToAdd;
+            }
+            else
+            {
+                throw new ProjectAlreadyExistsException($"A project with the name {projectToAdd.Name} already exists.");
+            }
         }
 
         /// <summary>
-        /// Updates an existing project with the specified ID using the provided ProjectDTO. If the project is not found or the updatedProject is null, the method will return without making any changes. For each property in the updatedProject that is not null, the corresponding property of the existing project will be updated. The project's teams will be updated based on the provided team IDs, or set to an empty list if the IDs are null.
+        /// Updates an existing project with the specified ID using the provided updated project data. If a project with the given ID is found, it is updated with the new data and the updated ProjectDTO is returned. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message.
         /// </summary>
         /// <param name="id">The ID of the project to update.</param>
         /// <param name="updatedProject">The updated project DTO.</param>
-        public void UpdateProject(string id, ProjectDTO updatedProject)
+        /// <returns>The updated ProjectDTO if successful.</returns>
+        /// <exception cref="ProjectNotFoundException"></exception>
+        public async Task<ProjectDTO> UpdateProjectAsync(string id, ProjectDTO updatedProject)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == id);
-            if (existing is null || updatedProject is null) 
-            {
-                return;
-            }
-
-            if (updatedProject.Id is not null) 
+            if (existing is not null) 
             {
                 existing.Id = updatedProject.Id;
+                existing.Name = updatedProject.Name;
+                existing.ShortDescription = updatedProject.Description;
+                //ProjectLinks are to be implemented in the future
+                existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
+                return updatedProject;
             }
-            if (updatedProject.Name is not null) 
+            else
             {
-                existing.Name = updatedProject.Name ?? "N/A";
+                throw new ProjectNotFoundException($"Project with ID {id} not found.");
             }
-            if (updatedProject.Description is not null) 
-            {
-                existing.ShortDescription = updatedProject.Description ?? "N/A";
-            }
-            if (updatedProject.TeamIds is not null) 
-            {
-                existing.Teams = updatedProject.TeamIds?.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
-            }
-        }
-
-        public void AddTeamsToProject(string projectId, IEnumerable<Team> teams)
-        {
-            var existing = _projects.FirstOrDefault(p => p.Id == projectId);
-            if (existing is null || teams is null) 
-            {
-                return;
-            }
-
-            if (existing.Teams == null) 
-            {
-                existing.Teams = new List<Team>();
-            }
-
-            foreach (var team in teams)
-            {
-                if (team is null) 
-                {
-                    continue;
-                }
-                // avoid duplicates by Team Id
-                if (!existing.Teams.Any(t => t.Id == team.Id))
-                {
-                    existing.Teams.Add(team);
-                }
-            }
-        }
-
-        public void RemoveTeamsFromProject(string projectId, IEnumerable<Team> teams)
-        {
-            var existing = _projects.FirstOrDefault(p => p.Id == projectId);
-            if (existing is null || teams is null || existing.Teams is null) 
-            {
-                return;
-            }
-
-            var idsToRemove = teams.Where(t => t is not null).Select(t => t.Id).ToHashSet();
-            existing.Teams = existing.Teams.Where(t => !idsToRemove.Contains(t.Id)).ToList();
         }
 
         /// <summary>
-        /// Deletes the project with the specified ID from the list. If the project is not found, the method will return without making any changes.
+        /// Deletes a project with the specified ID. If a project with the given ID is found, it is removed from the list of projects and the method returns true. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message and the method returns false.
         /// </summary>
         /// <param name="id">The ID of the project to delete.</param>
-        public void DeleteProject(string id)
+        /// <returns>A boolean indicating whether the project was deleted.</returns>
+        /// <exception cref="ProjectNotFoundException"></exception>
+        public async Task<bool> DeleteProjectAsync(string id)
         {
             var existing = _projects.FirstOrDefault(p => p.Id == id);
             if (existing is not null) 
             {
                 _projects.Remove(existing);
+                return true;
+            }
+            else
+            {
+                throw new ProjectNotFoundException($"Project with ID {id} not found.");
+                return false;
             }
         }
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a project was not found in the database. This exception is thrown when an operation attempts to access a project that does not exist, such as retrieving, updating, or deleting a project by its ID. The exception message provides details about the specific project that was not found, allowing for better error handling and debugging in the application.
+/// </summary>
+public class ProjectNotFoundException : Exception
+{
+    public ProjectNotFoundException(string message) : base(message)
+    {
+        
+    }
+}
+
+/// <summary>
+/// Custom exception class to indicate that a project with the same name already exists in the database. This exception is thrown when an attempt is made to add a new project with a name that is already in use by another project. The exception message provides details about the conflicting project name, allowing for better error handling and debugging in the application.
+/// </summary>
+public class ProjectAlreadyExistsException : Exception
+{
+    public ProjectAlreadyExistsException(string message) : base(message)
+    {
+        
     }
 }
