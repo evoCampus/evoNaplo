@@ -14,84 +14,94 @@ internal class TeamsController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves a list of all teams in the system, returning their details as TeamDTO objects. If no teams are found, an empty collection is returned.
+    /// Retrieves a list of all teams in the database. If no teams are found, a NotFound response is returned with an appropriate message. Each team is returned as a TeamDTO.
     /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of team data transfer objects.</returns>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="TeamDTO"/> objects representing all teams in the database.</returns>
     [HttpGet]
-    public Task<IEnumerable<TeamDTO>> GetTeams()
+    public async Task<ActionResult<IEnumerable<TeamDTO>>> GetTeams()
     {
-        return Task.FromResult(_teamService.GetAllTeams());
+        try
+        {
+            return Ok(await _teamService.GetAllTeamsAsync());
+        }
+        catch (TeamNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
-    /// Retrieves the details of a specific team based on the provided identifier. If a team with the given identifier exists, its details are returned as a TeamDTO object. If no team is found with the specified identifier, a NotFound response is returned.
+    /// Retrieves a specific team by its ID. If a team with the specified ID is found, it is returned as a TeamDTO. If no team is found with the given ID, a NotFound response is returned with an appropriate message.
     /// </summary>
-    /// <param name="teamId">The unique identifier of the team to retrieve.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a <see cref="TeamDTO"/> representing
-    /// the requested team.</returns>
-    [HttpGet("{id}")]
+    /// <param name="teamId">The ID of the team to retrieve.</param>
+    /// <returns>The TeamDTO if found, otherwise a NotFound response.</returns>
+    [HttpGet("{teamId}")]
     public async Task<ActionResult<TeamDTO>> GetTeam(string teamId)
     {
-        TeamDTO? team = _teamService.GetTeamById(teamId);
-        if (team is null)
+        try
         {
-            return NotFound($"Team with id {teamId} not found.");
+            return Ok(await _teamService.GetTeamByIdAsync(teamId));
         }
-        return Ok(team);
+        catch (TeamNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     /// <summary>
-    /// Creates a new team in the system based on the provided team data. If a team with the same identifier already exists, a Conflict response is returned.
+    /// Adds a new team to the database. If a team with the same name already exists, a Conflict response is returned with an appropriate message. If the team is added successfully, the created TeamDTO is returned in the response body.
     /// </summary>
-    /// <param name="teamToCreate">The data for the team to create.</param>
+    /// <param name="teamToCreate">The team data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created team.</returns>
     [HttpPost]
     public async Task<ActionResult<TeamDTO>> CreateTeam(TeamDTO teamToCreate)
     {
-        if (_teamService.GetTeamById(teamToCreate.Id) is null)
+        try
         {
-            _teamService.AddTeam(teamToCreate);
-            return Ok(teamToCreate);
+            return Ok(await _teamService.AddTeamAsync(teamToCreate));
         }
-        else
+        catch (TeamAlreadyExistsException ex)
         {
-            return Conflict($"Team with ID {teamToCreate.Id} already exists.");
+            return Conflict(ex.Message);
         }
     }
 
     /// <summary>
-    /// Updates the details of an existing team based on the provided identifier and updated team data. If no team with the given identifier exists, a NotFound response is returned.
+    /// Updates an existing team in the database based on the provided identifier and the provided updated team data. If no team with the given identifier exists, a NotFound response is returned with an appropriate message. If the team is updated successfully, a NoContent response is returned.
     /// </summary>
     /// <param name="teamId">The unique identifier of the team to update. Cannot be null or empty.</param>
     /// <param name="updatedTeam">An object containing the updated team information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the update is successful; otherwise, an HTTP 404 response if the team is not found.</returns>
-    [HttpPut("{id}")]
+    [HttpPut("{teamId}")]
     public async Task<ActionResult> UpdateTeam(string teamId, TeamDTO updatedTeam)
     {
-        if (_teamService.GetTeamById(teamId) is not null)
+        try
         {
-            _teamService.UpdateTeam(teamId, updatedTeam);
+            await _teamService.UpdateTeamAsync(teamId, updatedTeam);
             return NoContent();
         }
-        else
+        catch (TeamNotFoundException ex)
         {
-            return NotFound($"Team with ID {teamId} not found.");
+            return NotFound(ex.Message);
         }
     }
 
     /// <summary>
-    /// Deletes an existing team from the system based on the provided identifier. If no team with the given identifier exists, a NotFound response is returned.
+    /// Deletes a team from the database based on the provided identifier. If no team with the given identifier exists, a NotFound response is returned with an appropriate message. If the team is deleted successfully, a NoContent response is returned.
     /// </summary>
     /// <param name="teamId">The unique identifier of the team to delete. Cannot be null or empty.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 No Content response if the deletion is successful; otherwise, an HTTP 404 Not Found response if the team is not found.</returns>
-    [HttpDelete("{id}")]
+    /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 204 response if the deletion is successful; otherwise, an HTTP 404 response if the team is not found.</returns>
+    [HttpDelete("{teamId}")]
     public async Task<ActionResult> DeleteTeam(string teamId)
     {
-        if (_teamService.GetTeamById(teamId) is null)
+        try
         {
-            return NotFound($"Team with ID {teamId} not found.");
+            await _teamService.DeleteTeamAsync(teamId);
+            return NoContent();
         }
-        _teamService.DeleteTeam(teamId);
-        return NoContent();
+        catch (TeamNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 }
