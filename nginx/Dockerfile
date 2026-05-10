@@ -6,7 +6,7 @@ ENV NGINX_ENVSUBST_TEMPLATE_DIR=/app
 
 COPY nginx.conf.template /app/nginx.conf.template
 
-COPY auth.sh /docker-entrypoint.d/auth.sh
+COPY auth.sh /docker-entrypoint.d/100-setup-basic-auth.sh
 
 EXPOSE 80
 
