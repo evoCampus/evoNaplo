@@ -1,26 +1,35 @@
 using evoNaplo.DTO;
 using System.Text;
+using static evoNaplo.Services.Common.ExportHeaders;
 
 namespace evoNaplo.Services;
 
 public class CsvExportService : ICsvExportService
 {
-    public byte[] CreateCsvFile(IEnumerable<EvoCampusApplication> data, ExportData filter)
+    public byte[] CreateFile(IEnumerable<ImportData> data, ExportData filter)
     {
         var csv = new StringBuilder();
         
         // Header
         var headers = new List<string>();
-        if (filter.includeTimestamp) headers.Add(EscapeCsvField("Időbélyeg"));
-        if (filter.includeName) headers.Add(EscapeCsvField("Név"));
-        if (filter.includeEmail) headers.Add(EscapeCsvField("E-mail cím"));
-        if (filter.includePhoneNumber) headers.Add(EscapeCsvField("Telefonszám (pl: 70/1234567)"));
-        if (filter.includeMajor) headers.Add(EscapeCsvField("Tanulmányi évfolyam és szak megnevezése (pl.: Miskolci Egyetem Gépészmérnöki és Informatikai Kar ... szak ...specializáció, 3. félév)"));
-        if (filter.includeIsFirstTime) headers.Add(EscapeCsvField("Először veszel részt az evoCampus programban?"));
-        if (filter.includeGoals)
-            headers.Add(EscapeCsvField("Milyen személyes céljaid vannak az evoCampus 2026 tavaszi szemeszteri részvételével?"));
-        //if (filter.includeStayInTeam) headers.Add(EscapeCsvField("A jelenlegi csapatban maradnál?"));
-        if (filter.includeOtherComments) headers.Add(EscapeCsvField("Egyéb észrevétel, megjegyzés"));
+        if (filter.IncludeTimestamp ?? true) 
+            headers.Add(EscapeCsvField(HeaderTimestamp));
+        if (filter.IncludeName ?? true) 
+            headers.Add(EscapeCsvField(HeaderName));
+        if (filter.IncludeEmail ?? true) 
+            headers.Add(EscapeCsvField(HeaderEmail));
+        if (filter.IncludePhoneNumber ?? true) 
+            headers.Add(EscapeCsvField(HeaderPhoneNumber));
+        if (filter.IncludeMajor ?? true) 
+            headers.Add(EscapeCsvField(HeaderMajor));
+        if (filter.IncludeIsFirstTime ?? true) 
+            headers.Add(EscapeCsvField(HeaderIsFirstTime));
+        if (filter.includeGoals ?? true) 
+            headers.Add(EscapeCsvField(HeaderGoals));
+        if (filter.IncludeStayInTeam ?? true) 
+            headers.Add(EscapeCsvField(HeaderStayInTeam));
+        if (filter.IncludeOtherComments ?? true) 
+            headers.Add(EscapeCsvField(HeaderOtherComments));
 
         csv.AppendLine(string.Join(",", headers));
 
@@ -28,15 +37,29 @@ public class CsvExportService : ICsvExportService
         {
             var rowData = new List<string>();
             
-            if (filter.includeTimestamp) rowData.Add(EscapeCsvField(item.Timestamp));
-            if (filter.includeName) rowData.Add(EscapeCsvField(item.Name));
-            if (filter.includeEmail) rowData.Add(EscapeCsvField(item.Email));
-            if (filter.includePhoneNumber) rowData.Add(EscapeCsvField(item.PhoneNumber));
-            if (filter.includeMajor) rowData.Add(EscapeCsvField(item.Major));
-            if (filter.includeIsFirstTime) rowData.Add(EscapeCsvField(item.IsFirstTime));
-            if (filter.includeGoals) rowData.Add(EscapeCsvField(item.Goals));
-            //if (filter.includeStayInTeam) rowData.Add(EscapeCsvField(item.StayInTeam));
-            if (filter.includeOtherComments) rowData.Add(EscapeCsvField(item.OtherComments));
+            if (filter.IncludeTimestamp ?? true) 
+            {
+                string amPm = item.Timestamp.Hour < 12 ? "de." : "du.";
+                string formattedDate = item.Timestamp.ToString("yyyy/MM/dd HH:mm:ss ") + amPm + " CET";
+        
+                rowData.Add(EscapeCsvField(formattedDate));
+            }
+            if (filter.IncludeName ?? true) 
+                rowData.Add(EscapeCsvField(item.Name));
+            if (filter.IncludeEmail ?? true) 
+                rowData.Add(EscapeCsvField(item.Email));
+            if (filter.IncludePhoneNumber ?? true) 
+                rowData.Add(EscapeCsvField(item.PhoneNumber));
+            if (filter.IncludeMajor ?? true) 
+                rowData.Add(EscapeCsvField(item.Major));
+            if (filter.IncludeIsFirstTime ?? true) 
+                rowData.Add(EscapeCsvField(item.IsFirstTime));
+            if (filter.includeGoals ?? true) 
+                rowData.Add(EscapeCsvField(item.Goals));
+            if (filter.IncludeStayInTeam ?? true) 
+                rowData.Add(EscapeCsvField(item.StayInTeam));
+            if (filter.IncludeOtherComments ?? true) 
+                rowData.Add(EscapeCsvField(item.OtherComments));
 
             csv.AppendLine(string.Join(",", rowData));
         }

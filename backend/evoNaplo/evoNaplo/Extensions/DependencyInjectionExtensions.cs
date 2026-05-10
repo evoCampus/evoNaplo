@@ -12,10 +12,10 @@ public static class DependencyInjectionExtensions
     {
         services.AddScoped<IExampleService, ExampleService>();
         
-        services.AddScoped<IMentorService, MentorService>();
+        /*services.AddScoped<IMentorService, MentorService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IProjectService, ProjectService>();
-        services.AddScoped<IStudentService, StudentService>();
+        services.AddScoped<IStudentService, StudentService>();*/
         
         services.AddScoped<IExcelImportService, ExcelImportService>();
         services.AddScoped<IExcelExportService, ExcelExportService>();

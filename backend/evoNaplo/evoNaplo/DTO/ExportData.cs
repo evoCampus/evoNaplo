@@ -8,33 +8,33 @@ public enum ExportFormat
 
 public class ExportData
 {
-    public bool includeTimestamp { get; set; } = false;
-    public string? filterTimestamp { get; set; } = null;
+    public bool? IncludeTimestamp { get; set; }
+    public string? FilterTimestamp { get; set; }
     
-    public bool includeName  { get; set; } = false;
-    public string? filterName { get; set; } = null;
+    public bool? IncludeName  { get; set; }
+    public string? FilterName { get; set; }
     
-    public bool includeEmail  { get; set; } = false;
-    public string? filterEmail { get; set; } = null;
+    public bool? IncludeEmail  { get; set; }
+    public string? FilterEmail { get; set; }
     
-    public bool includePhoneNumber { get; set; } = false;
-    public string? filterPhoneNumber { get; set; } = null;
+    public bool? IncludePhoneNumber { get; set; }
+    public string? FilterPhoneNumber { get; set; }
     
-    public bool includeMajor  { get; set; } = false;
-    public string? filterMajor { get; set; } = null;
+    public bool? IncludeMajor  { get; set; }
+    public string? FilterMajor { get; set; }
     
-    public bool includeIsFirstTime  { get; set; } = false;
-    public string? filterIsFirstTime { get; set; } = null;
+    public bool? IncludeIsFirstTime  { get; set; }
+    public string? FilterIsFirstTime { get; set; }
     
-    public bool includeGoals  { get; set; } = false;
-    public string? filterGoals { get; set; } = null;
+    public bool? includeGoals  { get; set; }
+    public string? filterGoals { get; set; }
     
-    //public bool includeStayInTeam  { get; set; } = false;
-    //public string? filterStayInTeam { get; set; } = null;
+    public bool? IncludeStayInTeam  { get; set; }
+    public string? FilterStayInTeam { get; set; }
     
-    public bool includeOtherComments  { get; set; } = false;
-    public string? filterOtherComments { get; set; } = null;
+    public bool? IncludeOtherComments  { get; set; }
+    public string? FilterOtherComments { get; set; }
     
-    public int? rowCount { get; set; }
+    public int? RowCount { get; set; }
     public ExportFormat Format { get; set; } = ExportFormat.xlsx;
 }

@@ -1,7 +1,7 @@
 using evoNaplo.DTO;
 
 namespace evoNaplo.Services;
-public interface IExcelExportService
+
+public interface IExcelExportService : IDataExportService<ImportData> 
 {
-    byte[] CreateExcelFile(IEnumerable<EvoCampusApplication> data, ExportData filter);
 }

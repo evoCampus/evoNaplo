@@ -13,7 +13,7 @@ namespace evoNaplo.Controllers
         private readonly ICsvImportService _csvImportService;
         private readonly ICsvExportService _csvExportService;
         
-        private static List<EvoCampusApplication> _temporarySheet = new();
+        private static List<ImportData> _temporarySheet = new();
 
         public DataController(IExcelImportService excelImportService, IExcelExportService excelExportService, ICsvImportService csvImportService, ICsvExportService csvExportService)
         {
@@ -38,7 +38,7 @@ namespace evoNaplo.Controllers
             
             if (file.FileName.EndsWith(".csv"))
             {
-                var dataList = _csvImportService.ProcessCvsFile(file);
+                var dataList = _csvImportService.ProcessCsvFile(file);
                 _temporarySheet = dataList; 
                 return Ok(dataList);
             }
@@ -58,35 +58,35 @@ namespace evoNaplo.Controllers
                 return BadRequest("No file found. Import a spreadsheet first (.xlsx or .csv).");
             }
             // Queries
-            IEnumerable<EvoCampusApplication> query = _temporarySheet;
-            if (!string.IsNullOrWhiteSpace(filter.filterTimestamp))
+            IEnumerable<ImportData> query = _temporarySheet;
+            if (!string.IsNullOrWhiteSpace(filter.FilterTimestamp))
             {
-                query = query.Where(student => (student.Timestamp ?? "").ToLower().Contains(filter.filterTimestamp.ToLower()));
+                query = query.Where(student => student.Timestamp.ToString("yyyy.MM.dd HH:mm:ss").Contains(filter.FilterTimestamp));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.filterName))
+            if (!string.IsNullOrWhiteSpace(filter.FilterName))
             {
-                query = query.Where(student => (student.Name ?? "").ToLower().Contains(filter.filterName.ToLower()));
+                query = query.Where(student => (student.Name ?? "").ToLower().Contains(filter.FilterName.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.filterEmail))
+            if (!string.IsNullOrWhiteSpace(filter.FilterEmail))
             {
-                query = query.Where(student => (student.Email ?? "").ToLower().Contains(filter.filterEmail.ToLower()));
+                query = query.Where(student => (student.Email ?? "").ToLower().Contains(filter.FilterEmail.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.filterPhoneNumber))
+            if (!string.IsNullOrWhiteSpace(filter.FilterPhoneNumber))
             {
-                query = query.Where(student => (student.PhoneNumber ?? "").ToLower().Contains(filter.filterPhoneNumber.ToLower()));
+                query = query.Where(student => (student.PhoneNumber ?? "").ToLower().Contains(filter.FilterPhoneNumber.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.filterMajor))
+            if (!string.IsNullOrWhiteSpace(filter.FilterMajor))
             {
-                query = query.Where(student => (student.Major ?? "").ToLower().Contains(filter.filterMajor.ToLower()));
+                query = query.Where(student => (student.Major ?? "").ToLower().Contains(filter.FilterMajor.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(filter.filterIsFirstTime))
+            if (!string.IsNullOrWhiteSpace(filter.FilterIsFirstTime))
             {
-                query = query.Where(student => (student.IsFirstTime ?? "").ToLower().Contains(filter.filterIsFirstTime.ToLower()));
+                query = query.Where(student => (student.IsFirstTime ?? "").ToLower().Contains(filter.FilterIsFirstTime.ToLower()));
             }
 
             if (!string.IsNullOrWhiteSpace(filter.filterGoals))
@@ -94,29 +94,28 @@ namespace evoNaplo.Controllers
                 query = query.Where(student => (student.Goals ?? "").ToLower().Contains(filter.filterGoals.ToLower()));
             }
 
-            /*
-            if (!string.IsNullOrWhiteSpace(filter.filterStayInTeam))
+            
+            if (!string.IsNullOrWhiteSpace(filter.FilterStayInTeam))
             {
-                query = query.Where(student => (student.StayInTeam ?? "").ToLower().Contains(filter.filterStayInTeam.ToLower()));
+                query = query.Where(student => (student.StayInTeam ?? "").ToLower().Contains(filter.FilterStayInTeam.ToLower()));
             } 
-            */
 
-            if (!string.IsNullOrWhiteSpace(filter.filterOtherComments))
+            if (!string.IsNullOrWhiteSpace(filter.FilterOtherComments))
             {
-                query = query.Where(student => (student.OtherComments ?? "").ToLower().Contains(filter.filterOtherComments.ToLower()));
+                query = query.Where(student => (student.OtherComments ?? "").ToLower().Contains(filter.FilterOtherComments.ToLower()));
             }
-            var finalData = filter.rowCount > 0 ? query.Take(filter.rowCount.Value) : query;
+            var finalData = filter.RowCount > 0 ? query.Take(filter.RowCount.Value) : query;
             var date = DateTime.Now.ToString("yyyyMMdd-HHmmss");
             
             if (filter.Format == ExportFormat.xlsx)
             {
-                var fileBytes = _excelExportService.CreateExcelFile(finalData, filter); 
+                var fileBytes = _excelExportService.CreateFile(finalData, filter); 
                 var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
                 return File(fileBytes, contentType, $"evoNaplo-Export-{date}.xlsx");
             }
             else
             {
-                var fileBytes = _csvExportService.CreateCsvFile(finalData, filter);
+                var fileBytes = _csvExportService.CreateFile(finalData, filter);
                 return File(fileBytes, "text/csv", $"evoNaplo-Export-{date}.csv");
             }
             

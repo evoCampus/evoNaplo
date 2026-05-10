@@ -29,7 +29,7 @@ namespace evoNaplo.Controllers
             _exampleService = exampleService;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        /*[HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
@@ -39,6 +39,6 @@ namespace evoNaplo.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
-        }
+        }*/
     }
 }

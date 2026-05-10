@@ -1,46 +1,83 @@
 using Microsoft.AspNetCore.Http;
 using evoNaplo.DTO;
+using static evoNaplo.Services.Common.ExportHeaders;
 using ClosedXML.Excel;
+using System.Globalization;
 
 namespace evoNaplo.Services;
 
 public class ExcelImportService : IExcelImportService
 {
-    public List<EvoCampusApplication> ProcessExcelFile(IFormFile file)
+    public List<ImportData> ProcessExcelFile(IFormFile file)
     {
-        var applications = new List<EvoCampusApplication>();
+        var applications = new List<ImportData>();
         
-        // Load file into memory
         using (var stream = new MemoryStream())
         {
             file.CopyTo(stream);
             
-            // Open Excel file
             using (var workbook = new XLWorkbook(stream))
             {
-                // Select first sheet in file AND get every row with data present
                 var worksheet = workbook.Worksheet(1);
                 var rows =  worksheet.RowsUsed();
+
+                var headerRow = rows.First();
+                var columnMap =  new Dictionary<string, int>();
+
+                foreach (var cell in headerRow.CellsUsed())
+                {
+                    string headerName = cell.Value.ToString().Trim();
+                    columnMap[headerName] = cell.Address.ColumnNumber;
+                }
+
+                string GetCellValue(IXLRow row, string headerName)
+                {
+                    if (columnMap.TryGetValue(headerName, out int colIndex))
+                    {
+                        return row.Cell(colIndex).Value.ToString();
+                    }
+                    return string.Empty;
+                }
                 
-                // Get and store data from file (skip header)
                 foreach (var row in rows.Skip(1))
                 {
-                    var currentApplication = new EvoCampusApplication();
-                    currentApplication.Timestamp = row.Cell(1).Value.ToString();
-                    currentApplication.Name = row.Cell(2).Value.ToString();
-                    currentApplication.Email = row.Cell(3).Value.ToString();
-                    currentApplication.PhoneNumber = row.Cell(4).Value.ToString();
-                    currentApplication.Major = row.Cell(5).Value.ToString();
-                    currentApplication.IsFirstTime = row.Cell(6).Value.ToString();
-                    currentApplication.Goals = row.Cell(7).Value.ToString();
-                    //currentApplication.StayInTeam = row.Cell(8).Value.ToString();
-                    currentApplication.OtherComments = row.Cell(8).Value.ToString();
-                    
+                    var currentApplication = new ImportData
+                    {
+                        Name = GetCellValue(row, HeaderName),
+                        Email = GetCellValue(row, HeaderEmail),
+                        PhoneNumber =  GetCellValue(row, HeaderPhoneNumber),
+                        Major = GetCellValue(row, HeaderMajor),
+                        IsFirstTime = GetCellValue(row, HeaderIsFirstTime),
+                        Goals = GetCellValue(row, HeaderGoals),
+                        StayInTeam = GetCellValue(row, HeaderStayInTeam),
+                        OtherComments = GetCellValue(row, HeaderOtherComments)
+                    };
+                    string rawDate = GetCellValue(row, HeaderTimestamp).Trim();
+                    currentApplication.Timestamp = ParseCustomDate(rawDate);
                     applications.Add(currentApplication);
                 }
             }
         }
         
         return applications;
+    }
+    
+    private DateTime ParseCustomDate(string rawDate)
+    {
+        if (string.IsNullOrWhiteSpace(rawDate)) return DateTime.Now;
+
+        string cleanDate = rawDate.Replace(" CET", "").Replace(" CEST", "").Replace("de.", "AM").Replace("du.", "PM").Trim();
+
+        string[] formats =
+        {
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy/MM/dd hh:mm:ss tt",
+            "yyyy.MM.dd HH:mm:ss"
+        };
+
+        if (DateTime.TryParseExact(cleanDate, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsed))
+            return parsed;
+        
+        return DateTime.TryParse(cleanDate, out DateTime fallback) ? fallback : DateTime.Now;
     }
 }

@@ -17,4 +17,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Services\IMentorService.cs" />
+    <Compile Remove="Services\IProjectService.cs" />
+    <Compile Remove="Services\IStudentService.cs" />
+    <Compile Remove="Services\ITeamService.cs" />
+    <Compile Remove="Services\MentorService.cs" />
+    <Compile Remove="Services\ProjectService.cs" />
+    <Compile Remove="Services\StudentService.cs" />
+    <Compile Remove="Services\TeamService.cs" />
+  </ItemGroup>
+
 </Project>

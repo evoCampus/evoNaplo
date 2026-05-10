@@ -2,7 +2,6 @@ using evoNaplo.DTO;
 
 namespace evoNaplo.Services;
 
-public interface ICsvExportService
+public interface ICsvExportService : IDataExportService<ImportData> 
 {
-    byte[] CreateCsvFile(IEnumerable<EvoCampusApplication> data, ExportData filter);
 }

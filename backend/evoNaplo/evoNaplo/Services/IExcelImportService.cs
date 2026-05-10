@@ -5,5 +5,5 @@ namespace evoNaplo.Services;
 
 public interface IExcelImportService
 {
-    List<EvoCampusApplication> ProcessExcelFile(IFormFile file);
+    List<ImportData> ProcessExcelFile(IFormFile file);
 }

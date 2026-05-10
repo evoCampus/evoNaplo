@@ -5,5 +5,5 @@ namespace evoNaplo.Services;
 
 public interface ICsvImportService
 {
-    List<EvoCampusApplication> ProcessCvsFile(IFormFile file);
+    List<ImportData> ProcessCsvFile(IFormFile file);
 }
