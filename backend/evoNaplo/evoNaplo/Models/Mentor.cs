@@ -2,11 +2,11 @@
 {
     public class Mentor
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public required string Id { get; set; }
+        public required string Name { get; set; }
+        public required string Email { get; set; }
         public string? PhoneNumber { get; set; }
-        public ICollection<Team> Teams { get; set; }
-        public ICollection<Project> Projects { get; set; }
+        public required ICollection<Team> Teams { get; set; }
+        public required ICollection<Project> Projects { get; set; }
     }
 }

@@ -2,10 +2,10 @@
 {
     public class Project
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public required string Id { get; set; }
+        public required string Name { get; set; }
         public string? ShortDescription { get; set; }
-        public ICollection<ProjectLink> ProjectLinks { get; set; }
-        public ICollection<Team> Teams { get; set; }
+        public required ICollection<ProjectLink> ProjectLinks { get; set; }
+        public required ICollection<Team> Teams { get; set; }
     }
 }
