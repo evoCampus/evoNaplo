@@ -8,10 +8,10 @@
     }
     public class ProjectLink
     {
-        public string Id { get; set; }
-        public LinkTypes LinkType { get; set; }
-        public string Url { get; set; }
-        public string ProjectId { get; set; }
+        public required string Id { get; set; }
+        public required LinkTypes LinkType { get; set; }
+        public required string Url { get; set; }
+        public required string ProjectId { get; set; }
         public Project Project { get; set; }
     }
 }

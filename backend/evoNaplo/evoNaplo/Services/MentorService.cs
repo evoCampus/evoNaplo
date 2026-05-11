@@ -63,7 +63,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Adds a new mentor to the list. If a mentor with the same name already exists, a MentorAlreadyExistsException is thrown with an appropriate message. If the mentor is added successfully, the provided MentorDTO is returned. If the ID of the mentor to add is null or empty, a new GUID will be generated and assigned as the ID.
+        /// Adds a new mentor to the list. If a mentor with the same ID already exists, a MentorAlreadyExistsException is thrown with an appropriate message. If the mentor is added successfully, the provided MentorDTO is returned. If the ID of the mentor to add is null or empty, a new GUID will be generated and assigned as the ID.
         /// </summary>
         /// <param name="mentorToAdd">The MentorDTO to add.</param>
         /// <returns>The added MentorDTO if successful.</returns>
@@ -74,7 +74,11 @@ namespace evoNaplo.Services
             {
                 mentorToAdd.Id = Guid.NewGuid().ToString();
             }
-            if (_mentors.FirstOrDefault(m => m.Name == mentorToAdd.Name) is null)
+            if (_mentors.Any(m => m.Id == mentorToAdd.Id))
+            {
+                throw new MentorAlreadyExistsException($"A mentor with the ID {mentorToAdd.Id} already exists.");
+            }
+            else
             {
                 _mentors.Add(new Mentor
                 {
@@ -82,14 +86,10 @@ namespace evoNaplo.Services
                     Name = mentorToAdd.Name,
                     Email = mentorToAdd.Email,
                     PhoneNumber = mentorToAdd.PhoneNumber,
-                    Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>(),
-                    Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList() ?? new List<Project>(),
+                    Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
+                    Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
                 });
                 return mentorToAdd;
-            }
-            else
-            {
-                throw new MentorAlreadyExistsException($"A mentor with the name {mentorToAdd.Name} already exists.");
             }
         }
 
@@ -109,8 +109,8 @@ namespace evoNaplo.Services
                 existing.Name = updatedMentor.Name;
                 existing.Email = updatedMentor.Email;
                 existing.PhoneNumber = updatedMentor.PhoneNumber;
-                existing.Teams = updatedMentor.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
-                existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList() ?? new List<Project>();
+                existing.Teams = updatedMentor.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
+                existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList();
                 return updatedMentor;
             }
             else

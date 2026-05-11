@@ -61,7 +61,7 @@ namespace evoNaplo.Services
         }
 
         /// <summary>
-        /// Adds a new project to the list of projects. If a project with the same name already exists, a ProjectAlreadyExistsException is thrown with an appropriate message. If the project is added successfully, the provided ProjectDTO is returned. If the ID of the project to add is null or empty, a new GUID will be generated and assigned as the ID.
+        /// Adds a new project to the list of projects. If a project with the same ID already exists, a ProjectAlreadyExistsException is thrown with an appropriate message. If the project is added successfully, the provided ProjectDTO is returned. If the ID of the project to add is null or empty, a new GUID will be generated and assigned as the ID.
         /// </summary>
         /// <param name="projectToAdd">The ProjectDTO to add.</param>
         /// <returns>The added ProjectDTO if successful.</returns>
@@ -72,21 +72,27 @@ namespace evoNaplo.Services
             {
                 projectToAdd.Id = Guid.NewGuid().ToString();
             }
-            if (_projects.FirstOrDefault(p => p.Name == projectToAdd.Name) is null)
+            if (_projects.Any(p => p.Id == projectToAdd.Id))
+            {
+                throw new ProjectAlreadyExistsException($"A project with the ID {projectToAdd.Id} already exists.");
+            }
+            else
             {
                 _projects.Add(new Project
                 {
                     Id = projectToAdd.Id,
                     Name = projectToAdd.Name,
                     ShortDescription = projectToAdd.Description,
-                    //ProjectLinks are to be implemented in the future
-                    Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>()
+                    ProjectLinks = projectToAdd.ProjectLinks.Select(l => new ProjectLink
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
+                        Url = l.Value,
+                        ProjectId = projectToAdd.Id
+                    }).ToList(),
+                    Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
                 });
                 return projectToAdd;
-            }
-            else
-            {
-                throw new ProjectAlreadyExistsException($"A project with the name {projectToAdd.Name} already exists.");
             }
         }
 
@@ -105,8 +111,14 @@ namespace evoNaplo.Services
                 existing.Id = updatedProject.Id;
                 existing.Name = updatedProject.Name;
                 existing.ShortDescription = updatedProject.Description;
-                //ProjectLinks are to be implemented in the future
-                existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList() ?? new List<Team>();
+                existing.ProjectLinks = updatedProject.ProjectLinks.Select(l => new ProjectLink
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
+                    Url = l.Value,
+                    ProjectId = updatedProject.Id
+                }).ToList();
+                existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
                 return updatedProject;
             }
             else

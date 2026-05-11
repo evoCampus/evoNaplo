@@ -66,7 +66,11 @@ namespace evoNaplo.Services
             {
                 studentToAdd.Id = Guid.NewGuid().ToString();
             }
-            if (_students.FirstOrDefault(s => s.Id == studentToAdd.Id) is null)
+            if (_students.Any(s => s.Id == studentToAdd.Id))
+            {
+                throw new StudentAlreadyExistsException($"A student with the ID {studentToAdd.Id} already exists.");
+            }
+            else
             {
                 _students.Add(new Student
                 {
@@ -87,10 +91,6 @@ namespace evoNaplo.Services
                     WantsToStayWithCurrentTeam = studentToAdd.WantsToStayWithCurrentTeam,
                 });
                 return studentToAdd;
-            }
-            else
-            {
-                throw new StudentAlreadyExistsException($"A student with the ID {studentToAdd.Id} already exists.");
             }
         }
 

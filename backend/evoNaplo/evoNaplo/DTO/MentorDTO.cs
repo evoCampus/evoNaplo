@@ -23,8 +23,8 @@ public class MentorDTO
         Email = mentor.Email;
         PhoneNumber = mentor.PhoneNumber;
         //MentorProfile = mentor.MentorProfile;
-        TeamIds = mentor.Teams.Select(team => team.Id).ToList();
-        ProjectIds = mentor.Projects.Select(project => project.Id).ToList();
+        TeamIds = mentor.Teams.Select(t => t.Id).ToList();
+        ProjectIds = mentor.Projects.Select(p => p.Id).ToList();
         //SemesterNumber = mentor.SemesterNumber;
         //IsActive = mentor.IsActive;
     }

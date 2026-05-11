@@ -74,22 +74,22 @@ namespace evoNaplo.Services
             {
                 teamToAdd.Id = Guid.NewGuid().ToString();
             }
-            if (_teams.FirstOrDefault(t => t.Id == teamToAdd.Id) is null)
+            if (_teams.Any(t => t.Id == teamToAdd.Id))
+            {
+                throw new TeamAlreadyExistsException($"A team with the ID {teamToAdd.Id} already exists.");
+            }
+            else
             {
                 _teams.Add(new Team
                 {
                     Id = teamToAdd.Id,
-                    Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>(),
-                    Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>(),
+                    Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList(),
+                    Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList(),
                     //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
                     //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
-                    AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList() ?? new List<AttendanceSheet>(),
+                    AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList(),
                 });
                 return teamToAdd;
-            }
-            else
-            {
-                throw new TeamAlreadyExistsException($"A team with the ID {teamToAdd.Id} already exists.");
             }
         }
 
@@ -106,11 +106,11 @@ namespace evoNaplo.Services
             if (existing is not null) 
             {
                 existing.Id = updatedTeam.Id;
-                existing.Mentors = updatedTeam.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList() ?? new List<Mentor>();
-                existing.Students = updatedTeam.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList() ?? new List<Student>();
+                existing.Mentors = updatedTeam.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList();
+                existing.Students = updatedTeam.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList();
                 //existing.WeeklyMeetingDay = updatedTeam.WeeklyMeetingDay;
                 //existing.WeeklyMeetingTime = updatedTeam.WeeklyMeetingTime;
-                existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList() ?? new List<AttendanceSheet>();
+                existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList();
                 return updatedTeam;
             }
             else
