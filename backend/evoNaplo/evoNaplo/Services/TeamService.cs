@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using evoNaplo.Models;
 using evoNaplo.Services;
 namespace evoNaplo.Services
 {
@@ -14,30 +15,31 @@ namespace evoNaplo.Services
 
         public Team GetTeamById(string id)
         {
-            return _teams.FirstOrDefault(t => t.TeamID == id);
+            return _teams.First(t => t.Id == id);
         }
 
         public void AddTeam(Team team)
         {
-            if (string.IsNullOrEmpty(team.TeamID)) team.TeamID = System.Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(team.Id)) team.Id = System.Guid.NewGuid().ToString();
             _teams.Add(team);
         }
 
        
         public void UpdateTeam(string id, Team updatedTeam)
         {
-            var existing = _teams.FirstOrDefault(t => t.TeamID == id);
+            var existing = _teams.FirstOrDefault(t => t.Id == id);
             if (existing is null || updatedTeam is null) return;
 
-            if (updatedTeam.TeamAssignedMentors is not null) existing.TeamAssignedMentors = updatedTeam.TeamAssignedMentors;
-            if (updatedTeam.TeamAssignedStudents is not null) existing.TeamAssignedStudents = updatedTeam.TeamAssignedStudents;
+            if (updatedTeam.ProjectId is not null) existing.ProjectId = updatedTeam.ProjectId;
+            if (updatedTeam.Project is not null) existing.Project = updatedTeam.Project;
+            if (updatedTeam.Mentors is not null) existing.Mentors = updatedTeam.Mentors;
+            if (updatedTeam.Students is not null) existing.Students = updatedTeam.Students;
+            if (updatedTeam.AttendanceSheets is not null) existing.AttendanceSheets = updatedTeam.AttendanceSheets;
         }
-
-        
 
         public void DeleteTeam(string id)
         {
-            var existing = _teams.FirstOrDefault(t => t.TeamID == id);
+            var existing = _teams.FirstOrDefault(t => t.Id == id);
             if (existing is not null) _teams.Remove(existing);
         }
     }

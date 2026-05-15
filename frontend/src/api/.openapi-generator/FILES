@@ -1,0 +1,10 @@
+.gitignore
+.npmignore
+api.ts
+base.ts
+common.ts
+configuration.ts
+docs/WeatherForecast.md
+docs/WeatherForecastApi.md
+git_push.sh
+index.ts
