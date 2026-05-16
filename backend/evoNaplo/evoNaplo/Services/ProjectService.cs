@@ -68,7 +68,7 @@ internal class ProjectService : IProjectService
                 Url = l.Value,
                 ProjectId = projectToAdd.Id
             }).ToList(),
-            Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
+            Teams = projectToAdd.TeamIds,
         });
         return projectToAdd;
     }
@@ -95,7 +95,7 @@ internal class ProjectService : IProjectService
                 Url = l.Value,
                 ProjectId = updatedProject.Id
             }).ToList();
-            existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
+            existing.Teams = updatedProject.TeamIds;
             return updatedProject;
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");

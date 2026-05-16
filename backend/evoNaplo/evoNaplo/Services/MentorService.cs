@@ -64,8 +64,8 @@ internal class MentorService : IMentorService
             Name = mentorToAdd.Name,
             Email = mentorToAdd.Email,
             PhoneNumber = mentorToAdd.PhoneNumber,
-            Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
-            Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
+            Teams = mentorToAdd.TeamIds,
+            Projects = mentorToAdd.ProjectIds,
         });
         return mentorToAdd;
     }
@@ -86,8 +86,8 @@ internal class MentorService : IMentorService
             existing.Name = updatedMentor.Name;
             existing.Email = updatedMentor.Email;
             existing.PhoneNumber = updatedMentor.PhoneNumber;
-            existing.Teams = updatedMentor.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
-            existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList();
+            existing.Teams = updatedMentor.TeamIds;
+            existing.Projects = updatedMentor.ProjectIds;
             return updatedMentor;
         }
         throw new MentorNotFoundException($"Mentor with ID {id} not found.");

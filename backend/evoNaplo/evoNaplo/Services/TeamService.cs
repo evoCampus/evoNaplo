@@ -61,11 +61,11 @@ internal class TeamService : ITeamService
         _teams.Add(new Team
         {
             Id = teamToAdd.Id,
-            Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList(),
-            Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList(),
+            Mentors = teamToAdd.MentorIds,
+            Students = teamToAdd.StudentIds,
             //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
             //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
-            AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList(),
+            AttendanceSheets = teamToAdd.AttendanceSheetIds,
         });
         return teamToAdd;
     }
@@ -83,11 +83,11 @@ internal class TeamService : ITeamService
         if (existing is not null) 
         {
             existing.Id = updatedTeam.Id;
-            existing.Mentors = updatedTeam.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList();
-            existing.Students = updatedTeam.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList();
+            existing.Mentors = updatedTeam.MentorIds;
+            existing.Students = updatedTeam.StudentIds;
             //existing.WeeklyMeetingDay = updatedTeam.WeeklyMeetingDay;
             //existing.WeeklyMeetingTime = updatedTeam.WeeklyMeetingTime;
-            existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList();
+            existing.AttendanceSheets = updatedTeam.AttendanceSheetIds;
             return updatedTeam;
         }
         throw new TeamNotFoundException($"Team with ID {id} not found.");
