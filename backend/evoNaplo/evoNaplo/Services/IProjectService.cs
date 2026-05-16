@@ -1,3 +1,6 @@
+using evoNaplo.DTO;
+using evoNaplo.Models;
+
 namespace evoNaplo.Services;
 
 public interface IProjectService

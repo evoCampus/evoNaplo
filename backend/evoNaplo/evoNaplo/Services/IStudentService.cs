@@ -1,4 +1,7 @@
-﻿namespace evoNaplo.Services;
+﻿using evoNaplo.DTO;
+using evoNaplo.Models;
+
+namespace evoNaplo.Services;
 
 public interface IStudentService
 {

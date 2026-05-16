@@ -1,4 +1,9 @@
-﻿namespace evoNaplo.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using evoNaplo.Services;
+using evoNaplo.DTO;
+using evoNaplo.Exceptions;
+
+namespace evoNaplo.Controllers;
 
 /// <summary>
 /// Controller for managing teams in the application. Provides endpoints for retrieving, creating, updating, and deleting team records. Each endpoint interacts with the ITeamService to perform the necessary operations on the team data. The controller handles exceptions such as TeamNotFoundException and TeamAlreadyExistsException to return appropriate HTTP responses based on the outcome of each operation.

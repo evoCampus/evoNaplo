@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -11,6 +12,7 @@ public class TeamDTO
     public TimeSpan WeeklyMeetingTime { get; set; }
     public required IEnumerable<string> AttendanceSheetIds { get; set; }
 
+    [SetsRequiredMembers]
     public TeamDTO(Team team)
     {
         Id = team.Id;

@@ -1,4 +1,9 @@
-﻿namespace evoNaplo.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using evoNaplo.Services;
+using evoNaplo.DTO;
+using evoNaplo.Exceptions;
+
+namespace evoNaplo.Controllers;
 
 /// <summary>
 /// Controller for managing projects in the application. Provides endpoints for retrieving, creating, updating, and deleting project records. Each endpoint interacts with the IProjectService to perform the necessary operations on the project data. The controller handles exceptions such as ProjectNotFoundException and ProjectAlreadyExistsException to return appropriate HTTP responses based on the outcome of each operation.

@@ -1,3 +1,7 @@
+using evoNaplo.DTO;
+using evoNaplo.Models;
+using evoNaplo.Exceptions;
+
 namespace evoNaplo.Services;
 
 /// <summary>
@@ -75,7 +79,7 @@ internal class ProjectService : IProjectService
                 Url = l.Value,
                 ProjectId = projectToAdd.Id
             }).ToList(),
-            Teams = projectToAdd.TeamIds,
+            Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
         });
         return projectToAdd;
     }
@@ -102,7 +106,7 @@ internal class ProjectService : IProjectService
                 Url = l.Value,
                 ProjectId = updatedProject.Id
             }).ToList();
-            existing.Teams = updatedProject.TeamIds;
+            existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
             return updatedProject;
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");

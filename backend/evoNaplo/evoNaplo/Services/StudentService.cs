@@ -1,4 +1,8 @@
-﻿namespace evoNaplo.Services;
+﻿using evoNaplo.DTO;
+using evoNaplo.Models;
+using evoNaplo.Exceptions;
+
+namespace evoNaplo.Services;
 
 /// <summary>
 /// The StudentService class provides methods for managing students in the application. It allows for retrieving, adding, updating, and deleting students. The service uses an in-memory list to store student data. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a student is not found or when trying to add a student that already exists.

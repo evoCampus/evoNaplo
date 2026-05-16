@@ -1,4 +1,8 @@
-﻿namespace evoNaplo.Services;
+﻿using evoNaplo.DTO;
+using evoNaplo.Models;
+using evoNaplo.Exceptions;
+
+namespace evoNaplo.Services;
 
 /// <summary>
 /// The MentorService class provides methods for managing mentors in the application. It allows for retrieving, adding, updating, and deleting mentors. The service uses an in-memory list to store mentor data and interacts with team and project services to manage relationships between mentors, teams, and projects. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a mentor is not found or when trying to add a mentor that already exists.
@@ -71,8 +75,8 @@ internal class MentorService : IMentorService
             Name = mentorToAdd.Name,
             Email = mentorToAdd.Email,
             PhoneNumber = mentorToAdd.PhoneNumber,
-            Teams = mentorToAdd.TeamIds,
-            Projects = mentorToAdd.ProjectIds,
+            Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
+            Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
         });
         return mentorToAdd;
     }
@@ -93,8 +97,8 @@ internal class MentorService : IMentorService
             existing.Name = updatedMentor.Name;
             existing.Email = updatedMentor.Email;
             existing.PhoneNumber = updatedMentor.PhoneNumber;
-            existing.Teams = updatedMentor.TeamIds;
-            existing.Projects = updatedMentor.ProjectIds;
+            existing.Teams = updatedMentor.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
+            existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList();
             return updatedMentor;
         }
         throw new MentorNotFoundException($"Mentor with ID {id} not found.");

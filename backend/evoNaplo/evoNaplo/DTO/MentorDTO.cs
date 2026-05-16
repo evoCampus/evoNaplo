@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -14,6 +15,7 @@ public class MentorDTO
     public required int SemesterNumber { get; set; }
     public required bool IsActive { get; set; }
 
+    [SetsRequiredMembers]
     public MentorDTO(Mentor mentor)
     {
         Id = mentor.Id; 

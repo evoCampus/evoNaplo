@@ -1,3 +1,7 @@
+using evoNaplo.DTO;
+using evoNaplo.Models;
+using evoNaplo.Exceptions;
+
 namespace evoNaplo.Services;
 
 /// <summary>
@@ -68,11 +72,11 @@ internal class TeamService : ITeamService
         _teams.Add(new Team
         {
             Id = teamToAdd.Id,
-            Mentors = teamToAdd.MentorIds,
-            Students = teamToAdd.StudentIds,
+            Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList(),
+            Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList(),
             //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
             //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
-            AttendanceSheets = teamToAdd.AttendanceSheetIds,
+            AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList()
         });
         return teamToAdd;
     }
@@ -90,11 +94,11 @@ internal class TeamService : ITeamService
         if (existing is not null) 
         {
             existing.Id = updatedTeam.Id;
-            existing.Mentors = updatedTeam.MentorIds;
-            existing.Students = updatedTeam.StudentIds;
+            existing.Mentors = updatedTeam.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList();
+            existing.Students = updatedTeam.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList();
             //existing.WeeklyMeetingDay = updatedTeam.WeeklyMeetingDay;
             //existing.WeeklyMeetingTime = updatedTeam.WeeklyMeetingTime;
-            existing.AttendanceSheets = updatedTeam.AttendanceSheetIds;
+            existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList();
             return updatedTeam;
         }
         throw new TeamNotFoundException($"Team with ID {id} not found.");
