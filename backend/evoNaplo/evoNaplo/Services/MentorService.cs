@@ -1,5 +1,8 @@
 ﻿namespace evoNaplo.Services;
 
+/// <summary>
+/// The MentorService class provides methods for managing mentors in the application. It allows for retrieving, adding, updating, and deleting mentors. The service uses an in-memory list to store mentor data and interacts with team and project services to manage relationships between mentors, teams, and projects. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a mentor is not found or when trying to add a mentor that already exists.
+/// </summary>
 internal class MentorService : IMentorService
 {
     private static readonly List<Mentor> _mentors = new List<Mentor>();
@@ -13,10 +16,11 @@ internal class MentorService : IMentorService
     }
     
     /// <summary>
-    /// This method is used internally by the service to retrieve the Mentor model for operations that require it, such as adding or updating mentors. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
+    /// Retrieves a mentor model by its ID. If a mentor with the specified ID is found in the list of mentors, it is returned. If no mentor is found with the given ID, a MentorNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the mentor to retrieve.</param>
-    /// <returns>The Mentor model if found, otherwise null.</returns>
+    /// <returns>The Mentor model if found.</returns>
+    /// <exception cref="MentorNotFoundException"></exception>
     public Mentor GetMentorModelById(string id)
     {
         var mentor = _mentors.FirstOrDefault(m => m.Id == id);
@@ -28,10 +32,9 @@ internal class MentorService : IMentorService
     }
     
     /// <summary>
-    /// Retrieves a list of all mentors in the database. If no mentors are found, a MentorNotFoundException is thrown with an appropriate message. Each mentor is returned as a MentorDTO.
+    /// Retrieves all mentors as a collection of MentorDTOs. The method iterates through the list of mentors and converts each mentor model into a MentorDTO, which is then returned as an IEnumerable collection. This allows for a more structured and simplified representation of mentor data when it is accessed by other parts of the application.
     /// </summary>
-    /// <returns>A list of MentorDTOs if mentors are found.</returns>
-    /// <exception cref="MentorNotFoundException"></exception>
+    /// <returns>An IEnumerable collection of MentorDTOs representing all mentors.</returns>
     public async Task<IEnumerable<MentorDTO>> GetAllMentorsAsync()
     {
         IEnumerable<MentorDTO> mentors = _mentors.Select(m => new MentorDTO(m));
@@ -39,7 +42,7 @@ internal class MentorService : IMentorService
     }
 
     /// <summary>
-    /// Retrieves a specific mentor by their ID. If a mentor with the specified ID is found, it is returned as a MentorDTO. If no mentor is found with the given ID, a MentorNotFoundException is thrown with an appropriate message.
+    /// Retrieves a mentor by its ID and returns it as a MentorDTO. If a mentor with the specified ID is found in the list of mentors, it is converted into a MentorDTO and returned. If no mentor is found with the given ID, a MentorNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the mentor to retrieve.</param>
     /// <returns>The MentorDTO if found.</returns>
@@ -55,11 +58,10 @@ internal class MentorService : IMentorService
     }
 
     /// <summary>
-    /// Adds a new mentor to the list. If a mentor with the same ID already exists, a MentorAlreadyExistsException is thrown with an appropriate message. If the mentor is added successfully, the provided MentorDTO is returned. If the ID of the mentor to add is null or empty, a new GUID will be generated and assigned as the ID.
+    /// Adds a new mentor to the list of mentors. The method takes a MentorDTO as input, generates a new unique ID for the mentor, and creates a new Mentor model based on the provided DTO. The new mentor is then added to the list of mentors, and the original MentorDTO (with the newly assigned ID) is returned. This allows for the creation of new mentor entries in the application while ensuring that each mentor has a unique identifier.
     /// </summary>
     /// <param name="mentorToAdd">The MentorDTO to add.</param>
     /// <returns>The added MentorDTO if successful.</returns>
-    /// <exception cref="MentorAlreadyExistsException"></exception>
     public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAdd)
     {
         mentorToAdd.Id = Guid.NewGuid().ToString();
@@ -76,7 +78,7 @@ internal class MentorService : IMentorService
     }
 
     /// <summary>
-    /// Updates an existing mentor with the specified ID using the provided updated mentor data. If a mentor with the given ID is found, it is updated with the new data and the updated MentorDTO is returned. If no mentor is found with the specified ID, a MentorNotFoundException is thrown with an appropriate message.
+    /// Updates an existing mentor with the specified ID using the provided MentorDTO. The method first checks if a mentor with the given ID exists in the list of mentors. If a mentor is found, its properties are updated with the values from the provided MentorDTO, and the updated MentorDTO is returned. If no mentor is found with the specified ID, a MentorNotFoundException is thrown with an appropriate message. This allows for modifying existing mentor entries in the application while ensuring that only valid mentors can be updated.
     /// </summary>
     /// <param name="id">The ID of the mentor to update.</param>
     /// <param name="updatedMentor">The updated mentor DTO.</param>
@@ -99,7 +101,7 @@ internal class MentorService : IMentorService
     }
 
     /// <summary>
-    /// Deletes a mentor with the specified ID. If a mentor with the given ID is found, it is removed from the list of mentors and the method returns true. If no mentor is found with the specified ID, a MentorNotFoundException is thrown with an appropriate message and the method returns false.
+    /// Deletes a mentor with the specified ID from the list of mentors. The method checks if a mentor with the given ID exists in the list. If a mentor is found, it is removed from the list, and the method returns true to indicate that the deletion was successful. If no mentor is found with the specified ID, a MentorNotFoundException is thrown with an appropriate message. This allows for the removal of mentor entries from the application while ensuring that only valid mentors can be deleted.
     /// </summary>
     /// <param name="id">The ID of the mentor to delete.</param>
     /// <returns>A boolean indicating whether the mentor was deleted.</returns>

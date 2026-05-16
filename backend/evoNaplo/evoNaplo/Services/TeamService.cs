@@ -1,5 +1,8 @@
 namespace evoNaplo.Services;
 
+/// <summary>
+/// The TeamService class provides methods for managing teams in the application. It allows for retrieving, adding, updating, and deleting teams. The service uses an in-memory list to store team data and interacts with mentor and student services to manage relationships between teams, mentors, and students. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a team is not found or when trying to add a team that already exists.
+/// </summary>
 internal class TeamService : ITeamService
 {
     private static readonly List<Team> _teams = new List<Team>();
@@ -13,10 +16,11 @@ internal class TeamService : ITeamService
     }
 
     /// <summary>
-    /// This method is used internally by the service to retrieve the Team model for operations that require it, such as adding or updating teams. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
+    /// Retrieves a team model by its ID. If a team with the specified ID is found in the list of teams, it is returned. If no team is found with the given ID, a TeamNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the team to retrieve.</param>
-    /// <returns>The Team model if found, otherwise null.</returns>
+    /// <returns>The Team model if found.</returns>
+    /// <exception cref="TeamNotFoundException"></exception>
     public Team GetTeamModelById(string id)
     {
         var team = _teams.FirstOrDefault(t => t.Id == id);
@@ -28,10 +32,9 @@ internal class TeamService : ITeamService
     }
 
     /// <summary>
-    /// Retrieves a list of all teams in the database. If no teams are found, a TeamNotFoundException is thrown with an appropriate message. Each team is returned as a TeamDTO.
+    /// Retrieves all teams as a collection of TeamDTOs. The method iterates through the list of teams and converts each team model into a TeamDTO, which is then returned as an IEnumerable collection. This allows for a more structured and simplified representation of team data when it is accessed by other parts of the application.
     /// </summary>
-    /// <returns>A list of TeamDTOs if teams are found.</returns>
-    /// <exception cref="TeamNotFoundException"></exception>
+    /// <returns>An IEnumerable collection of TeamDTOs representing all teams.</returns>
     public async Task<IEnumerable<TeamDTO>> GetAllTeamsAsync()
     {
         IEnumerable<TeamDTO> teams = _teams.Select(t => new TeamDTO(t));
@@ -39,10 +42,10 @@ internal class TeamService : ITeamService
     }
 
     /// <summary>
-    /// Retrieves a specific team by its ID and returns it as a DTO, including related mentor and student IDs, and attendance sheet IDs.
+    /// Retrieves a team by its ID and returns it as a TeamDTO. If a team with the specified ID is found in the list of teams, it is converted into a TeamDTO and returned. If no team is found with the given ID, a TeamNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the team to retrieve.</param>
-    /// <returns>The team DTO if found.</returns>
+    /// <returns>The TeamDTO if found.</returns>
     /// <exception cref="TeamNotFoundException"></exception>
     public async Task<TeamDTO> GetTeamByIdAsync(string id)
     {
@@ -55,11 +58,10 @@ internal class TeamService : ITeamService
     }
 
     /// <summary>
-    /// Adds a new team to the list. If a team with the same ID already exists, a TeamAlreadyExistsException is thrown with an appropriate message. If the team is added successfully, the provided TeamDTO is returned. If the ID of the team to add is null or empty, a new GUID will be generated and assigned as the ID.
+    /// Adds a new team to the list of teams. The method takes a TeamDTO as input, generates a new unique ID for the team, and creates a new Team model based on the provided DTO. The new team is then added to the list of teams, and the original TeamDTO (with the newly assigned ID) is returned. This allows for the creation of new team entries in the application while ensuring that each team has a unique identifier.
     /// </summary>
     /// <param name="teamToAdd">The TeamDTO to add.</param>
     /// <returns>The added TeamDTO if successful.</returns>
-    /// <exception cref="TeamAlreadyExistsException"></exception>
     public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd)
     {
         teamToAdd.Id = Guid.NewGuid().ToString();
@@ -76,7 +78,7 @@ internal class TeamService : ITeamService
     }
 
     /// <summary>
-    /// Updates an existing team with the specified ID using the provided updated team data. If a team with the given ID is found, it is updated with the new data and the updated TeamDTO is returned. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message.
+    /// Updates an existing team with the specified ID using the provided TeamDTO. The method first checks if a team with the given ID exists in the list of teams. If a team is found, its properties are updated with the values from the provided TeamDTO, and the updated TeamDTO is returned. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message. This allows for modifying existing team entries in the application while ensuring that only valid teams can be updated.
     /// </summary>
     /// <param name="id">The ID of the team to update.</param>
     /// <param name="updatedTeam">The updated team DTO.</param>
@@ -99,7 +101,7 @@ internal class TeamService : ITeamService
     }
     
     /// <summary>
-    /// Deletes a team with the specified ID. If a team with the given ID is found, it is removed from the list of teams and the method returns true. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message and the method returns false.
+    /// Deletes a team with the specified ID from the list of teams. The method checks if a team with the given ID exists in the list. If a team is found, it is removed from the list, and the method returns true to indicate that the deletion was successful. If no team is found with the specified ID, a TeamNotFoundException is thrown with an appropriate message. This allows for the removal of team entries from the application while ensuring that only valid teams can be deleted.
     /// </summary>
     /// <param name="id">The ID of the team to delete.</param>
     /// <returns>A boolean indicating whether the team was deleted.</returns>

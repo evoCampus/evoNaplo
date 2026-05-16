@@ -1,14 +1,18 @@
 ﻿namespace evoNaplo.Services;
 
+/// <summary>
+/// The StudentService class provides methods for managing students in the application. It allows for retrieving, adding, updating, and deleting students. The service uses an in-memory list to store student data. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a student is not found or when trying to add a student that already exists.
+/// </summary>
 internal class StudentService : IStudentService
 {
     private static readonly List<Student> _students = new List<Student>();
     
     /// <summary>
-    /// This method is used internally by the service to retrieve the Student model for operations that require it, such as adding or updating students. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
+    /// Retrieves a student model by its ID. If a student with the specified ID is found in the list of students, it is returned. If no student is found with the given ID, a StudentNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the student to retrieve.</param>
-    /// <returns>The Student model if found, otherwise null.</returns>
+    /// <returns>The Student model if found.</returns>
+    /// <exception cref="StudentNotFoundException"></exception>
     public Student GetStudentModelById(string id)
     {
         var student = _students.FirstOrDefault(s => s.Id == id);
@@ -20,10 +24,9 @@ internal class StudentService : IStudentService
     }
 
     /// <summary>
-    /// Retrieves a list of all students in the database. If no students are found, a StudentNotFoundException is thrown with an appropriate message. Each student is returned as a StudentDTO.
+    /// Retrieves all students as a collection of StudentDTOs. The method iterates through the list of students and converts each student model into a StudentDTO, which is then returned as an IEnumerable collection. This allows for a more structured and simplified representation of student data when it is accessed by other parts of the application.
     /// </summary>
-    /// <returns>A list of StudentDTOs if students are found.</returns>
-    /// <exception cref="StudentNotFoundException"></exception>
+    /// <returns>An IEnumerable collection of StudentDTOs representing all students.</returns>
     public async Task<IEnumerable<StudentDTO>> GetAllStudentsAsync()
     {
         IEnumerable<StudentDTO> students = _students.Select(s => new StudentDTO(s));
@@ -31,7 +34,7 @@ internal class StudentService : IStudentService
     }
     
     /// <summary>
-    /// Retrieves a specific student by their ID. If a student with the specified ID is found, it is returned as a StudentDTO. If no student is found with the given ID, a StudentNotFoundException is thrown with an appropriate message.
+    /// Retrieves a student by its ID and returns it as a StudentDTO. If a student with the specified ID is found in the list of students, it is converted into a StudentDTO and returned. If no student is found with the given ID, a StudentNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the student to retrieve.</param>
     /// <returns>The StudentDTO if found.</returns>
@@ -47,11 +50,10 @@ internal class StudentService : IStudentService
     }
 
     /// <summary>
-    /// Adds a new student to the list. If a student with the same ID already exists, a StudentAlreadyExistsException is thrown with an appropriate message. If the student is added successfully, the provided StudentDTO is returned. If the ID of the student to add is null or empty, a new GUID will be generated and assigned as the ID.
+    /// Adds a new student to the list of students. The method takes a StudentDTO as input, generates a new unique ID for the student, and creates a new Student model based on the provided DTO. The new student is then added to the list of students, and the original StudentDTO (with the newly assigned ID) is returned. This allows for the creation of new student entries in the application while ensuring that each student has a unique identifier.
     /// </summary>
     /// <param name="studentToAdd">The StudentDTO to add.</param>
     /// <returns>The added StudentDTO if successful.</returns>
-    /// <exception cref="StudentAlreadyExistsException"></exception>
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd)
     {
         studentToAdd.Id = Guid.NewGuid().ToString();
@@ -77,7 +79,7 @@ internal class StudentService : IStudentService
     }
 
     /// <summary>
-    /// Updates an existing student with the specified ID using the provided updated student data. If a student with the given ID is found, it is updated with the new data and the updated StudentDTO is returned. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message.
+    /// Updates an existing student with the specified ID using the provided StudentDTO. The method first checks if a student with the given ID exists in the list of students. If a student is found, its properties are updated with the values from the provided StudentDTO, and the updated StudentDTO is returned. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message. This allows for modifying existing student entries in the application while ensuring that only valid students can be updated.
     /// </summary>
     /// <param name="id">The ID of the student to update.</param>
     /// <param name="updatedStudent">The updated student DTO.</param>
@@ -109,7 +111,7 @@ internal class StudentService : IStudentService
     }
 
     /// <summary>
-    /// Deletes a student with the specified ID. If a student with the given ID is found, it is removed from the list of students and the method returns true. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message and the method returns false.
+    /// Deletes a student with the specified ID from the list of students. The method checks if a student with the given ID exists in the list. If a student is found, it is removed from the list, and the method returns true to indicate that the deletion was successful. If no student is found with the specified ID, a StudentNotFoundException is thrown with an appropriate message. This allows for the removal of student entries from the application while ensuring that only valid students can be deleted.
     /// </summary>
     /// <param name="id">The ID of the student to delete.</param>
     /// <returns>A boolean indicating whether the student was deleted.</returns>

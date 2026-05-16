@@ -1,5 +1,8 @@
 namespace evoNaplo.Services;
 
+/// <summary>
+/// The ProjectService class provides methods for managing projects in the application. It allows for retrieving, adding, updating, and deleting projects. The service uses an in-memory list to store project data and interacts with the team service to manage relationships between projects and teams. The service also includes error handling to ensure that appropriate exceptions are thrown when operations fail, such as when a project is not found or when trying to add a project that already exists.
+/// </summary>
 internal class ProjectService : IProjectService
 {
     private static readonly List<Project> _projects = new List<Project>();
@@ -11,10 +14,11 @@ internal class ProjectService : IProjectService
     }
 
     /// <summary>
-    /// This method is used internally by the service to retrieve the Project model for operations that require it, such as adding or updating projects. It is not intended to be exposed directly to clients, as it returns the internal model rather than a DTO.
+    /// Retrieves a project model by its ID. If a project with the specified ID is found in the list of projects, it is returned. If no project is found with the given ID, a ProjectNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the project to retrieve.</param>
-    /// <returns>The Project model if found, otherwise null.</returns>
+    /// <returns>The Project model if found.</returns>
+    /// <exception cref="ProjectNotFoundException"></exception>
     public Project GetProjectModelById(string id)
     {
         var project = _projects.FirstOrDefault(p => p.Id == id);
@@ -26,10 +30,9 @@ internal class ProjectService : IProjectService
     }
 
     /// <summary>
-    /// Retrieves a list of all projects in the database. If no projects are found, a ProjectNotFoundException is thrown with an appropriate message. Each project is returned as a ProjectDTO.
+    /// Retrieves all projects as a collection of ProjectDTOs. The method iterates through the list of projects and converts each project model into a ProjectDTO, which is then returned as an IEnumerable collection. This allows for a more structured and simplified representation of project data when it is accessed by other parts of the application.
     /// </summary>
-    /// <returns>A list of ProjectDTOs if projects are found.</returns>
-    /// <exception cref="ProjectNotFoundException"></exception>
+    /// <returns>An IEnumerable collection of ProjectDTOs representing all projects.</returns>
     public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
     {
         IEnumerable<ProjectDTO> projects = _projects.Select(p => new ProjectDTO(p));
@@ -37,7 +40,7 @@ internal class ProjectService : IProjectService
     }
 
     /// <summary>
-    /// Retrieves a specific project by its ID. If a project with the specified ID is found, it is returned as a ProjectDTO. If no project is found with the given ID, a ProjectNotFoundException is thrown with an appropriate message.
+    /// Retrieves a project by its ID and returns it as a ProjectDTO. If a project with the specified ID is found in the list of projects, it is converted into a ProjectDTO and returned. If no project is found with the given ID, a ProjectNotFoundException is thrown with an appropriate message.
     /// </summary>
     /// <param name="id">The ID of the project to retrieve.</param>
     /// <returns>The ProjectDTO if found.</returns>
@@ -53,11 +56,10 @@ internal class ProjectService : IProjectService
     }
 
     /// <summary>
-    /// Adds a new project to the list of projects. If a project with the same ID already exists, a ProjectAlreadyExistsException is thrown with an appropriate message. If the project is added successfully, the provided ProjectDTO is returned. If the ID of the project to add is null or empty, a new GUID will be generated and assigned as the ID.
+    /// Adds a new project to the list of projects. The method takes a ProjectDTO as input, generates a new unique ID for the project, and creates a new Project model based on the provided DTO. The new project is then added to the list of projects, and the original ProjectDTO (with the newly assigned ID) is returned. This allows for the creation of new project entries in the application while ensuring that each project has a unique identifier.
     /// </summary>
     /// <param name="projectToAdd">The ProjectDTO to add.</param>
     /// <returns>The added ProjectDTO if successful.</returns>
-    /// <exception cref="ProjectAlreadyExistsException"></exception>
     public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd)
     {
         projectToAdd.Id = Guid.NewGuid().ToString();
@@ -79,7 +81,7 @@ internal class ProjectService : IProjectService
     }
 
     /// <summary>
-    /// Updates an existing project with the specified ID using the provided updated project data. If a project with the given ID is found, it is updated with the new data and the updated ProjectDTO is returned. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message.
+    /// Updates an existing project with the specified ID using the provided ProjectDTO. The method first checks if a project with the given ID exists in the list of projects. If a project is found, its properties are updated with the values from the provided ProjectDTO, and the updated ProjectDTO is returned. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message. This allows for modifying existing project entries in the application while ensuring that only valid projects can be updated.
     /// </summary>
     /// <param name="id">The ID of the project to update.</param>
     /// <param name="updatedProject">The updated project DTO.</param>
@@ -107,7 +109,7 @@ internal class ProjectService : IProjectService
     }
     
     /// <summary>
-    /// Deletes a project with the specified ID. If a project with the given ID is found, it is removed from the list of projects and the method returns true. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message and the method returns false.
+    /// Deletes a project with the specified ID from the list of projects. The method checks if a project with the given ID exists in the list. If a project is found, it is removed from the list, and the method returns true to indicate that the deletion was successful. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message. This allows for the removal of project entries from the application while ensuring that only valid projects can be deleted.
     /// </summary>
     /// <param name="id">The ID of the project to delete.</param>
     /// <returns>A boolean indicating whether the project was deleted.</returns>
