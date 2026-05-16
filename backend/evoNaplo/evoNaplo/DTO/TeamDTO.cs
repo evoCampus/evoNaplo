@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -21,5 +20,7 @@ public class TeamDTO
         //WeeklyMeetingDay = team.WeeklyMeetingDay;
         //WeeklyMeetingTime = team.WeeklyMeetingTime;
         AttendanceSheetIds = team.AttendanceSheets.Select(a => a.Id).ToList();
+
     }
+    
 }

@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -19,5 +18,7 @@ public class ProjectDTO
         Description = project.ShortDescription;
         ProjectLinks = project.ProjectLinks.ToDictionary(l => l.LinkType.ToString(), l => l.Url);
         TeamIds = project.Teams.Select(t => t.Id).ToList();
+        
     }
+
 }

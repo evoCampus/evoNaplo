@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using evoNaplo.DTO;
-using evoNaplo.Services;
+﻿namespace evoNaplo.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -104,4 +102,5 @@ public class ProjectsController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+    
 }

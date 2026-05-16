@@ -1,7 +1,7 @@
-﻿namespace evoNaplo.Models
-{ 
+﻿namespace evoNaplo.Models;
+
 public class Student
-    {
+{
     public required string Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
@@ -21,5 +21,5 @@ public class Student
     public bool WantsToStayWithCurrentTeam { get; set; }
     public string? TeamId { get; set; }
     public Team? Team { get; set; }
-    }
+    
 }

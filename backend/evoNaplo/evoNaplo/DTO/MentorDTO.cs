@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -27,5 +26,7 @@ public class MentorDTO
         ProjectIds = mentor.Projects.Select(p => p.Id).ToList();
         //SemesterNumber = mentor.SemesterNumber;
         //IsActive = mentor.IsActive;
+        
     }
+
 }

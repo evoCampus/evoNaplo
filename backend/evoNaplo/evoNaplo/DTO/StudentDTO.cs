@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using evoNaplo.Models;
 
 namespace evoNaplo.DTO;
 
@@ -41,5 +40,7 @@ public class StudentDTO
         IsWorkingStudent = student.IsWorkingStudent;
         WorkExperienceInSemesters = student.WorkingStudentDuration;
         WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam;
+        
     }
+
 }
