@@ -10,11 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"],
-      "@/*": ["./src/*"], 
-      "@/lib/*": ["../ui-library/lib/*"],
-      "@/hooks/*": ["../ui-library/hooks/*"],
-      "@/components/*": ["../ui-library/components/*"],
-      "@evonaplo/ui/*": ["../ui-library/*"]
+      "@/*": ["./src/*"]
     },
 
     /* Bundler mode */
@@ -29,13 +25,9 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
+    "erasableSyntaxOnly": false,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
   },
-  "include": [
-    "src", 
-    "../ui-library/**/*.ts", 
-    "../ui-library/**/*.tsx"
-  ],
+  "include": ["src"],
 }
