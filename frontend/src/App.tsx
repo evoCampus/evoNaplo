@@ -25,7 +25,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 function App() {
   const MOCK_USER: User = {
     name: "Teszt Admin",
-    role: "mentor",
+    role: "admin",
     email: "admin@test.com"
   };
 

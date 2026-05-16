@@ -4,13 +4,16 @@ import "./index.css";
 import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 import { ApiClientProvider } from "./components/ApiClientProvider";
+import { SemesterProvider } from "./components/SemesterProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ApiClientProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
+      <SemesterProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </SemesterProvider>
     </ApiClientProvider>
   </StrictMode>,
 );
