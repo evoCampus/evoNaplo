@@ -75,8 +75,7 @@ public class StudentsController : ControllerBase
     {
         try
         {
-            await _studentService.UpdateStudentAsync(studentId, updatedStudent);
-            return NoContent();
+            return Ok(await _studentService.UpdateStudentAsync(studentId, updatedStudent));
         }
         catch (StudentNotFoundException ex)
         {
@@ -94,8 +93,7 @@ public class StudentsController : ControllerBase
     {
         try
         {
-            await _studentService.DeleteStudentAsync(studentId);
-            return NoContent();
+            return Ok(await _studentService.DeleteStudentAsync(studentId));
         }
         catch (StudentNotFoundException ex)
         {

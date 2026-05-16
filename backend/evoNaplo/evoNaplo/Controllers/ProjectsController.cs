@@ -75,8 +75,7 @@ public class ProjectsController : ControllerBase
     {
         try
         {
-            await _projectService.UpdateProjectAsync(projectId, updatedProject);
-            return NoContent();
+            return Ok(await _projectService.UpdateProjectAsync(projectId, updatedProject));
         }
         catch (ProjectNotFoundException ex)
         {
@@ -94,8 +93,7 @@ public class ProjectsController : ControllerBase
     {
         try
         {
-            await _projectService.DeleteProjectAsync(projectId);
-            return NoContent();
+            return Ok(await _projectService.DeleteProjectAsync(projectId));
         }
         catch (ProjectNotFoundException ex)
         {

@@ -75,8 +75,7 @@ public class TeamsController : ControllerBase
     {
         try
         {
-            await _teamService.UpdateTeamAsync(teamId, updatedTeam);
-            return NoContent();
+            return Ok(await _teamService.UpdateTeamAsync(teamId, updatedTeam));
         }
         catch (TeamNotFoundException ex)
         {
@@ -94,8 +93,7 @@ public class TeamsController : ControllerBase
     {
         try
         {
-            await _teamService.DeleteTeamAsync(teamId);
-            return NoContent();
+            return Ok(await _teamService.DeleteTeamAsync(teamId));
         }
         catch (TeamNotFoundException ex)
         {

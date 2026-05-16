@@ -75,8 +75,7 @@ public class MentorsController : ControllerBase
     {
         try
         {
-            await _mentorService.UpdateMentorAsync(mentorId, updatedMentor);
-            return NoContent();
+            return Ok(await _mentorService.UpdateMentorAsync(mentorId, updatedMentor));
         }
         catch (MentorNotFoundException ex)
         {
@@ -94,8 +93,7 @@ public class MentorsController : ControllerBase
     {
         try
         {
-            await _mentorService.DeleteMentorAsync(mentorId);
-            return NoContent();
+            return Ok(await _mentorService.DeleteMentorAsync(mentorId));
         }
         catch (MentorNotFoundException ex)
         {
