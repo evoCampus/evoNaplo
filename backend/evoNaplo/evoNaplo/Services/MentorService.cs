@@ -17,9 +17,14 @@ internal class MentorService : IMentorService
     /// </summary>
     /// <param name="id">The ID of the mentor to retrieve.</param>
     /// <returns>The Mentor model if found, otherwise null.</returns>
-    public Mentor? GetMentorModelById(string id)
+    public Mentor GetMentorModelById(string id)
     {
-        return _mentors.FirstOrDefault(m => m.Id == id);
+        var mentor = _mentors.FirstOrDefault(m => m.Id == id);
+        if (mentor is null)
+        {
+            throw new MentorNotFoundException($"Mentor with ID {id} not found.");
+        }
+        return mentor;
     }
     
     /// <summary>

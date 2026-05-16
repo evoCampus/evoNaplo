@@ -15,9 +15,14 @@ internal class ProjectService : IProjectService
     /// </summary>
     /// <param name="id">The ID of the project to retrieve.</param>
     /// <returns>The Project model if found, otherwise null.</returns>
-    public Project? GetProjectModelById(string id)
+    public Project GetProjectModelById(string id)
     {
-        return _projects.FirstOrDefault(p => p.Id == id);
+        var project = _projects.FirstOrDefault(p => p.Id == id);
+        if (project is null)
+        {
+            throw new ProjectNotFoundException($"Project with ID {id} not found.");
+        }
+        return project;
     }
 
     /// <summary>

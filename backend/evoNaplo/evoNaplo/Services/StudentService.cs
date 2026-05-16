@@ -9,9 +9,14 @@ internal class StudentService : IStudentService
     /// </summary>
     /// <param name="id">The ID of the student to retrieve.</param>
     /// <returns>The Student model if found, otherwise null.</returns>
-    public Student? GetStudentModelById(string id)
+    public Student GetStudentModelById(string id)
     {
-        return _students.FirstOrDefault(s => s.Id == id);
+        var student = _students.FirstOrDefault(s => s.Id == id);
+        if (student is null)
+        {
+            throw new StudentNotFoundException($"Student with ID {id} not found.");
+        }
+        return student;
     }
 
     /// <summary>

@@ -17,9 +17,14 @@ internal class TeamService : ITeamService
     /// </summary>
     /// <param name="id">The ID of the team to retrieve.</param>
     /// <returns>The Team model if found, otherwise null.</returns>
-    public Team? GetTeamModelById(string id)
+    public Team GetTeamModelById(string id)
     {
-        return _teams.FirstOrDefault(t => t.Id == id);
+        var team = _teams.FirstOrDefault(t => t.Id == id);
+        if (team is null)
+        {
+            throw new TeamNotFoundException($"Team with ID {id} not found.");
+        }
+        return team;
     }
 
     /// <summary>
