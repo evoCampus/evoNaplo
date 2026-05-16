@@ -30,11 +30,7 @@ internal class MentorService : IMentorService
     public async Task<IEnumerable<MentorDTO>> GetAllMentorsAsync()
     {
         IEnumerable<MentorDTO> mentors = _mentors.Select(m => new MentorDTO(m));
-        if (mentors.Any())
-        {
             return mentors;
-        }
-        throw new MentorNotFoundException("No mentors found.");
     }
 
     /// <summary>

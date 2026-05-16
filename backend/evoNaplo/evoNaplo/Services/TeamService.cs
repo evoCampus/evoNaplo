@@ -30,11 +30,7 @@ internal class TeamService : ITeamService
     public async Task<IEnumerable<TeamDTO>> GetAllTeamsAsync()
     {
         IEnumerable<TeamDTO> teams = _teams.Select(t => new TeamDTO(t));
-        if (teams.Any())
-        {
-            return teams;
-        }
-        throw new TeamNotFoundException("No teams found.");
+        return teams;
     }
 
     /// <summary>

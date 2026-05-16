@@ -22,11 +22,7 @@ internal class StudentService : IStudentService
     public async Task<IEnumerable<StudentDTO>> GetAllStudentsAsync()
     {
         IEnumerable<StudentDTO> students = _students.Select(s => new StudentDTO(s));
-        if (students.Any())
-        {
-            return students;
-        }
-        throw new StudentNotFoundException("No students found.");
+        return students;
     }
     
     /// <summary>

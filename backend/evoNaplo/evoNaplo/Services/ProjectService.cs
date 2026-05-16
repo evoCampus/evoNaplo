@@ -28,11 +28,7 @@ internal class ProjectService : IProjectService
     public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
     {
         IEnumerable<ProjectDTO> projects = _projects.Select(p => new ProjectDTO(p));
-        if (projects.Any())
-        {
-            return projects;
-        }
-        throw new ProjectNotFoundException("No projects found.");
+        return projects;
     }
 
     /// <summary>
