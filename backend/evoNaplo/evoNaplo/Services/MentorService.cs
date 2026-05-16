@@ -30,7 +30,7 @@ internal class MentorService : IMentorService
     public async Task<IEnumerable<MentorDTO>> GetAllMentorsAsync()
     {
         IEnumerable<MentorDTO> mentors = _mentors.Select(m => new MentorDTO(m));
-            return mentors;
+        return mentors;
     }
 
     /// <summary>

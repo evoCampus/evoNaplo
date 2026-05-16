@@ -10,7 +10,6 @@ public class ProjectDTO
     public required Dictionary<string, string> ProjectLinks { get; set; }
     public required IEnumerable<string> TeamIds { get; set; }
 
-    [SetsRequiredMembers]
     public ProjectDTO(Project project)
     {
         Id = project.Id;

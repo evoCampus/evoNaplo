@@ -2,7 +2,7 @@ namespace evoNaplo.Services;
 
 public interface IMentorService
 {
-    public Mentor? GetMentorModelById(string id);
+    Mentor? GetMentorModelById(string id);
     Task<IEnumerable<MentorDTO>> GetAllMentorsAsync();
     Task<MentorDTO> GetMentorByIdAsync(string id);
     Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAdd);

@@ -2,7 +2,7 @@
 
 public interface IStudentService
 {
-    public Student? GetStudentModelById(string id);
+    Student? GetStudentModelById(string id);
     Task<IEnumerable<StudentDTO>> GetAllStudentsAsync();
     Task<StudentDTO> GetStudentByIdAsync(string id);
     Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd);
