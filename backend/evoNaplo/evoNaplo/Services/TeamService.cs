@@ -37,10 +37,7 @@ namespace evoNaplo.Services
             {
                 return teams;
             }
-            else
-            {
-                throw new TeamNotFoundException("No teams found.");
-            }
+            throw new TeamNotFoundException("No teams found.");
         }
 
         /// <summary>
@@ -56,10 +53,7 @@ namespace evoNaplo.Services
             {
                 return new TeamDTO(team);
             }
-            else
-            {
-                throw new TeamNotFoundException($"Team with ID {id} not found.");
-            }
+            throw new TeamNotFoundException($"Team with ID {id} not found.");
         }
 
         /// <summary>
@@ -78,19 +72,16 @@ namespace evoNaplo.Services
             {
                 throw new TeamAlreadyExistsException($"A team with the ID {teamToAdd.Id} already exists.");
             }
-            else
+            _teams.Add(new Team
             {
-                _teams.Add(new Team
-                {
-                    Id = teamToAdd.Id,
-                    Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList(),
-                    Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList(),
-                    //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
-                    //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
-                    AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList(),
-                });
-                return teamToAdd;
-            }
+                Id = teamToAdd.Id,
+                Mentors = teamToAdd.MentorIds.Select(_mentorService.GetMentorModelById).OfType<Mentor>().ToList(),
+                Students = teamToAdd.StudentIds.Select(_studentService.GetStudentModelById).OfType<Student>().ToList(),
+                //WeeklyMeetingDay = teamToAdd.WeeklyMeetingDay,
+                //WeeklyMeetingTime = teamToAdd.WeeklyMeetingTime,
+                AttendanceSheets = teamToAdd.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList(),
+            });
+            return teamToAdd;
         }
 
         /// <summary>
@@ -113,10 +104,7 @@ namespace evoNaplo.Services
                 existing.AttendanceSheets = updatedTeam.AttendanceSheetIds.Select(a => new AttendanceSheet { Id = a }).ToList();
                 return updatedTeam;
             }
-            else
-            {
-                throw new TeamNotFoundException($"Team with ID {id} not found.");
-            }
+            throw new TeamNotFoundException($"Team with ID {id} not found.");
         }
 
         /// <summary>
@@ -133,11 +121,8 @@ namespace evoNaplo.Services
                 _teams.Remove(existing);
                 return true;
             }
-            else
-            {
-                throw new TeamNotFoundException($"Team with ID {id} not found.");
-                return false;
-            }
+            throw new TeamNotFoundException($"Team with ID {id} not found.");
+            return false;
         }
     }
 }

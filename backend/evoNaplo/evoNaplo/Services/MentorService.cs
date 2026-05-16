@@ -37,10 +37,7 @@ namespace evoNaplo.Services
             {
                 return mentors;
             }
-            else
-            {
-                throw new MentorNotFoundException("No mentors found.");
-            }
+            throw new MentorNotFoundException("No mentors found.");
         }
 
         /// <summary>
@@ -56,10 +53,7 @@ namespace evoNaplo.Services
             {
                 return new MentorDTO(mentor);
             }
-            else
-            {
-                throw new MentorNotFoundException($"Mentor with ID {id} not found.");
-            }
+            throw new MentorNotFoundException($"Mentor with ID {id} not found.");
         }
 
         /// <summary>
@@ -78,19 +72,16 @@ namespace evoNaplo.Services
             {
                 throw new MentorAlreadyExistsException($"A mentor with the ID {mentorToAdd.Id} already exists.");
             }
-            else
+            _mentors.Add(new Mentor
             {
-                _mentors.Add(new Mentor
-                {
-                    Id = mentorToAdd.Id,
-                    Name = mentorToAdd.Name,
-                    Email = mentorToAdd.Email,
-                    PhoneNumber = mentorToAdd.PhoneNumber,
-                    Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
-                    Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
-                });
-                return mentorToAdd;
-            }
+                Id = mentorToAdd.Id,
+                Name = mentorToAdd.Name,
+                Email = mentorToAdd.Email,
+                PhoneNumber = mentorToAdd.PhoneNumber,
+                Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
+                Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
+            });
+            return mentorToAdd;
         }
 
         /// <summary>
@@ -113,10 +104,7 @@ namespace evoNaplo.Services
                 existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList();
                 return updatedMentor;
             }
-            else
-            {
-                throw new MentorNotFoundException($"Mentor with ID {id} not found.");
-            }
+            throw new MentorNotFoundException($"Mentor with ID {id} not found.");
         }
 
         /// <summary>
@@ -133,11 +121,8 @@ namespace evoNaplo.Services
                 _mentors.Remove(existing);
                 return true;
             }
-            else
-            {
-                throw new MentorNotFoundException($"Mentor with ID {id} not found.");
-                return false;
-            }
+            throw new MentorNotFoundException($"Mentor with ID {id} not found.");
+            return false;
         }
     }
 }

@@ -29,10 +29,8 @@ namespace evoNaplo.Services
             {
                 return students;
             }
-            else
-            {
-                throw new StudentNotFoundException("No students found.");
-            }
+            throw new StudentNotFoundException("No students found.");
+
         }
 
         /// <summary>
@@ -48,10 +46,7 @@ namespace evoNaplo.Services
             {
                 return new StudentDTO(student);
             }
-            else
-            {
-                throw new StudentNotFoundException($"Student with ID {id} not found.");
-            }
+            throw new StudentNotFoundException($"Student with ID {id} not found.");
         }
 
         /// <summary>
@@ -70,28 +65,25 @@ namespace evoNaplo.Services
             {
                 throw new StudentAlreadyExistsException($"A student with the ID {studentToAdd.Id} already exists.");
             }
-            else
+            _students.Add(new Student
             {
-                _students.Add(new Student
-                {
-                    Id = studentToAdd.Id,
-                    Name = studentToAdd.Name,
-                    Email = studentToAdd.Email,
-                    PhoneNumber = studentToAdd.PhoneNumber,
-                    UniversityProgramme = studentToAdd.UniversityProgramme,
-                    CurrentSemester = studentToAdd.CurrentSemester,
-                    IsFirstEvoCampusSemester = studentToAdd.IsInTheirFirstSemester,
-                    PersonalGoals = studentToAdd.PersonalGoals,
-                    HasAppliedForScholarship = studentToAdd.HasAppliedForScholarship,
-                    HasActiveScholarship = studentToAdd.HasScholarship,
-                    ScholarshipDuration = studentToAdd.ScholarshipDuration,
-                    HasAppliedForInternship = studentToAdd.HasAppliedForInternship,
-                    IsCurrentlyIntern = studentToAdd.HasInternship,
-                    IsWorkingStudent = studentToAdd.IsWorkingStudent,
-                    WantsToStayWithCurrentTeam = studentToAdd.WantsToStayWithCurrentTeam,
-                });
-                return studentToAdd;
-            }
+                Id = studentToAdd.Id,
+                Name = studentToAdd.Name,
+                Email = studentToAdd.Email,
+                PhoneNumber = studentToAdd.PhoneNumber,
+                UniversityProgramme = studentToAdd.UniversityProgramme,
+                CurrentSemester = studentToAdd.CurrentSemester,
+                IsFirstEvoCampusSemester = studentToAdd.IsInTheirFirstSemester,
+                PersonalGoals = studentToAdd.PersonalGoals,
+                HasAppliedForScholarship = studentToAdd.HasAppliedForScholarship,
+                HasActiveScholarship = studentToAdd.HasScholarship,
+                ScholarshipDuration = studentToAdd.ScholarshipDuration,
+                HasAppliedForInternship = studentToAdd.HasAppliedForInternship,
+                IsCurrentlyIntern = studentToAdd.HasInternship,
+                IsWorkingStudent = studentToAdd.IsWorkingStudent,
+                WantsToStayWithCurrentTeam = studentToAdd.WantsToStayWithCurrentTeam,
+            });
+            return studentToAdd;
         }
 
         /// <summary>
@@ -123,10 +115,7 @@ namespace evoNaplo.Services
                 existing.WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam;
                 return updatedStudent;
             }
-            else
-            {
-                throw new StudentNotFoundException($"Student with ID {id} not found.");
-            }
+            throw new StudentNotFoundException($"Student with ID {id} not found.");
         }
 
         /// <summary>
@@ -143,11 +132,8 @@ namespace evoNaplo.Services
                 _students.Remove(existing);
                 return true;
             }
-            else
-            {
-                throw new StudentNotFoundException($"Student with ID {id} not found.");
-                return false;
-            }
+            throw new StudentNotFoundException($"Student with ID {id} not found.");
+            return false;
         }
     }
 }

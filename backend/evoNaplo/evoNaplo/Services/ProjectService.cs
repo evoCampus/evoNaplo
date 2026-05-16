@@ -35,10 +35,7 @@ namespace evoNaplo.Services
             {
                 return projects;
             }
-            else
-            {
-                throw new ProjectNotFoundException("No projects found.");
-            }
+            throw new ProjectNotFoundException("No projects found.");
         }
 
         /// <summary>
@@ -54,10 +51,7 @@ namespace evoNaplo.Services
             {
                 return new ProjectDTO(project);
             }
-            else
-            {
-                throw new ProjectNotFoundException($"Project with ID {id} not found.");
-            }
+            throw new ProjectNotFoundException($"Project with ID {id} not found.");
         }
 
         /// <summary>
@@ -76,24 +70,21 @@ namespace evoNaplo.Services
             {
                 throw new ProjectAlreadyExistsException($"A project with the ID {projectToAdd.Id} already exists.");
             }
-            else
+            _projects.Add(new Project
             {
-                _projects.Add(new Project
+                Id = projectToAdd.Id,
+                Name = projectToAdd.Name,
+                ShortDescription = projectToAdd.Description,
+                ProjectLinks = projectToAdd.ProjectLinks.Select(l => new ProjectLink
                 {
-                    Id = projectToAdd.Id,
-                    Name = projectToAdd.Name,
-                    ShortDescription = projectToAdd.Description,
-                    ProjectLinks = projectToAdd.ProjectLinks.Select(l => new ProjectLink
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
-                        Url = l.Value,
-                        ProjectId = projectToAdd.Id
-                    }).ToList(),
-                    Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
-                });
-                return projectToAdd;
-            }
+                    Id = Guid.NewGuid().ToString(),
+                    LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
+                    Url = l.Value,
+                    ProjectId = projectToAdd.Id
+                }).ToList(),
+                Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
+            });
+            return projectToAdd;
         }
 
         /// <summary>
@@ -121,10 +112,7 @@ namespace evoNaplo.Services
                 existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
                 return updatedProject;
             }
-            else
-            {
-                throw new ProjectNotFoundException($"Project with ID {id} not found.");
-            }
+            throw new ProjectNotFoundException($"Project with ID {id} not found.");
         }
 
         /// <summary>
@@ -141,11 +129,8 @@ namespace evoNaplo.Services
                 _projects.Remove(existing);
                 return true;
             }
-            else
-            {
-                throw new ProjectNotFoundException($"Project with ID {id} not found.");
-                return false;
-            }
+            throw new ProjectNotFoundException($"Project with ID {id} not found.");
+            return false;
         }
     }
 }
