@@ -61,14 +61,7 @@ internal class TeamService : ITeamService
     /// <exception cref="TeamAlreadyExistsException"></exception>
     public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd)
     {
-        if (string.IsNullOrEmpty(teamToAdd.Id)) 
-        {
-            teamToAdd.Id = Guid.NewGuid().ToString();
-        }
-        if (_teams.Any(t => t.Id == teamToAdd.Id))
-        {
-            throw new TeamAlreadyExistsException($"A team with the ID {teamToAdd.Id} already exists.");
-        }
+        teamToAdd.Id = Guid.NewGuid().ToString();
         _teams.Add(new Team
         {
             Id = teamToAdd.Id,

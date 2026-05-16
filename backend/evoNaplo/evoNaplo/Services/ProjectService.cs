@@ -59,14 +59,7 @@ internal class ProjectService : IProjectService
     /// <exception cref="ProjectAlreadyExistsException"></exception>
     public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd)
     {
-        if (string.IsNullOrEmpty(projectToAdd.Id)) 
-        {
-            projectToAdd.Id = Guid.NewGuid().ToString();
-        }
-        if (_projects.Any(p => p.Id == projectToAdd.Id))
-        {
-            throw new ProjectAlreadyExistsException($"A project with the ID {projectToAdd.Id} already exists.");
-        }
+        projectToAdd.Id = Guid.NewGuid().ToString();
         _projects.Add(new Project
         {
             Id = projectToAdd.Id,

@@ -61,14 +61,7 @@ internal class MentorService : IMentorService
     /// <exception cref="MentorAlreadyExistsException"></exception>
     public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAdd)
     {
-        if (string.IsNullOrEmpty(mentorToAdd.Id)) 
-        {
-            mentorToAdd.Id = Guid.NewGuid().ToString();
-        }
-        if (_mentors.Any(m => m.Id == mentorToAdd.Id))
-        {
-            throw new MentorAlreadyExistsException($"A mentor with the ID {mentorToAdd.Id} already exists.");
-        }
+        mentorToAdd.Id = Guid.NewGuid().ToString();
         _mentors.Add(new Mentor
         {
             Id = mentorToAdd.Id,

@@ -53,14 +53,7 @@ internal class StudentService : IStudentService
     /// <exception cref="StudentAlreadyExistsException"></exception>
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd)
     {
-        if (string.IsNullOrEmpty(studentToAdd.Id)) 
-        {
-            studentToAdd.Id = Guid.NewGuid().ToString();
-        }
-        if (_students.Any(s => s.Id == studentToAdd.Id))
-        {
-            throw new StudentAlreadyExistsException($"A student with the ID {studentToAdd.Id} already exists.");
-        }
+        studentToAdd.Id = Guid.NewGuid().ToString();
         _students.Add(new Student
         {
             Id = studentToAdd.Id,
