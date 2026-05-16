@@ -119,7 +119,6 @@ internal class TeamService : ITeamService
             return true;
         }
         throw new TeamNotFoundException($"Team with ID {id} not found.");
-        return false;
     }
     
 }

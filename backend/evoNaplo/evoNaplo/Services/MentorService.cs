@@ -119,7 +119,6 @@ internal class MentorService : IMentorService
             return true;
         }
         throw new MentorNotFoundException($"Mentor with ID {id} not found.");
-        return false;
     }
     
 }

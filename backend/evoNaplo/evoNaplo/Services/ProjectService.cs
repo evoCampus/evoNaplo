@@ -127,7 +127,6 @@ internal class ProjectService : IProjectService
             return true;
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");
-        return false;
     }
     
 }

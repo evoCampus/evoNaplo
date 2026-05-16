@@ -129,7 +129,6 @@ internal class StudentService : IStudentService
             return true;
         }
         throw new StudentNotFoundException($"Student with ID {id} not found.");
-        return false;
     }
     
 }
