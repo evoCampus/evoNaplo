@@ -12,54 +12,34 @@ public class CsvExportService : ICsvExportService
         
         // Header
         var headers = new List<string>();
-        if (filter.IncludeTimestamp ?? true) 
-            headers.Add(EscapeCsvField(HeaderTimestamp));
-        if (filter.IncludeName ?? true) 
-            headers.Add(EscapeCsvField(HeaderName));
-        if (filter.IncludeEmail ?? true) 
-            headers.Add(EscapeCsvField(HeaderEmail));
-        if (filter.IncludePhoneNumber ?? true) 
-            headers.Add(EscapeCsvField(HeaderPhoneNumber));
-        if (filter.IncludeMajor ?? true) 
-            headers.Add(EscapeCsvField(HeaderMajor));
-        if (filter.IncludeIsFirstTime ?? true) 
-            headers.Add(EscapeCsvField(HeaderIsFirstTime));
-        if (filter.includeGoals ?? true) 
-            headers.Add(EscapeCsvField(HeaderGoals));
-        if (filter.IncludeStayInTeam ?? true) 
-            headers.Add(EscapeCsvField(HeaderStayInTeam));
-        if (filter.IncludeOtherComments ?? true) 
-            headers.Add(EscapeCsvField(HeaderOtherComments));
+        headers.Add(EscapeCsvField(HeaderTimestamp));
+        headers.Add(EscapeCsvField(HeaderName));
+        headers.Add(EscapeCsvField(HeaderEmail));
+        headers.Add(EscapeCsvField(HeaderPhoneNumber));
+        headers.Add(EscapeCsvField(HeaderMajor));
+        headers.Add(EscapeCsvField(HeaderIsFirstTime));
+        headers.Add(EscapeCsvField(HeaderGoals));
+        headers.Add(EscapeCsvField(HeaderStayInTeam));
+        headers.Add(EscapeCsvField(HeaderOtherComments));
 
         csv.AppendLine(string.Join(",", headers));
 
         foreach (var item in data)
         {
             var rowData = new List<string>();
-            
-            if (filter.IncludeTimestamp ?? true) 
-            {
-                string amPm = item.Timestamp.Hour < 12 ? "de." : "du.";
-                string formattedDate = item.Timestamp.ToString("yyyy/MM/dd HH:mm:ss ") + amPm + " CET";
-        
-                rowData.Add(EscapeCsvField(formattedDate));
-            }
-            if (filter.IncludeName ?? true) 
-                rowData.Add(EscapeCsvField(item.Name));
-            if (filter.IncludeEmail ?? true) 
-                rowData.Add(EscapeCsvField(item.Email));
-            if (filter.IncludePhoneNumber ?? true) 
-                rowData.Add(EscapeCsvField(item.PhoneNumber));
-            if (filter.IncludeMajor ?? true) 
-                rowData.Add(EscapeCsvField(item.Major));
-            if (filter.IncludeIsFirstTime ?? true) 
-                rowData.Add(EscapeCsvField(item.IsFirstTime));
-            if (filter.includeGoals ?? true) 
-                rowData.Add(EscapeCsvField(item.Goals));
-            if (filter.IncludeStayInTeam ?? true) 
-                rowData.Add(EscapeCsvField(item.StayInTeam));
-            if (filter.IncludeOtherComments ?? true) 
-                rowData.Add(EscapeCsvField(item.OtherComments));
+    
+            string amPm = item.Timestamp.Hour < 12 ? "de." : "du.";
+            string formattedDate = item.Timestamp.ToString("yyyy/MM/dd HH:mm:ss ") + amPm + " CET";
+    
+            rowData.Add(EscapeCsvField(formattedDate));
+            rowData.Add(EscapeCsvField(item.Name));
+            rowData.Add(EscapeCsvField(item.Email));
+            rowData.Add(EscapeCsvField(item.PhoneNumber));
+            rowData.Add(EscapeCsvField(item.Major));
+            rowData.Add(EscapeCsvField(item.IsFirstTime));
+            rowData.Add(EscapeCsvField(item.Goals));
+            rowData.Add(EscapeCsvField(item.StayInTeam));
+            rowData.Add(EscapeCsvField(item.OtherComments));
 
             csv.AppendLine(string.Join(",", rowData));
         }
