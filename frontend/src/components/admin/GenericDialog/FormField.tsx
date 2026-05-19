@@ -14,10 +14,10 @@ export function FormField<T>({ field, value, isEditing, onChange }: FormFieldPro
 
   return (
     <div className={`flex flex-col gap-1 w-full ${isFullWidth ? "sm:col-span-2" : ""}`}>
-      <div className="flex items-center gap-2 bg-background rounded-xl px-4 py-3 shadow-sm border border-transparent focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 transition-all w-full overflow-hidden">
-        <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
-          {field.label}:
-        </span>
+      <div className="flex items-center gap-2 bg-background rounded-xl px-4 py-3 shadow-sm border border-transparent focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 transition-all w-full">
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+            {field.label}: {field.required && <span className="text-destructive">*</span>}
+          </span>
         {isEditing ? (
           <input
             type={inputType}
