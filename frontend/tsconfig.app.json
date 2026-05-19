@@ -7,6 +7,15 @@
     "module": "ESNext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "src/*": ["./src/*"],
+      "@/*": ["./src/*"], 
+      "@/lib/*": ["../ui-library/lib/*"],
+      "@/hooks/*": ["../ui-library/hooks/*"],
+      "@/components/*": ["../ui-library/components/*"],
+      "@evonaplo/ui/*": ["../ui-library/*"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -22,7 +31,11 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
   },
-  "include": ["src"]
+  "include": [
+    "src", 
+    "../ui-library/**/*.ts", 
+    "../ui-library/**/*.tsx"
+  ],
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using evoNaplo.Services;
+using evoNaplo.Models;
 namespace evoNaplo.Services
 {
     internal class StudentService : IStudentService
@@ -18,45 +19,44 @@ namespace evoNaplo.Services
        
         public Student GetStudentById(string id)
         {
-            return _students.FirstOrDefault(s => s.StudID == id);
+            return _students.FirstOrDefault(s => s.Id == id);
         }
 
        
         public void AddStudent(Student student)
         {
-            if (string.IsNullOrEmpty(student.StudID)) student.StudID = System.Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(student.Id)) student.Id = System.Guid.NewGuid().ToString();
             _students.Add(student);
         }
       
         public void UpdateStudent(string id, Student updatedStudent)
         {
-            var existingStudent = _students.FirstOrDefault(s => s.StudID == id);
+            var existingStudent = _students.FirstOrDefault(s => s.Id == id);
             if (existingStudent is null || updatedStudent is null) return;
 
-            if (updatedStudent.StudName is not null) existingStudent.StudName = updatedStudent.StudName;
-            if (updatedStudent.StudEmail is not null) existingStudent.StudEmail = updatedStudent.StudEmail;
-            if (updatedStudent.StudPhoneNumber is not null) existingStudent.StudPhoneNumber = updatedStudent.StudPhoneNumber;
-            if (updatedStudent.CurrentStudies is not null) existingStudent.CurrentStudies = updatedStudent.CurrentStudies;
-            
-            if (updatedStudent.IsFirstSemester != existingStudent.IsFirstSemester) existingStudent.IsFirstSemester = updatedStudent.IsFirstSemester;
+            if (updatedStudent.Name is not null) existingStudent.Name = updatedStudent.Name;
+            if (updatedStudent.Email is not null) existingStudent.Email = updatedStudent.Email;
+            if (updatedStudent.PhoneNumber is not null) existingStudent.PhoneNumber = updatedStudent.PhoneNumber;
+            if (updatedStudent.UniversityName is not null) existingStudent.UniversityName = updatedStudent.UniversityName;
+            if (updatedStudent.UniversityProgramme is not null) existingStudent.UniversityProgramme = updatedStudent.UniversityProgramme;
+            if (updatedStudent.CurrentSemester != existingStudent.CurrentSemester) existingStudent.CurrentSemester = updatedStudent.CurrentSemester;
             if (updatedStudent.PersonalGoals != null) existingStudent.PersonalGoals = updatedStudent.PersonalGoals;
-            if (updatedStudent.AppliedForCampus != existingStudent.AppliedForCampus) existingStudent.AppliedForCampus = updatedStudent.AppliedForCampus;
-            if (updatedStudent.ActiveScholarship != existingStudent.ActiveScholarship) existingStudent.ActiveScholarship = updatedStudent.ActiveScholarship;
-            if (updatedStudent.ScholarshipDuration != 0) existingStudent.ScholarshipDuration = updatedStudent.ScholarshipDuration;
-            if (updatedStudent.StayWithCurrentTeam != existingStudent.StayWithCurrentTeam) existingStudent.StayWithCurrentTeam = updatedStudent.StayWithCurrentTeam;
-            if (updatedStudent.StudAssignedTeam != null) existingStudent.StudAssignedTeam = updatedStudent.StudAssignedTeam;
-            if (updatedStudent.StudAssignedProject != null) existingStudent.StudAssignedProject = updatedStudent.StudAssignedProject;
-            if (updatedStudent.InternshipApplied != existingStudent.InternshipApplied) existingStudent.InternshipApplied = updatedStudent.InternshipApplied;
-            if (updatedStudent.IsAnIntern != existingStudent.IsAnIntern) existingStudent.IsAnIntern = updatedStudent.IsAnIntern;
-            if (updatedStudent.doeswork != existingStudent.doeswork) existingStudent.doeswork = updatedStudent.doeswork;
-            if (updatedStudent.WorkDuration != null) existingStudent.WorkDuration = updatedStudent.WorkDuration;
+            if (updatedStudent.IsFirstEvoCampusSemester != existingStudent.IsFirstEvoCampusSemester) existingStudent.IsFirstEvoCampusSemester = updatedStudent.IsFirstEvoCampusSemester;
+            if (updatedStudent.HasAppliedForScholarship != existingStudent.HasAppliedForScholarship) existingStudent.HasAppliedForScholarship = updatedStudent.HasAppliedForScholarship;
+            if (updatedStudent.HasActiveScholarship != existingStudent.HasActiveScholarship) existingStudent.HasActiveScholarship = updatedStudent.HasActiveScholarship;
+            if (updatedStudent.ScholarshipDuration != existingStudent.ScholarshipDuration) existingStudent.ScholarshipDuration = updatedStudent.ScholarshipDuration;
+            if (updatedStudent.HasAppliedForInternship != existingStudent.HasAppliedForInternship) existingStudent.HasAppliedForInternship = updatedStudent.HasAppliedForInternship;
+            if (updatedStudent.IsCurrentlyIntern != existingStudent.IsCurrentlyIntern) existingStudent.IsCurrentlyIntern = updatedStudent.IsCurrentlyIntern;
+            if (updatedStudent.IsWorkingStudent != existingStudent.IsWorkingStudent) existingStudent.IsWorkingStudent = updatedStudent.IsWorkingStudent;
+            if (updatedStudent.WorkingStudentDuration != null) existingStudent.WorkingStudentDuration = updatedStudent.WorkingStudentDuration;
+            if (updatedStudent.Team is not null) existingStudent.Team = updatedStudent.Team;
+            if (updatedStudent.WantsToStayWithCurrentTeam != existingStudent.WantsToStayWithCurrentTeam) existingStudent.WantsToStayWithCurrentTeam = updatedStudent.WantsToStayWithCurrentTeam;
         }
 
-        
         public void DeleteStudent(string id)
         {
             
-            var studentToRemove = _students.FirstOrDefault(s => s.StudID == id);
+            var studentToRemove = _students.FirstOrDefault(s => s.Id == id);
 
             
             if (studentToRemove != null)

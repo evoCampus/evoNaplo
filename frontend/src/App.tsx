@@ -1,121 +1,64 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Routes, Route } from "react-router";
+import type { User } from "./types";
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthPage from "./pages/AuthPage";
+
+import AppLayout from "./components/layouts/AppLayout";
+import DashboardLayout from "./components/layouts/DashboardLayout";
+
+import MentorHomePage from "./pages/mentor/MentorHomePage";
+import UpcomingMeetingsPage from "./pages/mentor/UpcomingMeetingsPage";
+import ProjectDetailsPage from "./pages/mentor/ProjectDetailsPage";
+
+import StudentsPage from "./pages/admin/StudentsPage";
+import MentorsPage from "./pages/admin/MentorsPage";
+import ProjectsPage from "./pages/admin/ProjectsPage";
+import AdminHomePage from "./pages/admin/AdminHomePage";
+import TeamsPage from "./pages/admin/TeamsPage";
+
+import SemestersPage from "./pages/SemestersPage";
+import SettingsPage from "./pages/SettingsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const MOCK_USER: User = {
+    name: "Teszt Admin",
+    role: "mentor",
+    email: "admin@test.com"
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<AuthPage />} />
+        <Route element={<DashboardLayout user={MOCK_USER} />}>
+            <Route element={<ProtectedRoute user={MOCK_USER} allowedRoles={['mentor']} />}>
+                <Route path="mentor" >
+                    <Route index element={<MentorHomePage />} />
+                    <Route path="meetings" element={<UpcomingMeetingsPage />} />
+                    <Route path="projects/:id" element={<ProjectDetailsPage />} />
+                    <Route path="semesters" element={<SemestersPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                </Route>
+            </Route>
+            <Route element={<ProtectedRoute user={MOCK_USER} allowedRoles={['admin']} />}>
+                <Route path="admin">
+                    <Route index element={<AdminHomePage />} />
+                    <Route path="students" element={<StudentsPage />} />
+                    <Route path="mentors" element={<MentorsPage />} />
+                    <Route path="teams" element={<TeamsPage />} />
+                    <Route path="projects" element={<ProjectsPage />} />
+                    <Route path="semesters" element={<SemestersPage />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                </Route>
+            </Route>
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+    </Routes>
+  );
 }
 
-export default App
+export default App;

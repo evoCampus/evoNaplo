@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using evoNaplo.Services;
-
+using evoNaplo.Models;
 
 namespace evoNaplo.Services
 {
@@ -16,31 +16,34 @@ namespace evoNaplo.Services
 
         public Mentor? GetMentorById(string id)
         {
-            return _mentors.FirstOrDefault(m => m.MentorId == id);
+            return _mentors.FirstOrDefault(m => m.Id == id);
         }
 
         public void AddMentor(Mentor mentor)
         {
-            if (string.IsNullOrEmpty(mentor.MentorId)) mentor.MentorId = System.Guid.NewGuid().ToString();
+            if (string.IsNullOrEmpty(mentor.Id)) mentor.Id = System.Guid.NewGuid().ToString();
             _mentors.Add(mentor);
         }
 
        
         public void UpdateMentor(string id, Mentor updatedMentor)
         {
-            var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
+            var existing = _mentors.FirstOrDefault(m => m.Id == id);
             if (existing is null || updatedMentor is null) return;
 
-            if (updatedMentor.MentorName is not null) existing.MentorName = updatedMentor.MentorName;
-            if (updatedMentor.MentorEmail is not null) existing.MentorEmail = updatedMentor.MentorEmail;
-            if (updatedMentor.MentorPhoneNumber is not null) existing.MentorPhoneNumber = updatedMentor.MentorPhoneNumber;
-            if (updatedMentor.MentorAssignedTeam is not null) existing.MentorAssignedTeam = updatedMentor.MentorAssignedTeam;
-            if (updatedMentor.MentorAssignedProject is not null) existing.MentorAssignedProject = updatedMentor.MentorAssignedProject;
+            if (updatedMentor.Name is not null) existing.Name = updatedMentor.Name;
+            if (updatedMentor.Email is not null) existing.Email = updatedMentor.Email;
+            if (updatedMentor.PhoneNumber is not null) existing.PhoneNumber = updatedMentor.PhoneNumber;
+            if (updatedMentor.TeamCount != 0) existing.TeamCount = updatedMentor.TeamCount;
+            if (updatedMentor.ProjecCount != 0) existing.ProjecCount = updatedMentor.ProjecCount;
+            if (updatedMentor.StudentCount != 0) existing.StudentCount = updatedMentor.StudentCount;
+            if (updatedMentor.Teams is not null) existing.Teams = updatedMentor.Teams;
+            if (updatedMentor.Projects is not null) existing.Projects = updatedMentor.Projects;
         }
 
         public void DeleteMentor(string id)
         {
-            var existing = _mentors.FirstOrDefault(m => m.MentorId == id);
+            var existing = _mentors.FirstOrDefault(m => m.Id == id);
             if (existing is not null) _mentors.Remove(existing);
         }
     }
