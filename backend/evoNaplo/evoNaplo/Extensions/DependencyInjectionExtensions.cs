@@ -11,10 +11,16 @@ public static class DependencyInjectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
+        
         services.AddScoped<IMentorService, MentorService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IStudentService, StudentService>();
+        
+        services.AddScoped<IExcelImportService, ExcelImportService>();
+        services.AddScoped<IExcelExportService, ExcelExportService>();
+        services.AddScoped<ICsvImportService, CsvImportService>();
+        services.AddScoped<ICsvExportService, CsvExportService>();
         return services;
     }
 
@@ -41,7 +47,7 @@ public static class DependencyInjectionExtensions
         connectionString = $"Server={host},{port};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
 
         services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            options.UseSqlServer(connectionString));
 
         return services;
     }
