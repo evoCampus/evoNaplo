@@ -14,7 +14,6 @@ namespace evoNaplo.Data
             try
             {
                 logger.LogInformation("Starting database seed. includeInvalids={IncludeInvalids}", includeInvalids);
-
                 // Read configurable counts from environment variables
                 int projectsCount = TryGetEnvInt("EVONAPLO_SEED_PROJECTS", 10);
                 int mentorsCount = TryGetEnvInt("EVONAPLO_SEED_MENTORS", 10);
@@ -219,7 +218,6 @@ namespace evoNaplo.Data
                 throw;
             }
         }
-
         private static string CorruptEmail(string email)
         {
             if (string.IsNullOrEmpty(email)) return "not-an-email";
@@ -227,13 +225,11 @@ namespace evoNaplo.Data
                 return email.Replace("@", "") + "_bad";
             return "invalid_email";
         }
-
         private static string CorruptPhone(string phone)
         {
             if (string.IsNullOrEmpty(phone)) return "abc123";
             return "PHONE-INVALID-" + phone.Substring(0, Math.Min(4, phone.Length));
         }
-
         private static int TryGetEnvInt(string name, int fallback)
         {
             var v = Environment.GetEnvironmentVariable(name);
