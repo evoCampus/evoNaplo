@@ -1,4 +1,4 @@
-﻿namespace evoNaplo.Models;
+namespace evoNaplo.Models;
 
 public class Team
 {
@@ -8,5 +8,4 @@ public class Team
     public required ICollection<AttendanceSheet> AttendanceSheets { get; set; }
     public required ICollection<Mentor> Mentors { get; set; }
     public required ICollection<Student> Students { get; set; }
-    
 }

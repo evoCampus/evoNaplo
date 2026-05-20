@@ -1,4 +1,4 @@
-﻿namespace evoNaplo.Models;
+namespace evoNaplo.Models;
 
 public class Mentor
 {

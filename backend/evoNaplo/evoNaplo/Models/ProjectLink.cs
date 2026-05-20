@@ -1,4 +1,4 @@
-﻿namespace evoNaplo.Models;
+namespace evoNaplo.Models;
 
 public enum LinkTypes
 {
@@ -14,5 +14,4 @@ public class ProjectLink
     public required string Url { get; set; }
     public required string ProjectId { get; set; }
     public Project Project { get; set; }
-    
 }

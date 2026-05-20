@@ -1,4 +1,4 @@
-﻿namespace evoNaplo.Models;
+namespace evoNaplo.Models;
 
 public class Student
 {
@@ -21,5 +21,4 @@ public class Student
     public bool WantsToStayWithCurrentTeam { get; set; }
     public string? TeamId { get; set; }
     public Team? Team { get; set; }
-    
 }

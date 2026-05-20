@@ -1,4 +1,4 @@
-﻿namespace evoNaplo.Models;
+namespace evoNaplo.Models;
 
 public class AttendanceSheet
 {
@@ -9,5 +9,4 @@ public class AttendanceSheet
     public ICollection<Student> PresentStudents { get; set; }
     public string TeamId { get; set; }
     public Team? Team { get; set; }
-    
 }
