@@ -62,10 +62,13 @@ export default function StudentsPage() {
   const [studentsPromise, setStudentsPromise] = useState<Promise<StudentDTO[]>>(initialPromise);
 
   const shouldOpenAdd = location.state?.openAdd === true;
+  const editItem = location.state?.editItem as StudentDTO | undefined;
 
-  const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(shouldOpenAdd ? DEFAULT_STUDENT : null);
-  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd);
-  const [isCreating, setIsCreating] = useState(shouldOpenAdd);
+  const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(
+    editItem ? editItem : (shouldOpenAdd ? DEFAULT_STUDENT : null)
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
+  const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
 
   const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -89,10 +92,10 @@ export default function StudentsPage() {
   };
 
   useEffect(() => {
-    if (location.state?.openAdd) {
+    if (location.state?.openAdd || location.state?.editItem) {
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state?.openAdd, location.pathname, navigate]);
+  }, [location.state?.openAdd, location.state?.editItem, location.pathname, navigate]);
 
   const handleSave = async (student: StudentDTO) => {
     try {

@@ -46,10 +46,13 @@ export default function MentorsPage() {
   const [mentorsPromise, setMentorsPromise] = useState<Promise<MentorDTO[]>>(initialPromise);
 
   const shouldOpenAdd = location.state?.openAdd === true;
+  const editItem = location.state?.editItem as MentorDTO | undefined;
 
-  const [selectedMentor, setSelectedMentor] = useState<MentorDTO | null>(shouldOpenAdd ? DEFAULT_MENTOR : null);
-  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd);
-  const [isCreating, setIsCreating] = useState(shouldOpenAdd);
+  const [selectedMentor, setSelectedMentor] = useState<MentorDTO | null>(
+    editItem ? editItem : (shouldOpenAdd ? DEFAULT_MENTOR : null)
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
+  const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
 
   const [mentorToDelete, setMentorToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -73,10 +76,10 @@ export default function MentorsPage() {
   };
 
   useEffect(() => {
-    if (location.state?.openAdd) {
+    if (location.state?.openAdd || location.state?.editItem) {
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state?.openAdd, location.pathname, navigate]);
+  }, [location.state?.openAdd, location.state?.editItem, location.pathname, navigate]);
 
   const handleSave = async (mentor: MentorDTO) => {
     try {

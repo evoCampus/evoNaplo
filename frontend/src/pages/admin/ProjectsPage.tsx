@@ -33,10 +33,13 @@ export default function ProjectsPage() {
   const [projectsPromise, setProjectsPromise] = useState<Promise<ProjectDTO[]>>(initialPromise);
 
   const shouldOpenAdd = location.state?.openAdd === true;
+  const editItem = location.state?.editItem as ProjectDTO | undefined;
 
-  const [selectedProject, setSelectedProject] = useState<ProjectDTO | null>(shouldOpenAdd ? DEFAULT_PROJECT : null);
-  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd);
-  const [isCreating, setIsCreating] = useState(shouldOpenAdd);
+  const [selectedProject, setSelectedProject] = useState<ProjectDTO | null>(
+    editItem ? editItem : (shouldOpenAdd ? DEFAULT_PROJECT : null)
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
+  const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
 
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -60,10 +63,10 @@ export default function ProjectsPage() {
   };
 
   useEffect(() => {
-    if (location.state?.openAdd) {
+    if (location.state?.openAdd || location.state?.editItem) {
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state?.openAdd, location.pathname, navigate]);
+  }, [location.state?.openAdd, location.state?.editItem, location.pathname, navigate]);
 
   const handleSave = async (project: ProjectDTO) => {
     try {

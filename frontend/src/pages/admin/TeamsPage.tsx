@@ -34,10 +34,13 @@ export default function TeamsPage() {
   const [teamsPromise, setTeamsPromise] = useState<Promise<TeamDTO[]>>(initialPromise);
 
   const shouldOpenAdd = location.state?.openAdd === true;
+  const editItem = location.state?.editItem as TeamDTO | undefined;
 
-  const [selectedTeam, setSelectedTeam] = useState<TeamDTO | null>(shouldOpenAdd ? DEFAULT_TEAM : null);
-  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd);
-  const [isCreating, setIsCreating] = useState(shouldOpenAdd);
+  const [selectedTeam, setSelectedTeam] = useState<TeamDTO | null>(
+    editItem ? editItem : (shouldOpenAdd ? DEFAULT_TEAM : null)
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
+  const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
 
   const [teamToDelete, setTeamToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -61,10 +64,10 @@ export default function TeamsPage() {
   };
 
   useEffect(() => {
-    if (location.state?.openAdd) {
+    if (location.state?.openAdd || location.state?.editItem) {
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [location.state?.openAdd, location.pathname, navigate]);
+  }, [location.state?.openAdd, location.state?.editItem, location.pathname, navigate]);
 
   const handleSave = async (team: TeamDTO, selectedProjectIds: string[]) => {
     try {

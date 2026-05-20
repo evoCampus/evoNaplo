@@ -31,7 +31,7 @@ export default function SemestersPage() {
                   Current
                 </span>
               ) : (
-                <Button variant="outline" size="sm" onClick={() => setCurrentSemester(semester)}>
+                <Button variant="outline" size="sm" className="cursor-pointer" onClick={() => setCurrentSemester(semester)}>
                   Select
                 </Button>
               )}
