@@ -1,8 +1,10 @@
-﻿namespace evoNaplo.Models
+﻿using NanoidDotNet;
+
+namespace evoNaplo.Models
 {
     public class AttendanceSheet
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Nanoid.Generate();
         public DateTimeOffset WeeklyMeetingTime { get; set; }
         public TimeSpan LengthOfMeeting { get; set; }
         public DayOfWeek DayOfWeek { get; set; }
