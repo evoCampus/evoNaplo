@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 import { Navbar } from "../Navbar";
-import { TooltipProvider } from "@evonaplo/ui/components/ui/tooltip";
+import { TooltipProvider } from "@evonaplo/ui-library";
 import { ThemeProvider } from "../ThemeProvider";
 
 export default function AppLayout() {
