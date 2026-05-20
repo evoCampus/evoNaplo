@@ -1,18 +1,15 @@
-using System.Collections.Generic;
-using System.Linq;
-using evoNaplo.Services;
+using evoNaplo.DTO;
 using evoNaplo.Models;
 
-namespace evoNaplo.Services
-{
-    internal interface IMentorService
-    {
-        IEnumerable<Mentor> GetAllMentors();
-        Mentor? GetMentorById(string id);
-        void AddMentor(Mentor mentor);
-       
-        void UpdateMentor(string id, Mentor updatedMentor);
+namespace evoNaplo.Services;
 
-        void DeleteMentor(string id);
-    }
+public interface IMentorService
+{
+    Mentor? GetMentorModelById(string id);
+    Task<IEnumerable<MentorDTO>> GetAllMentorsAsync();
+    Task<MentorDTO> GetMentorByIdAsync(string id);
+    Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAdd);
+    Task<MentorDTO> UpdateMentorAsync(string id, MentorDTO updatedMentor);
+    Task<bool> DeleteMentorAsync(string id);
+    
 }

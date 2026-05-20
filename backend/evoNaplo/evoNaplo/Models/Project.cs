@@ -1,13 +1,11 @@
-﻿using NanoidDotNet;
+namespace evoNaplo.Models;
 
-namespace evoNaplo.Models
+public class Project
 {
-    public class Project
-    {
-        public string Id { get; set; } = Nanoid.Generate();
-        public string Name { get; set; }
-        public string? ShortDescription { get; set; }
-        public ICollection<ProjectLink> ProjectLinks { get; set; }
-        public ICollection<Team> Teams { get; set; }
-    }
+    public required string Id { get; set; }
+    public required string Name { get; set; }
+    public string? ShortDescription { get; set; }
+    public required ICollection<ProjectLink> ProjectLinks { get; set; }
+    public required ICollection<Team> Teams { get; set; }
+    
 }

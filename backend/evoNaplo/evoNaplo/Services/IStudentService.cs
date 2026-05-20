@@ -1,17 +1,15 @@
-﻿using evoNaplo.Services;
-using System.Collections.Generic;
-using System.Linq;
+﻿using evoNaplo.DTO;
 using evoNaplo.Models;
 
-namespace evoNaplo.Services
-{
-    internal interface IStudentService
-    {
-            IEnumerable<Student> GetAllStudents();
-            Student GetStudentById(string id);
-            void AddStudent(Student student);
-            void UpdateStudent(string id, Student updatedStudent);
-            void DeleteStudent(string id);
+namespace evoNaplo.Services;
 
-    }
+public interface IStudentService
+{
+    Student? GetStudentModelById(string id);
+    Task<IEnumerable<StudentDTO>> GetAllStudentsAsync();
+    Task<StudentDTO> GetStudentByIdAsync(string id);
+    Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd);
+    Task<StudentDTO> UpdateStudentAsync(string id, StudentDTO updatedStudent);
+    Task<bool> DeleteStudentAsync(string id);
+    
 }
