@@ -18,5 +18,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["components", "lib", "hooks", "**/*.ts", "**/*.tsx"]
+  "include": ["components", "lib", "hooks", "index.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["dist", "node_modules"]
 }

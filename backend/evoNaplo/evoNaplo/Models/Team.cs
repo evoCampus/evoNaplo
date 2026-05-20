@@ -1,8 +1,10 @@
-﻿namespace evoNaplo.Models
+﻿using NanoidDotNet;
+
+namespace evoNaplo.Models
 {
     public class Team
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Nanoid.Generate();
         public string ProjectId { get; set; }
         public Project Project { get; set; }
         public ICollection<AttendanceSheet> AttendanceSheets { get; set; }

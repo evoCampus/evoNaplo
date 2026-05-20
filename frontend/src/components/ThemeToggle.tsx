@@ -1,12 +1,12 @@
 import { Moon, Sun } from "lucide-react";
 
-import { Button } from "@evonaplo/ui/components/ui/button";
+import { Button } from "@evonaplo/ui-library";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@evonaplo/ui/components/ui/dropdown-menu";
+} from "@evonaplo/ui-library";
 import { useTheme } from "../hooks/use-theme";
 
 export function ThemeToggle() {
