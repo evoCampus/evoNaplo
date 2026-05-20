@@ -1,0 +1,63 @@
+services:
+  mssql:
+    container_name: mssql
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    ports:
+      - "1433:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PASSWORD=${MSSQL_PASSWORD}
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+      - MSSQL_DB=evoNaploDb
+      - MSSQL_USER=evoNaploUser
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P $$MSSQL_SA_PASSWORD -Q 'SELECT 1'" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    hostname: mssql
+
+  frontend:
+    container_name: frontend
+    image: evonaplo:frontend-latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    hostname: frontend
+
+  backend:
+    container_name: backend
+    image: evonaplo:backend-latest
+    build:
+      context: ./backend/evoNaplo/evoNaplo/
+      dockerfile: Dockerfile
+    environment:
+      - EVONAPLO_DATABASE_HOST=mssql
+      - EVONAPLO_DATABASE_PORT=1433
+      - EVONAPLO_DATABASE_NAME=evoNaploDb
+      - EVONAPLO_DATABASE_USER=evoNaploUser
+      - EVONAPLO_DATABASE_PASS=Admin123!
+    hostname: backend
+
+  nginx-proxy:
+    container_name: nginx
+    image: evonaplo:nginx-proxy-latest
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+    environment:
+      - FRONTEND_URL=http://frontend:80
+      - BACKEND_URL=http://backend:8080
+      #  optional
+      #- HTTP_AUTH_USER=root
+      #- HTTP_AUTH_PASS=root
+    hostname: nginx
