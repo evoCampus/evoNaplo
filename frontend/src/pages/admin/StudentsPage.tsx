@@ -1,4 +1,5 @@
-import { useState, Suspense, useTransition, useMemo } from "react";
+import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus, SlidersHorizontal } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
@@ -26,8 +27,29 @@ const studentFields: FieldConfig<StudentDTO>[] = [
   { key: "wantsToStayWithCurrentTeam", label: "Wants to stay with current team", type: "checkbox" },
 ];
 
+const DEFAULT_STUDENT: StudentDTO = {
+  id: null,
+  name: "",
+  email: "",
+  phoneNumber: "",
+  universityProgramme: "",
+  currentSemester: 0,
+  isInTheirFirstSemester: false,
+  personalGoals: "",
+  hasAppliedForScholarship: false,
+  hasScholarship: false,
+  scholarshipDurationInSemesters: 0,
+  hasAppliedForInternship: false,
+  hasInternship: false,
+  isWorkingStudent: false,
+  workExperienceInSemesters: 0,
+  wantsToStayWithCurrentTeam: false,
+};
+
 export default function StudentsPage() {
   const apiClient = useApiClient();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
 
   const initialPromise = useMemo(() => {
@@ -39,9 +61,11 @@ export default function StudentsPage() {
 
   const [studentsPromise, setStudentsPromise] = useState<Promise<StudentDTO[]>>(initialPromise);
 
-  const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const shouldOpenAdd = location.state?.openAdd === true;
+
+  const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(shouldOpenAdd ? DEFAULT_STUDENT : null);
+  const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd);
+  const [isCreating, setIsCreating] = useState(shouldOpenAdd);
 
   const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -59,26 +83,16 @@ export default function StudentsPage() {
   };
 
   const handleAdd = () => {
-    setSelectedStudent({
-      name: "",
-      email: "",
-      phoneNumber: "",
-      universityProgramme: "",
-      currentSemester: 0,
-      isInTheirFirstSemester: false,
-      personalGoals: "",
-      hasAppliedForScholarship: false,
-      hasScholarship: false,
-      scholarshipDurationInSemesters: 0,
-      hasAppliedForInternship: false,
-      hasInternship: false,
-      isWorkingStudent: false,
-      workExperienceInSemesters: 0,
-      wantsToStayWithCurrentTeam: false,
-    } as StudentDTO);
+    setSelectedStudent(DEFAULT_STUDENT);
     setIsCreating(true);
     setIsDialogOpen(true);
   };
+
+  useEffect(() => {
+    if (location.state?.openAdd) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.openAdd, location.pathname, navigate]);
 
   const handleSave = async (student: StudentDTO) => {
     try {
@@ -119,7 +133,7 @@ export default function StudentsPage() {
     });
   };
 
-    return (
+  return (
     <div className="max-w-6xl w-full mx-auto py-4">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Students</h1>

@@ -23,28 +23,28 @@ export default function AdminHomePage() {
           <Button 
             variant="secondary" 
             className="justify-start h-12 text-lg font-medium bg-muted/40 hover:bg-muted/60"
-            onClick={() => navigate("/admin/students")}
+            onClick={() => navigate("/admin/students", { state: { openAdd: true } })}
           >
             <Plus className="mr-3 h-5 w-5" /> Add Student
           </Button>
           <Button 
             variant="secondary" 
             className="justify-start h-12 text-lg font-medium bg-muted/40 hover:bg-muted/60"
-            onClick={() => navigate("/admin/mentors")}
+            onClick={() => navigate("/admin/mentors", { state: { openAdd: true } })}
           >
             <Plus className="mr-3 h-5 w-5" /> Add Mentor
           </Button>
           <Button 
             variant="secondary" 
             className="justify-start h-12 text-lg font-medium bg-muted/40 hover:bg-muted/60"
-            onClick={() => navigate("/admin/teams")}
+            onClick={() => navigate("/admin/teams", { state: { openAdd: true } })}
           >
             <Plus className="mr-3 h-5 w-5" /> Create Team
           </Button>
           <Button 
             variant="secondary" 
             className="justify-start h-12 text-lg font-medium bg-muted/40 hover:bg-muted/60"
-            onClick={() => navigate("/admin/projects")}
+            onClick={() => navigate("/admin/projects", { state: { openAdd: true } })}
           >
             <Plus className="mr-3 h-5 w-5" /> Add Project
           </Button>
