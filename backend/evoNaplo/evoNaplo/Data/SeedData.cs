@@ -46,7 +46,9 @@ namespace evoNaplo.Data
                     {
                         Id = Guid.NewGuid().ToString(),
                         Name = faker.Company.CatchPhrase(),
-                        ShortDescription = faker.Lorem.Sentence()
+                        ShortDescription = faker.Lorem.Sentence(),
+                        ProjectLinks = new List<ProjectLink>(),
+                        Teams = new List<Team>()
                     });
                 }
                 context.Projects.AddRange(projects);
@@ -81,9 +83,6 @@ namespace evoNaplo.Data
                         Name = faker.Name.FullName(),
                         Email = faker.Internet.Email(),
                         PhoneNumber = faker.Phone.PhoneNumber(),
-                        TeamCount = 0,
-                        StudentCount = 0,
-                        ProjecCount = 0,
                         Teams = new List<Team>(),
                         Projects = new List<Project>()
                     });

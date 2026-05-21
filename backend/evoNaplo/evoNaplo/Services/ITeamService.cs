@@ -11,5 +11,5 @@ public interface ITeamService
     Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd);
     Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeam);
     Task<bool> DeleteTeamAsync(string id);
-    
+
 }
