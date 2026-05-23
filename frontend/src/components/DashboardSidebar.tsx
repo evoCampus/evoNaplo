@@ -9,9 +9,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   Calendar as CalendarComponent
 } from "@evonaplo/ui-library";
 import { Link, useLocation } from "react-router";
@@ -24,22 +21,56 @@ import {
   Settings,
   LayoutDashboard,
   Calendar,
-  ChevronDown
-} from "lucide-react"
-import { useState } from "react";
+  Loader2
+} from "lucide-react";
+import { Suspense, useState, useTransition, useMemo } from "react";
+import MentorDynamicProjectsList from "./mentor/MentorDynamicProjectsList";
+import { type UIMentorProject } from "../types";
+import { useApiClient } from "src/hooks/use-api-client";
 
 export function DashboardSidebar({ user }: SidebarProps) {
-    const location = useLocation();
-    const [date, setDate] = useState<Date | undefined>(new Date());
-    const [expandedTeams, setExpandedTeams] = useState<string[]>(["evoNapló"]);
+  const location = useLocation();
+  const apiClient = useApiClient();
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
+  const [,startTransition] = useTransition();
 
-    const toggleTeam = (teamName: string) => {
-      setExpandedTeams(prev =>
-        prev.includes(teamName)
-          ? prev.filter(t => t !== teamName)
-          : [...prev, teamName]
+  const toggleProject = (projectName: string) => {
+    startTransition(() => {
+      setExpandedProjects(prev =>
+        prev.includes(projectName)
+          ? prev.filter(p => p !== projectName)
+          : [...prev, projectName]
       );
-    };
+    });
+  };
+
+  const projectsPromise = useMemo(() => {
+    if (user.role !== "mentor") return Promise.resolve([]);
+
+    return (async (): Promise<UIMentorProject[]> => {
+      const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
+      if (!mentor.projects || mentor.projects.length === 0) return [];
+
+      const projectPromises = mentor.projects.map(async (projectId) => {
+        const { data: project } = await apiClient.projects.apiProjectsIdGet(projectId);
+
+        const mappedProject: UIMentorProject = {
+          id: project.id || projectId,
+          name: project.name || "Unknown Project",
+          subItems: [
+            { title: "Project description", url: `/mentor/projects/${project.id}#description` },
+            { title: "Team members", url: `/mentor/projects/${project.id}#members` },
+            { title: "Team meetings", url: `/mentor/projects/${project.id}#meetings` },
+          ]
+        };
+
+        return mappedProject;
+      });
+
+      return Promise.all(projectPromises);
+    })();
+  }, [apiClient, user.id, user.role]);
 
   const adminItems = [
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
@@ -52,28 +83,8 @@ export function DashboardSidebar({ user }: SidebarProps) {
   ];
 
   const mentorItems = [
+    { title: "Dashboard", url: "/mentor", icon: LayoutDashboard },
     { title: "Upcoming Meetings", url: "/mentor/meetings", icon: Calendar },
-  ];
-
-  const teams = [
-    {
-      name: "evoNapló",
-      id: "1",
-      subItems: [
-        { title: "Project description", url: "/mentor/projects/1#description" },
-        { title: "Team members", url: "/mentor/projects/1#members" },
-        { title: "Team meetings", url: "/mentor/projects/1#meetings" },
-      ]
-    },
-    {
-      name: "evoStory",
-      id: "2",
-      subItems: [
-        { title: "Project description", url: "/mentor/projects/2#description" },
-        { title: "Team members", url: "/mentor/projects/2#members" },
-        { title: "Team meetings", url: "/mentor/projects/2#meetings" },
-      ]
-    },
   ];
 
   const mentorFooterItems = [
@@ -112,34 +123,18 @@ export function DashboardSidebar({ user }: SidebarProps) {
                     </SidebarMenuItem>
                   ))}
 
-                  {teams.map((team) => (
-                    <SidebarMenuItem key={team.name}>
-                      <SidebarMenuButton
-                        onClick={() => toggleTeam(team.name)}
-                        className="w-full justify-between"
-                        isActive={location.pathname.startsWith(`/mentor/projects/${team.id}`)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Users2 className="w-4 h-4" />
-                          <span>{team.name}</span>
-                        </div>
-                        <ChevronDown className={`w-3 h-3 transition-transform ${expandedTeams.includes(team.name) ? "rotate-180" : ""}`} />
-                      </SidebarMenuButton>
-                      {expandedTeams.includes(team.name) && (
-                        <SidebarMenuSub>
-                          {team.subItems.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton asChild isActive={location.pathname + location.hash === subItem.url}>
-                                <Link to={subItem.url}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      )}
-                    </SidebarMenuItem>
-                  ))}
+                  <Suspense fallback={
+                    <div className="flex items-center gap-2 p-2 px-4 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Loading projects...</span>
+                    </div>
+                  }>
+                    <MentorDynamicProjectsList
+                      projectsPromise={projectsPromise}
+                      expandedProjects={expandedProjects}
+                      onToggleProject={toggleProject}
+                    />
+                  </Suspense>
 
                   {mentorFooterItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
@@ -157,6 +152,7 @@ export function DashboardSidebar({ user }: SidebarProps) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
       <SidebarFooter className="p-4">
         <CalendarComponent
           mode="single"
