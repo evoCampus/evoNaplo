@@ -2,11 +2,12 @@ import { Outlet } from "react-router";
 import { SidebarProvider } from "@evonaplo/ui-library";
 import { DashboardSidebar } from "../DashboardSidebar";
 import { Navigate } from "react-router";
-import type { User } from "../../types";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { useUser } from "../../hooks/use-user";
 
-export default function DashboardLayout({ user }: { user: User }) {
+export default function DashboardLayout() {
+    const { user } = useUser();
 
     if (!user) return <Navigate to="/" replace />;
     return (

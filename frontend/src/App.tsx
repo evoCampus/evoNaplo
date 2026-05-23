@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router";
-import type { User } from "./types";
+import { Loader2 } from "lucide-react";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthPage from "./pages/AuthPage";
@@ -23,20 +23,27 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 
+import { useUser } from "./hooks/use-user";
+
+
 function App() {
-  const MOCK_USER: User = {
-    name: "Teszt Admin",
-    role: "admin",
-    email: "admin@test.com"
-  };
+  const { user, isLoading } = useUser();
+
+  if (isLoading || !user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <ErrorBoundary>
       <Routes>
         <Route element={<AppLayout />}>
           <Route index element={<AuthPage />} />
-          <Route element={<DashboardLayout user={MOCK_USER} />}>
-              <Route element={<ProtectedRoute user={MOCK_USER} allowedRoles={['mentor']} />}>
+          <Route element={<DashboardLayout />}>
+              <Route element={<ProtectedRoute user={user} allowedRoles={['mentor']} />}>
                   <Route path="mentor" >
                       <Route index element={<MentorHomePage />} />
                       <Route path="meetings" element={<UpcomingMeetingsPage />} />
@@ -45,7 +52,7 @@ function App() {
                       <Route path="settings" element={<SettingsPage />} />
                   </Route>
               </Route>
-              <Route element={<ProtectedRoute user={MOCK_USER} allowedRoles={['admin']} />}>
+              <Route element={<ProtectedRoute user={user} allowedRoles={['admin']} />}>
                   <Route path="admin">
                       <Route index element={<AdminHomePage />} />
                       <Route path="students" element={<StudentsPage />} />

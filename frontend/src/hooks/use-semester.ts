@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { SemesterContext } from "../components/SemesterProvider";
+import { SemesterContext } from "../contexts/SemesterContext";
 
 export function useSemester() {
   const context = useContext(SemesterContext);

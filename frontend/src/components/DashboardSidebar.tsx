@@ -1,4 +1,3 @@
-import type { SidebarProps } from "../types";
 import {
   Sidebar,
   SidebarContent,
@@ -27,26 +26,18 @@ import { Suspense, useState, useTransition, useMemo } from "react";
 import MentorDynamicProjectsList from "./mentor/MentorDynamicProjectsList";
 import { type UIMentorProject } from "../types";
 import { useApiClient } from "src/hooks/use-api-client";
+import { useUser } from "src/hooks/use-user";
 
-export function DashboardSidebar({ user }: SidebarProps) {
+export function DashboardSidebar() {
+  const { user } = useUser();
   const location = useLocation();
   const apiClient = useApiClient();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   const [,startTransition] = useTransition();
 
-  const toggleProject = (projectName: string) => {
-    startTransition(() => {
-      setExpandedProjects(prev =>
-        prev.includes(projectName)
-          ? prev.filter(p => p !== projectName)
-          : [...prev, projectName]
-      );
-    });
-  };
-
   const projectsPromise = useMemo(() => {
-    if (user.role !== "mentor") return Promise.resolve([]);
+    if (!user || user.role !== "mentor") return Promise.resolve([]);
 
     return (async (): Promise<UIMentorProject[]> => {
       const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
@@ -70,7 +61,19 @@ export function DashboardSidebar({ user }: SidebarProps) {
 
       return Promise.all(projectPromises);
     })();
-  }, [apiClient, user.id, user.role]);
+  }, [apiClient, user]);
+
+  if (!user) return null;
+
+  const toggleProject = (projectName: string) => {
+    startTransition(() => {
+      setExpandedProjects(prev =>
+        prev.includes(projectName)
+          ? prev.filter(p => p !== projectName)
+          : [...prev, projectName]
+      );
+    });
+  };
 
   const adminItems = [
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard },

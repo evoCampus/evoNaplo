@@ -1,12 +1,5 @@
-import { createContext, useState, useEffect, type ReactNode } from "react";
-
-interface SemesterContextType {
-  currentSemester: number;
-  setCurrentSemester: (semester: number) => void;
-  availableSemesters: number[];
-}
-
-export const SemesterContext = createContext<SemesterContextType | undefined>(undefined);
+import { useState, useEffect, type ReactNode } from "react";
+import { SemesterContext } from "../contexts/SemesterContext";
 
 export function SemesterProvider({ children }: { children: ReactNode }) {
   const [currentSemester, setCurrentSemester] = useState<number>(() => {

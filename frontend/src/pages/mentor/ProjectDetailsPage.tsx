@@ -1,75 +1,96 @@
-import { Button } from "@evonaplo/ui-library";
-import { 
-  FileText, 
-  Users2, 
-  Calendar, 
-  User, 
-  Clock, 
-  MapPin, 
-  Plus 
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { useParams } from "react-router";
+import { useMemo, Suspense, useState, useTransition } from "react";
+import { useApiClient } from "../../hooks/use-api-client";
+import ErrorBoundary from "../../components/ErrorBoundary";
+import { type ProjectDetailedData, type TeamWithMembers } from "../../types";
+import ProjectDetailsContent from "../../components/mentor/ProjectDetailsContent";
 
 export default function ProjectDetailsPage() {
+  const { id } = useParams<{ id: string }>();
+  const apiClient = useApiClient();
+  const [isPending, startTransition] = useTransition();
+
+  const initialPromise = useMemo(() => {
+    if (!id) return Promise.reject(new Error("Project ID is required"));
+
+    return (async (): Promise<ProjectDetailedData> => {
+      const { data: project } = await apiClient.projects.apiProjectsIdGet(id);
+
+      let teamsWithMembers: TeamWithMembers[] = [];
+      if (project.teams && project.teams.length > 0) {
+        const teamPromises = project.teams.map(async (teamId) => {
+          const { data: teamData } = await apiClient.teams.apiTeamsIdGet(teamId);
+
+          let memberNames: string[] = [];
+          if (teamData.students && teamData.students.length > 0) {
+            const studentPromises = teamData.students.map(sid =>
+              apiClient.students.apiStudentsIdGet(sid).then(res => res.data.name || "Unknown Student")
+            );
+            memberNames = await Promise.all(studentPromises);
+          }
+
+          return { ...teamData, memberNames };
+        });
+
+        teamsWithMembers = await Promise.all(teamPromises);
+      }
+
+      return { project, teams: teamsWithMembers };
+    })();
+  }, [id, apiClient]);
+
+  const [dataPromise, setDataPromise] = useState<Promise<ProjectDetailedData>>(initialPromise);
+
+  const triggerRefresh = () => {
+    if (!id) return;
+    const promise = (async (): Promise<ProjectDetailedData> => {
+      const { data: project } = await apiClient.projects.apiProjectsIdGet(id);
+
+      let teamsWithMembers: TeamWithMembers[] = [];
+      if (project.teams && project.teams.length > 0) {
+        const teamPromises = project.teams.map(async (teamId) => {
+          const { data: teamData } = await apiClient.teams.apiTeamsIdGet(teamId);
+
+          let memberNames: string[] = [];
+          if (teamData.students && teamData.students.length > 0) {
+            const studentPromises = teamData.students.map(sid =>
+              apiClient.students.apiStudentsIdGet(sid).then(res => res.data.name || "Unknown Student")
+            );
+            memberNames = await Promise.all(studentPromises);
+          }
+
+          return { ...teamData, memberNames };
+        });
+
+        teamsWithMembers = await Promise.all(teamPromises);
+      }
+
+      return { project, teams: teamsWithMembers };
+    })();
+
+    setDataPromise(promise);
+    return promise;
+  };
+
+  const handleRefresh = () => {
+    startTransition(async () => {
+      await triggerRefresh();
+    });
+  };
+
   return (
-    <div className="max-w-5xl mx-auto py-8 space-y-8">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">evoNapló</h1>
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-9 px-4">
-          <Plus className="w-4 h-4 mr-1" />
-          Add demo ppt
-        </Button>
-      </div>
-
-      {/* Project Description */}
-      <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all">
-        <div className="flex items-center gap-3 text-foreground">
-          <FileText className="w-6 h-6" />
-          <h2 className="text-xl font-bold tracking-tight">Project description</h2>
+    <ErrorBoundary onReset={handleRefresh}>
+      <Suspense fallback={
+        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground font-medium">Loading project details...</p>
         </div>
-        <p className="text-lg text-foreground/80 pl-9">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        </p>
-      </div>
-
-      {/* Members */}
-      <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all">
-        <div className="flex items-center gap-3 text-foreground">
-          <Users2 className="w-6 h-6" />
-          <h2 className="text-xl font-bold tracking-tight">Members</h2>
+      }>
+        <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+          <ProjectDetailsContent dataPromise={dataPromise} />
         </div>
-        <div className="space-y-3 pl-9">
-          <div className="flex items-center gap-3 text-foreground/90">
-            <div className="bg-muted p-1 rounded-full">
-              <User className="w-4 h-4" />
-            </div>
-            <span className="text-lg">Sándor József Benedek</span>
-          </div>
-          <div className="flex items-center gap-3 text-foreground/90">
-            <div className="bg-muted p-1 rounded-full">
-              <User className="w-4 h-4" />
-            </div>
-            <span className="text-lg">Nagy Gabriella</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Team Meetings */}
-      <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all">
-        <div className="flex items-center gap-3 text-foreground">
-          <Calendar className="w-6 h-6" />
-          <h2 className="text-xl font-bold tracking-tight">Team meetings</h2>
-        </div>
-        <div className="space-y-3 pl-9">
-          <div className="flex items-center gap-3 text-foreground/80">
-            <Clock className="w-4 h-4 text-muted-foreground" />
-            <span className="text-lg">2026. 03. 25. 17:00</span>
-          </div>
-          <div className="flex items-center gap-3 text-foreground/80">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <span className="text-lg">Evosoft Miskolc</span>
-          </div>
-        </div>
-      </div>
-    </div>
+      </Suspense>
+    </ErrorBoundary>
   );
 }

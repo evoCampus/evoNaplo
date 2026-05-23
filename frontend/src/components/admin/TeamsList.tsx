@@ -1,8 +1,7 @@
 import { Trash2 } from "lucide-react";
 import { use } from "react";
 import type { TeamDTO } from "../../api/api";
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+import { getDayName, formatTime } from "../../lib/date-utils";
 
 export default function TeamsList({
   teamsPromise,
@@ -25,7 +24,7 @@ export default function TeamsList({
         >
           <div className="flex flex-col gap-1">
             <span className="text-lg font-medium text-foreground/90">
-              Team - {DAYS[team.weeklyMeetingDay ?? 0] || "Unknown"} at {team.weeklyMeetingTime || "TBD"}
+              Team - {getDayName(team.weeklyMeetingDay)} at {formatTime(team.weeklyMeetingTime)}
             </span>
             <span className="text-xs text-muted-foreground">
               {team.students?.length || 0} students • {team.mentors?.length || 0} mentors

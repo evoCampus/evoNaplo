@@ -16,6 +16,7 @@ import { Pencil, Save, X, AlertCircle } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { TeamDTO, StudentDTO, MentorDTO, ProjectDTO, DayOfWeek } from "../../api";
 import { SearchableCheckboxList } from "./SearchableCheckboxList";
+import { getDayName, DAYS_OF_WEEK } from "../../lib/date-utils";
 
 interface TeamDialogProps {
   isOpen: boolean;
@@ -232,18 +233,14 @@ export function TeamDialog({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="0">Monday</SelectItem>
-                        <SelectItem value="1">Tuesday</SelectItem>
-                        <SelectItem value="2">Wednesday</SelectItem>
-                        <SelectItem value="3">Thursday</SelectItem>
-                        <SelectItem value="4">Friday</SelectItem>
-                        <SelectItem value="5">Saturday</SelectItem>
-                        <SelectItem value="6">Sunday</SelectItem>
+                        {DAYS_OF_WEEK.map((name, index) => (
+                          <SelectItem key={index} value={String(index)}>{name}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   ) : (
                     <span className="text-sm text-foreground pl-2">
-                      {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][weeklyMeetingDay]}
+                      {getDayName(weeklyMeetingDay)}
                     </span>
                   )}
                 </div>

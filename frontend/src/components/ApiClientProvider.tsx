@@ -1,7 +1,6 @@
-import { createContext, useMemo } from "react";
+import { useMemo } from "react";
 import ApiClient from "../api/api.client";
-
-export const ApiClientContext = createContext<ApiClient | null>(null);
+import { ApiClientContext } from "../contexts/ApiClientContext";
 
 interface ApiClientProviderProps {
   children: React.ReactNode;
