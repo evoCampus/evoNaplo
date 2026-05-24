@@ -1,4 +1,4 @@
-import { useState, ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { UserContext } from "../contexts/UserContext";
 import type { User } from "../types";
 

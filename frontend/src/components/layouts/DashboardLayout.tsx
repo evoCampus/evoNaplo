@@ -12,7 +12,7 @@ export default function DashboardLayout() {
     if (!user) return <Navigate to="/" replace />;
     return (
         <SidebarProvider className="h-full">
-            <DashboardSidebar user={user} />
+            <DashboardSidebar />
             <main className="flex-1 overflow-y-auto p-6">
                 <Suspense fallback={
                     <div className="flex items-center justify-center h-full">
