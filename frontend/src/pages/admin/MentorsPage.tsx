@@ -1,13 +1,14 @@
 import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { MentorDTO } from "../../api";
 import { GenericDialog, type FieldConfig } from "src/components/admin/GenericDialog";
 import MentorsList from "../../components/admin/MentorsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { AdminFilter, type FilterField } from "../../components/admin/AdminFilter";
 
 const mentorFields: FieldConfig<MentorDTO>[] = [
   { key: "name", label: "Name", type: "text", required: true },
@@ -16,6 +17,12 @@ const mentorFields: FieldConfig<MentorDTO>[] = [
   { key: "mentorProfile", label: "Mentor Profile", type: "text", fullWidth: true },
   { key: "semesterNumber", label: "Semester Number", type: "number", required: true },
   { key: "isActive", label: "Is Active", type: "checkbox" },
+];
+
+const mentorFilterFields: FilterField<MentorDTO>[] = [
+  { key: "name", label: "Name", type: "text" },
+  { key: "email", label: "Email", type: "text" },
+  { key: "isActive", label: "Is Active", type: "boolean" },
 ];
 
 const DEFAULT_MENTOR: MentorDTO = {
@@ -36,20 +43,38 @@ export default function MentorsPage() {
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
 
+  const [allMentors, setAllMentors] = useState<MentorDTO[] | null>(null);
+  const [filters, setFilters] = useState<Partial<Record<keyof MentorDTO, unknown>>>({});
+
   const initialPromise = useMemo(() => {
-    return (async () => {
-      const res = await apiClient.mentors.apiMentorsGet();
-      return res.data;
-    })();
+    return apiClient.mentors.apiMentorsGet().then((res) => res.data);
   }, [apiClient]);
 
-  const [mentorsPromise, setMentorsPromise] = useState<Promise<MentorDTO[]>>(initialPromise);
+  useEffect(() => {
+    initialPromise.then((data) => setAllMentors(data));
+  }, [initialPromise]);
+
+  const mentorsPromise = useMemo(() => {
+    if (allMentors === null) return initialPromise;
+
+    const filtered = allMentors.filter((m) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = m[key as keyof MentorDTO];
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    });
+    return Promise.resolve(filtered);
+  }, [allMentors, filters, initialPromise]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as MentorDTO | undefined;
 
   const [selectedMentor, setSelectedMentor] = useState<MentorDTO | null>(
-    editItem ? editItem : (shouldOpenAdd ? DEFAULT_MENTOR : null)
+    editItem ? editItem : shouldOpenAdd ? DEFAULT_MENTOR : null
   );
   const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
   const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
@@ -57,10 +82,10 @@ export default function MentorsPage() {
   const [mentorToDelete, setMentorToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const triggerRefresh = () => {
-    const promise = apiClient.mentors.apiMentorsGet().then(res => res.data);
-    setMentorsPromise(promise);
-    return promise;
+  const triggerRefresh = async () => {
+    const res = await apiClient.mentors.apiMentorsGet();
+    setAllMentors(res.data);
+    return res.data;
   };
 
   const handleEdit = (mentor: MentorDTO) => {
@@ -123,13 +148,17 @@ export default function MentorsPage() {
   return (
     <div className="max-w-6xl w-full mx-auto py-4">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Mentors</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Mentors</h1>
         <div className="flex items-center gap-6">
-          <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <span className="text-sm font-medium">Filters</span>
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-          <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg">
+          <AdminFilter
+            fields={mentorFilterFields}
+            currentFilters={filters}
+            onFilterChange={setFilters}
+          />
+          <Button
+            onClick={handleAdd}
+            className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg shadow-md transition-all active:scale-95"
+          >
             <Plus className="w-4 h-4 mr-1" />
             Add
           </Button>
@@ -137,8 +166,21 @@ export default function MentorsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense fallback={<div className="text-center p-8 text-muted-foreground">Loading mentors...</div>}>
-          <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">Loading mentors...</span>
+            </div>
+          }
+        >
+          <div
+            className={
+              isPending
+                ? "opacity-50 pointer-events-none transition-opacity duration-200"
+                : "transition-opacity duration-200"
+            }
+          >
             <MentorsList mentorsPromise={mentorsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
           </div>
         </Suspense>

@@ -1,13 +1,14 @@
 import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { StudentDTO } from "../../api";
 import { GenericDialog, type FieldConfig } from "src/components/admin/GenericDialog";
 import StudentsList from "../../components/admin/StudentsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { AdminFilter, type FilterField } from "../../components/admin/AdminFilter";
 
 const studentFields: FieldConfig<StudentDTO>[] = [
   { key: "name", label: "Name", type: "text", required: true },
@@ -25,6 +26,13 @@ const studentFields: FieldConfig<StudentDTO>[] = [
   { key: "isWorkingStudent", label: "Is working student", type: "checkbox" },
   { key: "workExperienceInSemesters", label: "Work Experience", type: "number", fullWidth: true, required: true },
   { key: "wantsToStayWithCurrentTeam", label: "Wants to stay with current team", type: "checkbox" },
+];
+
+const studentFilterFields: FilterField<StudentDTO>[] = [
+  { key: "name", label: "Name", type: "text" },
+  { key: "email", label: "Email", type: "text" },
+  { key: "universityProgramme", label: "Programme", type: "text" },
+  { key: "isWorkingStudent", label: "Working Student", type: "boolean" },
 ];
 
 const DEFAULT_STUDENT: StudentDTO = {
@@ -52,20 +60,38 @@ export default function StudentsPage() {
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
 
+  const [allStudents, setAllStudents] = useState<StudentDTO[] | null>(null);
+  const [filters, setFilters] = useState<Partial<Record<keyof StudentDTO, unknown>>>({});
+
   const initialPromise = useMemo(() => {
-    return (async () => {
-      const res = await apiClient.students.apiStudentsGet();
-      return res.data;
-    })();
+    return apiClient.students.apiStudentsGet().then((res) => res.data);
   }, [apiClient]);
 
-  const [studentsPromise, setStudentsPromise] = useState<Promise<StudentDTO[]>>(initialPromise);
+  useEffect(() => {
+    initialPromise.then((data) => setAllStudents(data));
+  }, [initialPromise]);
+
+  const studentsPromise = useMemo(() => {
+    if (allStudents === null) return initialPromise;
+
+    const filtered = allStudents.filter((s) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = s[key as keyof StudentDTO];
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    });
+    return Promise.resolve(filtered);
+  }, [allStudents, filters, initialPromise]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as StudentDTO | undefined;
 
   const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(
-    editItem ? editItem : (shouldOpenAdd ? DEFAULT_STUDENT : null)
+    editItem ? editItem : shouldOpenAdd ? DEFAULT_STUDENT : null
   );
   const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
   const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
@@ -73,10 +99,10 @@ export default function StudentsPage() {
   const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const triggerRefresh = () => {
-    const promise = apiClient.students.apiStudentsGet().then(res => res.data);
-    setStudentsPromise(promise);
-    return promise;
+  const triggerRefresh = async () => {
+    const res = await apiClient.students.apiStudentsGet();
+    setAllStudents(res.data);
+    return res.data;
   };
 
   const handleEdit = (student: StudentDTO) => {
@@ -139,13 +165,17 @@ export default function StudentsPage() {
   return (
     <div className="max-w-6xl w-full mx-auto py-4">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Students</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Students</h1>
         <div className="flex items-center gap-6">
-          <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <span className="text-sm font-medium">Filters</span>
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-          <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg">
+          <AdminFilter
+            fields={studentFilterFields}
+            currentFilters={filters}
+            onFilterChange={setFilters}
+          />
+          <Button
+            onClick={handleAdd}
+            className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg shadow-md transition-all active:scale-95"
+          >
             <Plus className="w-4 h-4 mr-1" />
             Add
           </Button>
@@ -153,8 +183,21 @@ export default function StudentsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense fallback={<div className="text-center p-8 text-muted-foreground">Loading students...</div>}>
-          <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">Loading students...</span>
+            </div>
+          }
+        >
+          <div
+            className={
+              isPending
+                ? "opacity-50 pointer-events-none transition-opacity duration-200"
+                : "transition-opacity duration-200"
+            }
+          >
             <StudentsList studentsPromise={studentsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
           </div>
         </Suspense>

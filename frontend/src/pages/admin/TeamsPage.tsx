@@ -1,13 +1,25 @@
 import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
-import { Plus, SlidersHorizontal } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { TeamDTO } from "../../api";
 import { TeamDialog } from "../../components/admin/TeamDialog";
 import TeamsList from "../../components/admin/TeamsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 import ErrorBoundary from "../../components/ErrorBoundary";
+import { AdminFilter, type FilterField } from "../../components/admin/AdminFilter";
+import { DAYS_OF_WEEK } from "../../lib/date-utils";
+
+const teamFilterFields: FilterField<TeamDTO>[] = [
+  {
+    key: "weeklyMeetingDay",
+    label: "Meeting Day",
+    type: "select",
+    options: DAYS_OF_WEEK.map((name, index) => ({ label: name, value: index })),
+  },
+  { key: "weeklyMeetingTime", label: "Meeting Time", type: "text" },
+];
 
 const DEFAULT_TEAM: TeamDTO = {
   id: null,
@@ -24,20 +36,44 @@ export default function TeamsPage() {
   const navigate = useNavigate();
   const [isPending, startTransition] = useTransition();
 
+  const [allTeams, setAllTeams] = useState<TeamDTO[] | null>(null);
+  const [filters, setFilters] = useState<Partial<Record<keyof TeamDTO, unknown>>>({});
+
   const initialPromise = useMemo(() => {
-    return (async () => {
-      const res = await apiClient.teams.apiTeamsGet();
-      return res.data;
-    })();
+    return apiClient.teams.apiTeamsGet().then((res) => res.data);
   }, [apiClient]);
 
-  const [teamsPromise, setTeamsPromise] = useState<Promise<TeamDTO[]>>(initialPromise);
+  useEffect(() => {
+    initialPromise.then((data) => setAllTeams(data));
+  }, [initialPromise]);
+
+  const teamsPromise = useMemo(() => {
+    if (allTeams === null) return initialPromise;
+
+    const filtered = allTeams.filter((t) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = t[key as keyof TeamDTO];
+        
+        // Handle numeric fields (like weeklyMeetingDay)
+        if (typeof itemValue === "number") {
+          return itemValue === Number(value);
+        }
+
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    });
+    return Promise.resolve(filtered);
+  }, [allTeams, filters, initialPromise]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as TeamDTO | undefined;
 
   const [selectedTeam, setSelectedTeam] = useState<TeamDTO | null>(
-    editItem ? editItem : (shouldOpenAdd ? DEFAULT_TEAM : null)
+    editItem ? editItem : shouldOpenAdd ? DEFAULT_TEAM : null
   );
   const [isDialogOpen, setIsDialogOpen] = useState(shouldOpenAdd || !!editItem);
   const [isCreating, setIsCreating] = useState(shouldOpenAdd && !editItem);
@@ -45,10 +81,10 @@ export default function TeamsPage() {
   const [teamToDelete, setTeamToDelete] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const triggerRefresh = () => {
-    const promise = apiClient.teams.apiTeamsGet().then(res => res.data);
-    setTeamsPromise(promise);
-    return promise;
+  const triggerRefresh = async () => {
+    const res = await apiClient.teams.apiTeamsGet();
+    setAllTeams(res.data);
+    return res.data;
   };
 
   const handleEdit = (team: TeamDTO) => {
@@ -139,13 +175,17 @@ export default function TeamsPage() {
   return (
     <div className="max-w-6xl w-full mx-auto py-4">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Teams</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">Teams</h1>
         <div className="flex items-center gap-6">
-          <button className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <span className="text-sm font-medium">Filters</span>
-            <SlidersHorizontal className="w-4 h-4" />
-          </button>
-          <Button onClick={handleAdd} className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg">
+          <AdminFilter
+            fields={teamFilterFields}
+            currentFilters={filters}
+            onFilterChange={setFilters}
+          />
+          <Button
+            onClick={handleAdd}
+            className="bg-primary hover:bg-primary/90 cursor-pointer text-primary-foreground px-5 h-10 rounded-lg shadow-md transition-all active:scale-95"
+          >
             <Plus className="w-4 h-4 mr-1" />
             Add
           </Button>
@@ -153,8 +193,21 @@ export default function TeamsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense fallback={<div className="text-center p-8 text-muted-foreground">Loading teams...</div>}>
-          <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">Loading teams...</span>
+            </div>
+          }
+        >
+          <div
+            className={
+              isPending
+                ? "opacity-50 pointer-events-none transition-opacity duration-200"
+                : "transition-opacity duration-200"
+            }
+          >
             <TeamsList teamsPromise={teamsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
           </div>
         </Suspense>
