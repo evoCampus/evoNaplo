@@ -1,12 +1,11 @@
 import { Users, UserSquare2, Users2, FolderRoot, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@evonaplo/ui-library";
 import type { StudentDTO, MentorDTO, TeamDTO, ProjectDTO } from "../../api";
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+import { getDayName, formatTime } from "../../lib/date-utils";
 
 function getTeamName(team: TeamDTO) {
-  const dayStr = team.weeklyMeetingDay !== undefined && team.weeklyMeetingDay !== null ? DAYS[team.weeklyMeetingDay] : "Unknown";
-  const timeStr = team.weeklyMeetingTime || "TBD";
+  const dayStr = getDayName(team.weeklyMeetingDay);
+  const timeStr = formatTime(team.weeklyMeetingTime);
   return `Team - ${dayStr} at ${timeStr}`;
 }
 

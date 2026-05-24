@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Search, Download, Upload, Users, UserSquare2, 
-  Users2, FolderRoot, CalendarDays, X 
+import {
+  Search, Download, Upload, Users, UserSquare2,
+  Users2, FolderRoot, CalendarDays, X
 } from "lucide-react";
 import { Button, Input } from "@evonaplo/ui-library";
 import { useNavigate } from "react-router";
@@ -9,12 +9,12 @@ import { useApiClient } from "../../hooks/use-api-client";
 import type { StudentDTO, MentorDTO, TeamDTO, ProjectDTO } from "../../api";
 import DashboardSearchResults from "../../components/admin/DashboardSearchResults";
 import DashboardQuickActions from "../../components/admin/DashboardQuickActions";
-import { useAdminSearch } from "../../hooks/useAdminSearch";
+import { useAdminSearch } from "../../hooks/use-admin-search";
 
 export default function AdminHomePage() {
   const navigate = useNavigate();
   const apiClient = useApiClient();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [students, setStudents] = useState<StudentDTO[]>([]);
   const [mentors, setMentors] = useState<MentorDTO[]>([]);
@@ -134,8 +134,8 @@ export default function AdminHomePage() {
       {/* Search Bar */}
       <div className="relative w-full max-w-xl">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input 
-          placeholder="Search students, mentors, teams, semesters..." 
+        <Input
+          placeholder="Search students, mentors, teams, semesters..."
           value={searchQuery}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
           className="pl-10 pr-10 h-12 bg-card border border-border/80 hover:border-border rounded-xl text-base shadow-sm focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20 transition-all placeholder:text-muted-foreground/70"
@@ -177,14 +177,14 @@ export default function AdminHomePage() {
               <p className="text-sm text-muted-foreground">Import or export system records using Excel spreadsheets.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="h-12 text-base font-medium border-border/50 hover:bg-muted/80 hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center gap-2"
               >
                 <Download className="h-5 w-5" /> Import from XLSX
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="h-12 text-base font-medium border-border/50 hover:bg-muted/80 hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center gap-2"
               >
                 <Upload className="h-5 w-5" /> Export to XLSX

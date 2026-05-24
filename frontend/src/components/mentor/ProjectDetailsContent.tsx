@@ -21,8 +21,7 @@ export default function ProjectDetailsContent({
         </Button>
       </div>
 
-      {/* Project Description */}
-      <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all shadow-sm">
+      <div className="bg-card rounded-2xl p-6 space-y-4 border border-transparent hover:border-border/50 transition-all shadow-sm">
         <div className="flex items-center gap-3 text-foreground">
           <FileText className="w-6 h-6 text-primary" />
           <h2 className="text-xl font-bold tracking-tight">Project description</h2>

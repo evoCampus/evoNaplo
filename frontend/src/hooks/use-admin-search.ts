@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { StudentDTO, MentorDTO, TeamDTO, ProjectDTO } from "../api";
+import { getDayName, formatTime } from "../lib/date-utils";
 
 interface UseAdminSearchProps {
   searchQuery: string;
@@ -8,8 +9,6 @@ interface UseAdminSearchProps {
   teams: TeamDTO[];
   projects: ProjectDTO[];
 }
-
-const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 
 export function useAdminSearch({
   searchQuery,
@@ -37,11 +36,8 @@ export function useAdminSearch({
   const filteredTeams = useMemo(() => {
     if (!query) return [];
     return teams.filter((t) => {
-      const dayStr =
-        t.weeklyMeetingDay !== undefined && t.weeklyMeetingDay !== null
-          ? DAYS[t.weeklyMeetingDay]
-          : "unknown";
-      const timeStr = (t.weeklyMeetingTime || "tbd").toLowerCase();
+      const dayStr = getDayName(t.weeklyMeetingDay).toLowerCase();
+      const timeStr = formatTime(t.weeklyMeetingTime).toLowerCase();
       return "team".includes(query) || dayStr.includes(query) || timeStr.includes(query);
     });
   }, [teams, query]);

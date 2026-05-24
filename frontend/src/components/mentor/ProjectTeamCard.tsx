@@ -10,7 +10,7 @@ export default function ProjectTeamCard({ team }: { team: TeamWithMembers }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Members */}
-          <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all shadow-sm">
+          <div className="bg-card rounded-2xl p-6 space-y-4 border border-transparent hover:border-border/50 transition-all shadow-sm">
             <div className="flex items-center gap-3 text-foreground">
               <Users2 className="w-6 h-6 text-primary" />
               <h2 className="text-xl font-bold tracking-tight">Members</h2>
@@ -32,7 +32,7 @@ export default function ProjectTeamCard({ team }: { team: TeamWithMembers }) {
           </div>
 
           {/* Team Meetings */}
-          <div className="bg-card rounded-2xl p-6 space-y-4 shadow-sm border border-transparent hover:border-border/50 transition-all shadow-sm">
+          <div className="bg-card rounded-2xl p-6 space-y-4 border border-transparent hover:border-border/50 transition-all shadow-sm">
             <div className="flex items-center gap-3 text-foreground">
               <Calendar className="w-6 h-6 text-primary" />
               <h2 className="text-xl font-bold tracking-tight">Team meetings</h2>

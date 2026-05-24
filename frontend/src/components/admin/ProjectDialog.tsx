@@ -11,6 +11,7 @@ import { Pencil, Save, X, AlertCircle } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { ProjectDTO, TeamDTO, StudentDTO, MentorDTO } from "../../api";
 import { SearchableCheckboxList } from "./SearchableCheckboxList";
+import { getDayName, formatTime } from "../../lib/date-utils";
 
 interface ProjectDialogProps {
   isOpen: boolean;
@@ -19,8 +20,6 @@ interface ProjectDialogProps {
   item: ProjectDTO | null;
   isCreating?: boolean;
 }
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export function ProjectDialog({
   isOpen,
@@ -149,8 +148,8 @@ export function ProjectDialog({
   const displayTitle = !isCreating && item ? item.name : "Create Project";
 
   const mappedTeams = teamsList.map((team) => {
-    const day = DAYS[team.weeklyMeetingDay ?? 0] || "Unknown";
-    const time = team.weeklyMeetingTime || "TBD";
+    const day = getDayName(team.weeklyMeetingDay);
+    const time = formatTime(team.weeklyMeetingTime);
     const studentNames = team.students
       ?.map((id) => studentsList.find((s) => s.id === id)?.name || "")
       .filter(Boolean)
