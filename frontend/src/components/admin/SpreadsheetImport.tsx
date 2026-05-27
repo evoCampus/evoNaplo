@@ -13,9 +13,23 @@ export default function SpreadsheetImport() {
     const [rows, setRows] = useState<any[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    const playSound = (type: "error" | "success" | "loading")=> {
+        const audio = new Audio(`/sounds/${type}.mp3`);
+        audio.play().catch(error => console.warn("Sound blocked by browser: ", error));
+    }
     useEffect(() => {
+        if (status === "invalid") {
+            playSound("error");
+        }
+        if (status === "done") {
+            playSound("success");
+        }
+        if (status === "loading") {
+            playSound("loading");
+        }
+        
         if (status === "invalid" || status === "done") {
-            const timer = setTimeout(() => setStatus("idle"), 3000);
+            const timer = setTimeout(() => setStatus("idle"), 3500);
             return () => clearTimeout(timer);
         }
     }, [status]);
@@ -33,6 +47,7 @@ export default function SpreadsheetImport() {
         }
 
         try {
+            await new Promise((resolve) => setTimeout(resolve, 1200));
             const response = await apiClient.data.dataImportPost(file);
             const importedData = response.data;
 
@@ -87,14 +102,14 @@ export default function SpreadsheetImport() {
                     <Alert className="bg-background/95 backdrop-blur shadow-xl">
                         <Loader2 className="animate-spin h-4 w-4" />
                         <AlertTitle>Importing...</AlertTitle>
-                        <AlertDescription>Importing record from spreadsheet.</AlertDescription>
+                        <AlertDescription>Importing records from spreadsheet.</AlertDescription>
                     </Alert>
                 </div>
                 <div className={`absolute w-full transition-all duration-500 ease-in-out ${status === "invalid" ? "translate-y-0 opacity-100 visible" : "-translate-y-24 opacity-0 invisible"}`}>
                     <Alert variant="destructive" className="bg-background/95 backdrop-blur shadow-xl">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Spreadsheet error</AlertTitle>
-                        <AlertDescription>Invalid file format. Please use .xlsx or .csv!.</AlertDescription>
+                        <AlertDescription>There was an error with your import. Please check your file format.</AlertDescription>
                     </Alert>
                 </div>
                 <div className={`absolute w-full transition-all duration-500 ease-in-out ${status === "done" ? "translate-y-0 opacity-100 visible" : "-translate-y-24 opacity-0 invisible"}`}>
