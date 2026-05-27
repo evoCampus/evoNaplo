@@ -6,21 +6,21 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [default to undefined]
-**name** | **string** |  | [optional] [default to undefined]
-**email** | **string** |  | [optional] [default to undefined]
+**name** | **string** |  | [default to undefined]
+**email** | **string** |  | [default to undefined]
 **phoneNumber** | **string** |  | [optional] [default to undefined]
 **universityProgramme** | **string** |  | [optional] [default to undefined]
-**currentSemester** | **number** |  | [optional] [default to undefined]
-**isInTheirFirstSemester** | **boolean** |  | [optional] [default to undefined]
+**currentSemester** | **number** |  | [default to undefined]
+**isInTheirFirstSemester** | **boolean** |  | [default to undefined]
 **personalGoals** | **string** |  | [optional] [default to undefined]
-**hasAppliedForScholarship** | **boolean** |  | [optional] [default to undefined]
-**hasScholarship** | **boolean** |  | [optional] [default to undefined]
-**scholarshipDurationInSemesters** | **number** |  | [optional] [default to undefined]
-**hasAppliedForInternship** | **boolean** |  | [optional] [default to undefined]
-**hasInternship** | **boolean** |  | [optional] [default to undefined]
-**isWorkingStudent** | **boolean** |  | [optional] [default to undefined]
-**workExperienceInSemesters** | **number** |  | [optional] [default to undefined]
-**wantsToStayWithCurrentTeam** | **boolean** |  | [optional] [default to undefined]
+**hasAppliedForScholarship** | **boolean** |  | [default to undefined]
+**hasScholarship** | **boolean** |  | [default to undefined]
+**scholarshipDuration** | **string** |  | [optional] [default to undefined]
+**hasAppliedForInternship** | **boolean** |  | [default to undefined]
+**hasInternship** | **boolean** |  | [default to undefined]
+**isWorkingStudent** | **boolean** |  | [default to undefined]
+**workExperienceInSemesters** | **string** |  | [optional] [default to undefined]
+**wantsToStayWithCurrentTeam** | **boolean** |  | [default to undefined]
 
 ## Example
 
@@ -38,7 +38,7 @@ const instance: StudentDTO = {
     personalGoals,
     hasAppliedForScholarship,
     hasScholarship,
-    scholarshipDurationInSemesters,
+    scholarshipDuration,
     hasAppliedForInternship,
     hasInternship,
     isWorkingStudent,

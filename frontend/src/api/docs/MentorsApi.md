@@ -5,9 +5,9 @@ All URIs are relative to *http://localhost*
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
 |[**apiMentorsGet**](#apimentorsget) | **GET** /api/Mentors | |
-|[**apiMentorsIdDelete**](#apimentorsiddelete) | **DELETE** /api/Mentors/{id} | |
-|[**apiMentorsIdGet**](#apimentorsidget) | **GET** /api/Mentors/{id} | |
-|[**apiMentorsIdPut**](#apimentorsidput) | **PUT** /api/Mentors/{id} | |
+|[**apiMentorsMentorIdDelete**](#apimentorsmentoriddelete) | **DELETE** /api/Mentors/{mentorId} | |
+|[**apiMentorsMentorIdGet**](#apimentorsmentoridget) | **GET** /api/Mentors/{mentorId} | |
+|[**apiMentorsMentorIdPut**](#apimentorsmentoridput) | **PUT** /api/Mentors/{mentorId} | |
 |[**apiMentorsPost**](#apimentorspost) | **POST** /api/Mentors | |
 
 # **apiMentorsGet**
@@ -53,8 +53,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsIdDelete**
-> apiMentorsIdDelete()
+# **apiMentorsMentorIdDelete**
+> apiMentorsMentorIdDelete()
 
 
 ### Example
@@ -68,10 +68,10 @@ import {
 const configuration = new Configuration();
 const apiInstance = new MentorsApi(configuration);
 
-let id: string; // (default to undefined)
+let mentorId: string; // (default to undefined)
 
-const { status, data } = await apiInstance.apiMentorsIdDelete(
-    id
+const { status, data } = await apiInstance.apiMentorsMentorIdDelete(
+    mentorId
 );
 ```
 
@@ -79,7 +79,7 @@ const { status, data } = await apiInstance.apiMentorsIdDelete(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **id** | [**string**] |  | defaults to undefined|
+| **mentorId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -103,8 +103,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsIdGet**
-> MentorDTO apiMentorsIdGet()
+# **apiMentorsMentorIdGet**
+> MentorDTO apiMentorsMentorIdGet()
 
 
 ### Example
@@ -118,10 +118,10 @@ import {
 const configuration = new Configuration();
 const apiInstance = new MentorsApi(configuration);
 
-let id: string; // (default to undefined)
+let mentorId: string; // (default to undefined)
 
-const { status, data } = await apiInstance.apiMentorsIdGet(
-    id
+const { status, data } = await apiInstance.apiMentorsMentorIdGet(
+    mentorId
 );
 ```
 
@@ -129,7 +129,7 @@ const { status, data } = await apiInstance.apiMentorsIdGet(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **id** | [**string**] |  | defaults to undefined|
+| **mentorId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type
@@ -153,8 +153,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsIdPut**
-> apiMentorsIdPut()
+# **apiMentorsMentorIdPut**
+> apiMentorsMentorIdPut()
 
 
 ### Example
@@ -169,11 +169,11 @@ import {
 const configuration = new Configuration();
 const apiInstance = new MentorsApi(configuration);
 
-let id: string; // (default to undefined)
+let mentorId: string; // (default to undefined)
 let mentorDTO: MentorDTO; // (optional)
 
-const { status, data } = await apiInstance.apiMentorsIdPut(
-    id,
+const { status, data } = await apiInstance.apiMentorsMentorIdPut(
+    mentorId,
     mentorDTO
 );
 ```
@@ -183,7 +183,7 @@ const { status, data } = await apiInstance.apiMentorsIdPut(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **mentorDTO** | **MentorDTO**|  | |
-| **id** | [**string**] |  | defaults to undefined|
+| **mentorId** | [**string**] |  | defaults to undefined|
 
 
 ### Return type

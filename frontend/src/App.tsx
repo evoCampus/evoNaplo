@@ -52,7 +52,7 @@ function App() {
                       <Route path="settings" element={<SettingsPage />} />
                   </Route>
               </Route>
-              <Route element={<ProtectedRoute user={user} allowedRoles={['admin']} />}>
+              <Route element={<ProtectedRoute user={user} allowedRoles={['admin', 'mentor']} />}>
                   <Route path="admin">
                       <Route index element={<AdminHomePage />} />
                       <Route path="students" element={<StudentsPage />} />

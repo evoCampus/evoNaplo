@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  Search, Download, Upload, Users, UserSquare2,
+  Search, Upload, Users, UserSquare2,
   Users2, FolderRoot, CalendarDays, X
 } from "lucide-react";
 import { Button, Input } from "@evonaplo/ui-library";
@@ -9,6 +9,7 @@ import { useApiClient } from "../../hooks/use-api-client";
 import type { StudentDTO, MentorDTO, TeamDTO, ProjectDTO } from "../../api";
 import DashboardSearchResults from "../../components/admin/DashboardSearchResults";
 import DashboardQuickActions from "../../components/admin/DashboardQuickActions";
+import SpreadsheetImport from "../../components/admin/SpreadsheetImport";
 import { useAdminSearch } from "../../hooks/use-admin-search";
 
 export default function AdminHomePage() {
@@ -177,12 +178,8 @@ export default function AdminHomePage() {
               <p className="text-sm text-muted-foreground">Import or export system records using Excel spreadsheets.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Button
-                variant="outline"
-                className="h-12 text-base font-medium border-border/50 hover:bg-muted/80 hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center gap-2"
-              >
-                <Download className="h-5 w-5" /> Import from XLSX
-              </Button>
+              <SpreadsheetImport/>
+              
               <Button
                 variant="outline"
                 className="h-12 text-base font-medium border-border/50 hover:bg-muted/80 hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center gap-2"

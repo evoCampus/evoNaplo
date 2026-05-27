@@ -6,14 +6,14 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **string** |  | [default to undefined]
-**name** | **string** |  | [optional] [default to undefined]
-**email** | **string** |  | [optional] [default to undefined]
+**name** | **string** |  | [default to undefined]
+**email** | **string** |  | [default to undefined]
 **phoneNumber** | **string** |  | [optional] [default to undefined]
 **mentorProfile** | **string** |  | [optional] [default to undefined]
-**teams** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
-**projects** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
-**semesterNumber** | **number** |  | [optional] [default to undefined]
-**isActive** | **boolean** |  | [optional] [default to undefined]
+**teamIds** | **Array&lt;string&gt;** |  | [default to undefined]
+**projectIds** | **Array&lt;string&gt;** |  | [default to undefined]
+**semesterNumber** | **number** |  | [default to undefined]
+**isActive** | **boolean** |  | [default to undefined]
 
 ## Example
 
@@ -26,8 +26,8 @@ const instance: MentorDTO = {
     email,
     phoneNumber,
     mentorProfile,
-    teams,
-    projects,
+    teamIds,
+    projectIds,
     semesterNumber,
     isActive,
 };
