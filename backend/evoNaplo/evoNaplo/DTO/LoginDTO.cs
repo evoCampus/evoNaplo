@@ -1,4 +1,4 @@
-namespace evoNaplo.Models;
+namespace evoNaplo.DTO;
 
 public class LoginDTO
 {

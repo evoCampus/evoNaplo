@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using evoNaplo.DTO;
 using evoNaplo.Services;
-using evoNaplo.Models;
+using evoNaplo.Exceptions;
 
 namespace evoNaplo.Controllers;
 
@@ -20,12 +20,11 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> Register(RegisterDTO registerData)
     {
         try {
-            RegisterDTO user = _authService.Register(registerData);
-            return Ok("User registered.");
+            return Ok(await _authService.RegisterAsync(registerData));
         }
-        catch (Exception e)
+        catch (UserWithEmailAlreadyExistsException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(ex.Message);
         }
         
     }
@@ -33,12 +32,14 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginDTO loginData)
     {
-        LoginDTO? user = _authService.Login(loginData);
-        if (user is not null)
+        try
         {
-            return Ok("Welcome");
+            return Ok(await _authService.LoginAsync(loginData));
         }
-        return Unauthorized("Invalid email or password.");
+        catch (Exception ex) when (ex is UserWithGivenEmailNotFoundException or InvalidPasswordException)
+        {
+            return Unauthorized("Invalid credentials");
+        }
     }
 
 }
