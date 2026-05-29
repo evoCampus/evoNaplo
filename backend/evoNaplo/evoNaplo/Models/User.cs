@@ -10,5 +10,4 @@ public class User
     public string? MentorId { get; set; }
     public Mentor? Mentor { get; set; }
     
-    
 }
