@@ -3,7 +3,7 @@ using evoNaplo.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks(); // Temporary fix, doesn't build without it
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {

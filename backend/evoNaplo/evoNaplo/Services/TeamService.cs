@@ -13,7 +13,7 @@ internal class TeamService : ITeamService
     private readonly IMentorService _mentorService;
     private readonly IStudentService _studentService;
 
-    public TeamService(/*IMentorService mentorService,*/ IStudentService studentService)
+    public TeamService(/*IMentorService mentorService,*/ IStudentService studentService) // Temporary fix, doesn't build without it
     {
         //_mentorService = mentorService;
         _studentService = studentService;

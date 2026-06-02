@@ -22,6 +22,8 @@ public class StudentDTO
     public DateTime WorkExperienceInSemesters { get; set; }
     public required bool WantsToStayWithCurrentTeam { get; set; }
 
+    public StudentDTO() { }
+    
     [SetsRequiredMembers]
     public StudentDTO(Student student)
     {
