@@ -60,6 +60,12 @@ internal class StudentService : IStudentService
     /// <returns>The added StudentDTO if successful.</returns>
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd)
     {
+        bool exists = _students.Any(s => s.Email == studentToAdd.Email);
+
+        if (exists) {
+            throw new StudentAlreadyExistsException($"Student with {studentToAdd.Email} email already exists.");
+        }
+        
         studentToAdd.Id = Guid.NewGuid().ToString();
         _students.Add(new Student
         {
