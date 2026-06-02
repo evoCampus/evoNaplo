@@ -175,7 +175,7 @@ export default function AdminHomePage() {
           <div className="bg-card rounded-2xl border border-border/20 p-6 shadow-sm space-y-4">
             <div className="space-y-1">
               <h2 className="text-xl font-semibold tracking-tight text-foreground/95">Data Management</h2>
-              <p className="text-sm text-muted-foreground">Import or export system records using Excel spreadsheets.</p>
+              <p className="text-sm text-muted-foreground">Import or export system records using spreadsheets.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SpreadsheetImport/>
