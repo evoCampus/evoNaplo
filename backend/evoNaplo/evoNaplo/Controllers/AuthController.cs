@@ -24,7 +24,7 @@ public class AuthController : ControllerBase
         }
         catch (UserWithEmailAlreadyExistsException ex)
         {
-            return BadRequest(ex.Message);
+            return Conflict(ex.Message);
         }
         
     }
