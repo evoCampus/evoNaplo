@@ -8,10 +8,6 @@ public class AuditLog
     public DateTimeOffset Timestamp { get; set; }
     public string EventType { get; set; } = null!;
     public string? UserId { get; set; }
-    public string? ActorId { get; set; }
-    public string? CorrelationId { get; set; }
-    public string? ClientIp { get; set; }
-    public string? UserAgent { get; set; }
     public string? Resource { get; set; }
     public string? Action { get; set; }
     public string? Outcome { get; set; }
