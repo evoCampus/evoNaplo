@@ -24,29 +24,10 @@ public class AuthController : ControllerBase
     public async Task<ActionResult> Register(RegisterDTO registerData)
     {
         try {
-            var result = await _authService.RegisterAsync(registerData);
-            _logger.LogInformation("Register endpoint success for {Email}", registerData.Email);
-            await _auditService.LogAsync(new Models.AuditLog
-            {
-                EventType = "RegisterEndpoint",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Success",
-                Details = $"Registered {registerData.Email}"
-            });
-            return Ok(result);
+            return Ok(await _authService.RegisterAsync(registerData));
         }
         catch (UserWithEmailAlreadyExistsException ex)
         {
-            _logger.LogWarning("Register endpoint attempt with existing email {Email}", registerData.Email);
-            await _auditService.LogAsync(new Models.AuditLog
-            {
-                EventType = "RegisterEndpoint",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Failure",
-                Details = ex.Message
-            });
             return Conflict(ex.Message);
         }
         
@@ -57,29 +38,10 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var result = await _authService.LoginAsync(loginData);
-            _logger.LogInformation("Login endpoint success for {Email}", loginData.Email);
-            await _auditService.LogAsync(new Models.AuditLog
-            {
-                EventType = "LoginEndpoint",
-                Resource = "User",
-                Action = "Login",
-                Outcome = "Success",
-                Details = $"Login {loginData.Email}"
-            });
-            return Ok(result);
+            return Ok(await _authService.LoginAsync(loginData));
         }
         catch (Exception ex) when (ex is UserWithGivenEmailNotFoundException or InvalidPasswordException)
         {
-            _logger.LogWarning("Login endpoint failed for {Email}: {Message}", loginData.Email, ex.Message);
-            await _auditService.LogAsync(new Models.AuditLog
-            {
-                EventType = "LoginEndpoint",
-                Resource = "User",
-                Action = "Login",
-                Outcome = "Failure",
-                Details = ex.Message
-            });
             return Unauthorized("Invalid credentials");
         }
     }
