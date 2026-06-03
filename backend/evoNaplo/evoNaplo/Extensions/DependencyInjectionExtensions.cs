@@ -12,6 +12,8 @@ public static class DependencyInjectionExtensions
         AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
+        services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMentorService, MentorService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IProjectService, ProjectService>();

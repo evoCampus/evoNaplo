@@ -11,16 +11,29 @@ internal class AuthService : IAuthService
 {
     private readonly PasswordHasher<User> _passwordHasher = new();
     private readonly AppDbContext _context;
+    private readonly ILogger<AuthService> _logger;
+    private readonly IAuditService _auditService;
 
-    public AuthService(AppDbContext context)
+    public AuthService(AppDbContext context, ILogger<AuthService> logger, IAuditService auditService)
     {
         _context = context;
+        _logger = logger;
+        _auditService = auditService;
     }
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
     {
         if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
         {
+            _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
+            await _auditService.LogAsync(new Models.AuditLog
+            {
+                EventType = "RegisterAttempt",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Failure",
+                Details = $"Email {registerData.Email} already in use"
+            });
             throw new UserWithEmailAlreadyExistsException("Email already in use.");
         }
         User user = new User
@@ -33,6 +46,16 @@ internal class AuthService : IAuthService
         user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+        _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
+        await _auditService.LogAsync(new Models.AuditLog
+        {
+            EventType = "Register",
+            Resource = "User",
+            Action = "Register",
+            Outcome = "Success",
+            UserId = user.Id,
+            Details = $"User {user.Email} created"
+        });
         return new UserDTO(user);
     }
 
@@ -42,8 +65,27 @@ internal class AuthService : IAuthService
             ?? throw new UserWithGivenEmailNotFoundException($"User with email '{loginData.Email}' not found.");
         if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
         {
+            _logger.LogInformation("User login success {UserId} {Email}", user.Id, user.Email);
+            await _auditService.LogAsync(new Models.AuditLog
+            {
+                EventType = "Login",
+                Resource = "User",
+                Action = "Login",
+                Outcome = "Success",
+                UserId = user.Id,
+                Details = $"User {user.Email} logged in"
+            });
             return new UserDTO(user);
         }
+        _logger.LogWarning("User login failed (invalid password) {Email}", loginData.Email);
+        await _auditService.LogAsync(new Models.AuditLog
+        {
+            EventType = "Login",
+            Resource = "User",
+            Action = "Login",
+            Outcome = "Failure",
+            Details = $"Invalid password for {loginData.Email}"
+        });
         throw new InvalidPasswordException($"Invalid password for '{loginData.Email}'.");
     }
 

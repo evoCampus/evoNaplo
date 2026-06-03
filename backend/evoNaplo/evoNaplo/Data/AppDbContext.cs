@@ -13,6 +13,7 @@ namespace evoNaplo.Data
         public DbSet<ProjectLink> ProjectLinks { get; set; }
         public DbSet<AttendanceSheet> AttendanceSheets { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
         
     }
 }
