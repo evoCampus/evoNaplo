@@ -38,6 +38,7 @@ public class AuthController : ControllerBase
         }
         catch (UserWithEmailAlreadyExistsException ex)
         {
+<<<<<<< HEAD
             _logger.LogWarning("Register endpoint attempt with existing email {Email}", registerData.Email);
             await _auditService.LogAsync(new Models.AuditLog
             {
@@ -48,6 +49,9 @@ public class AuthController : ControllerBase
                 Details = ex.Message
             });
             return BadRequest(ex.Message);
+=======
+            return Conflict(ex.Message);
+>>>>>>> 7fe1fed04d153b6bb2603304ea39675ccb75c037
         }
         
     }
