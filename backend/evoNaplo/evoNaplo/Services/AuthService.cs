@@ -26,7 +26,7 @@ internal class AuthService : IAuthService
         if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
         {
             _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
-            await _auditService.LogAsync(new Models.AuditLog
+            await _auditService.LogAsync(new AuditLog
             {
                 EventType = "RegisterAttempt",
                 Resource = "User",
@@ -47,7 +47,7 @@ internal class AuthService : IAuthService
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
         _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
-        await _auditService.LogAsync(new Models.AuditLog
+        await _auditService.LogAsync(new AuditLog
         {
             EventType = "Register",
             Resource = "User",
@@ -66,7 +66,7 @@ internal class AuthService : IAuthService
         if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
         {
             _logger.LogInformation("User login success {UserId} {Email}", user.Id, user.Email);
-            await _auditService.LogAsync(new Models.AuditLog
+            await _auditService.LogAsync(new AuditLog
             {
                 EventType = "Login",
                 Resource = "User",
@@ -78,7 +78,7 @@ internal class AuthService : IAuthService
             return new UserDTO(user);
         }
         _logger.LogWarning("User login failed (invalid password) {Email}", loginData.Email);
-        await _auditService.LogAsync(new Models.AuditLog
+        await _auditService.LogAsync(new AuditLog
         {
             EventType = "Login",
             Resource = "User",
