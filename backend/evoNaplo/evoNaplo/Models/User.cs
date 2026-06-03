@@ -1,5 +1,12 @@
 namespace evoNaplo.Models;
 
+public enum UserRole
+{
+    Admin,
+    Mentor,
+
+}
+
 public class User
 {
     public string Id { get; set; } = null!;
