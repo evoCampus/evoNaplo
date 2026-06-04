@@ -14,6 +14,5 @@ public class User
     public string PasswordHash { get; set; } = null!;
     public UserRole Role { get; set; }
     public string? MentorId { get; set; }
-    public Mentor? Mentor { get; set; }
     
 }

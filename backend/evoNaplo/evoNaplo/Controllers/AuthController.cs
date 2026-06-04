@@ -22,21 +22,21 @@ public class AuthController : ControllerBase
         try {
             return Ok(await _authService.RegisterAsync(registerData));
         }
-        catch (MentorWithGivenEmailNotFoundException ex)
+        catch (PasswordMismatchException ex)
         {
-            return NotFound(ex.Message);
-        }
-        catch (UserWithEmailAlreadyExistsException ex)
-        {
-            return Conflict(ex.Message);
+            return BadRequest(ex.Message);
         }
         catch (PasswordTooShortException ex)
         {
             return BadRequest(ex.Message);
         }
-        catch (PasswordMismatchException ex)
+        catch (UserWithEmailAlreadyExistsException ex)
         {
-            return BadRequest(ex.Message);
+            return Conflict(ex.Message);
+        }
+        catch (MentorWithGivenEmailNotFoundException ex)
+        {
+            return NotFound(ex.Message);
         }
     }
 

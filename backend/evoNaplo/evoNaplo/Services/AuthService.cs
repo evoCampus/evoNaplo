@@ -4,6 +4,7 @@ using evoNaplo.DTO;
 using evoNaplo.Exceptions;
 using evoNaplo.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace evoNaplo.Services;
 
@@ -23,31 +24,18 @@ internal class AuthService : IAuthService
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
     {
-        if (!await _context.Mentors.AnyAsync(mentor => mentor.Email == registerData.Email))
+        if (registerData.Password != registerData.ConfirmPassword)
         {
-            _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
+            _logger.LogWarning("Register attempt with password mismatch {Email}", registerData.Email);
             await _auditService.LogAsync(new AuditLog
             {
                 EventType = "RegisterAttempt",
                 Resource = "User",
                 Action = "Register",
                 Outcome = "Failure",
-                Details = $"Mentor with email {registerData.Email} not found"
+                Details = $"Password mismatch for {registerData.Email}"
             });
-            throw new MentorWithGivenEmailNotFoundException("Mentor with given email not found.");
-        }
-        else if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
-        {
-            _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
-            await _auditService.LogAsync(new AuditLog
-            {
-                EventType = "RegisterAttempt",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Failure",
-                Details = $"Email {registerData.Email} already in use"
-            });
-            throw new UserWithEmailAlreadyExistsException("Email already in use.");
+            throw new PasswordMismatchException("Password and confirm password do not match.");
         }
         else if (registerData.Password.Length < 10)
         {
@@ -62,27 +50,52 @@ internal class AuthService : IAuthService
             });
             throw new PasswordTooShortException("Password must be at least 10 characters long.");
         }
-        else if (registerData.Password != registerData.ConfirmPassword)
+        else if (!await _context.Users.AnyAsync())
         {
-            _logger.LogWarning("Register attempt with password mismatch {Email}", registerData.Email);
+            User user = new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = registerData.Email,
+                Role = UserRole.Admin,
+                MentorId = null,
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "Register",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Success",
+                UserId = user.Id,
+                Details = $"First user created: {user.Email}"
+            });
+            return new UserDTO(user);
+        }
+        else if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
+        {
+            _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
             await _auditService.LogAsync(new AuditLog
             {
                 EventType = "RegisterAttempt",
                 Resource = "User",
                 Action = "Register",
                 Outcome = "Failure",
-                Details = $"Password mismatch for {registerData.Email}"
+                Details = $"Email {registerData.Email} already in use"
             });
-            throw new PasswordMismatchException("Password and confirm password do not match.");
+            throw new UserWithEmailAlreadyExistsException("Email already in use.");
         }
-        else
+        var mentor = await _context.Mentors.FirstOrDefaultAsync(m => m.Email == registerData.Email);
+        if (mentor != null)
         {
             User user = new User
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = registerData.Email,
                 Role = UserRole.Mentor,
-
+                MentorId = mentor.Id,
             };
             user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
             await _context.Users.AddAsync(user);
@@ -99,11 +112,24 @@ internal class AuthService : IAuthService
             });
             return new UserDTO(user);
         }
+        else
+        {
+            _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "RegisterAttempt",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Failure",
+                Details = $"Mentor with email {registerData.Email} not found"
+            });
+            throw new MentorWithGivenEmailNotFoundException("Mentor with given email not found.");
+        }
     }
 
     public async Task<UserDTO> LoginAsync(LoginDTO loginData)
     {
-        User user = await _context.Users.FirstOrDefaultAsync(user => user.Email == loginData.Email) 
+        User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginData.Email) 
             ?? throw new UserWithGivenEmailNotFoundException($"User with email '{loginData.Email}' not found.");
         if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
         {
