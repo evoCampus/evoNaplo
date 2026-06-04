@@ -23,7 +23,20 @@ internal class AuthService : IAuthService
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
     {
-        if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
+        if (!await _context.Mentors.AnyAsync(mentor => mentor.Email == registerData.Email))
+        {
+            _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "RegisterAttempt",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Failure",
+                Details = $"Mentor with email {registerData.Email} not found"
+            });
+            throw new MentorWithGivenEmailNotFoundException("Mentor with given email not found.");
+        }
+        else if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
         {
             _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
             await _auditService.LogAsync(new AuditLog
@@ -36,27 +49,56 @@ internal class AuthService : IAuthService
             });
             throw new UserWithEmailAlreadyExistsException("Email already in use.");
         }
-        User user = new User
+        else if (registerData.Password.Length < 10)
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = registerData.Name,
-            Email = registerData.Email,
-            Role = UserRole.Mentor,
-        };
-        user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
-        await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-        _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
-        await _auditService.LogAsync(new AuditLog
+            _logger.LogWarning("Register attempt with too short password {Email}", registerData.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "RegisterAttempt",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Failure",
+                Details = $"Password too short for {registerData.Email}"
+            });
+            throw new PasswordTooShortException("Password must be at least 10 characters long.");
+        }
+        else if (registerData.Password != registerData.ConfirmPassword)
         {
-            EventType = "Register",
-            Resource = "User",
-            Action = "Register",
-            Outcome = "Success",
-            UserId = user.Id,
-            Details = $"User {user.Email} created"
-        });
-        return new UserDTO(user);
+            _logger.LogWarning("Register attempt with password mismatch {Email}", registerData.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "RegisterAttempt",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Failure",
+                Details = $"Password mismatch for {registerData.Email}"
+            });
+            throw new PasswordMismatchException("Password and confirm password do not match.");
+        }
+        else
+        {
+            User user = new User
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = registerData.Email,
+                Role = UserRole.Mentor,
+
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "Register",
+                Resource = "User",
+                Action = "Register",
+                Outcome = "Success",
+                UserId = user.Id,
+                Details = $"User {user.Email} created"
+            });
+            return new UserDTO(user);
+        }
     }
 
     public async Task<UserDTO> LoginAsync(LoginDTO loginData)

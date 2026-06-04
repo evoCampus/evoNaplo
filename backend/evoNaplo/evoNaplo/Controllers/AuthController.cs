@@ -10,14 +10,10 @@ namespace evoNaplo.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    private readonly ILogger<AuthController> _logger;
-    private readonly IAuditService _auditService;
 
-    public AuthController(IAuthService authService, ILogger<AuthController> logger, IAuditService auditService)
+    public AuthController(IAuthService authService)
     {
         _authService = authService;
-        _logger = logger;
-        _auditService = auditService;
     }
 
     [HttpPost("register")]
@@ -26,11 +22,22 @@ public class AuthController : ControllerBase
         try {
             return Ok(await _authService.RegisterAsync(registerData));
         }
+        catch (MentorWithGivenEmailNotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
         catch (UserWithEmailAlreadyExistsException ex)
         {
             return Conflict(ex.Message);
         }
-        
+        catch (PasswordTooShortException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (PasswordMismatchException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPost("login")]
