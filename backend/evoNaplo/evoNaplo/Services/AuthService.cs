@@ -24,33 +24,7 @@ internal class AuthService : IAuthService
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
     {
-        if (registerData.Password != registerData.ConfirmPassword)
-        {
-            _logger.LogWarning("Register attempt with password mismatch {Email}", registerData.Email);
-            await _auditService.LogAsync(new AuditLog
-            {
-                EventType = "RegisterAttempt",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Failure",
-                Details = $"Password mismatch for {registerData.Email}"
-            });
-            throw new PasswordMismatchException("Password and confirm password do not match.");
-        }
-        else if (registerData.Password.Length < 10)
-        {
-            _logger.LogWarning("Register attempt with too short password {Email}", registerData.Email);
-            await _auditService.LogAsync(new AuditLog
-            {
-                EventType = "RegisterAttempt",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Failure",
-                Details = $"Password too short for {registerData.Email}"
-            });
-            throw new PasswordTooShortException("Password must be at least 10 characters long.");
-        }
-        else if (!await _context.Users.AnyAsync())
+        if (!await _context.Users.AnyAsync())
         {
             User user = new User
             {

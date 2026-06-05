@@ -4,7 +4,6 @@ public enum UserRole
 {
     Admin,
     Mentor,
-
 }
 
 public class User
@@ -14,5 +13,4 @@ public class User
     public string PasswordHash { get; set; } = null!;
     public UserRole Role { get; set; }
     public string? MentorId { get; set; }
-    
 }

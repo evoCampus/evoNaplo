@@ -22,14 +22,6 @@ public class AuthController : ControllerBase
         try {
             return Ok(await _authService.RegisterAsync(registerData));
         }
-        catch (PasswordMismatchException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (PasswordTooShortException ex)
-        {
-            return BadRequest(ex.Message);
-        }
         catch (UserWithEmailAlreadyExistsException ex)
         {
             return Conflict(ex.Message);
@@ -47,7 +39,11 @@ public class AuthController : ControllerBase
         {
             return Ok(await _authService.LoginAsync(loginData));
         }
-        catch (Exception ex) when (ex is UserWithGivenEmailNotFoundException or InvalidPasswordException)
+        catch (UserWithGivenEmailNotFoundException)
+        {
+            return Unauthorized("Invalid credentials");
+        }
+        catch (InvalidPasswordException)
         {
             return Unauthorized("Invalid credentials");
         }
