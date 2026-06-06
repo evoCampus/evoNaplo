@@ -5,7 +5,7 @@ namespace evoNaplo.Services;
 
 public interface IStudentService
 {
-    Student? GetStudentModelById(string id);
+    Task<Student> GetStudentModelById(string id);
     Task<IEnumerable<StudentDTO>> GetAllStudentsAsync();
     Task<StudentDTO> GetStudentByIdAsync(string id);
     Task<StudentDTO> AddStudentAsync(StudentDTO studentToAdd);

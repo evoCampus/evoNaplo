@@ -15,6 +15,9 @@ public class MentorDTO
     public required int SemesterNumber { get; set; }
     public required bool IsActive { get; set; }
 
+    public MentorDTO() {
+    }
+
     [SetsRequiredMembers]
     public MentorDTO(Mentor mentor)
     {

@@ -1,6 +1,7 @@
+using evoNaplo.DAL.Interfaces;
 using evoNaplo.DTO;
-using evoNaplo.Models;
 using evoNaplo.Exceptions;
+using evoNaplo.Models;
 
 namespace evoNaplo.Services;
 
@@ -9,11 +10,12 @@ namespace evoNaplo.Services;
 /// </summary>
 internal class ProjectService : IProjectService
 {
-    private static readonly List<Project> _projects = new List<Project>();
+    private readonly IProjectRepository _projectRepository;
     private readonly ITeamService _teamService;
 
-    public ProjectService(ITeamService teamService)
+    public ProjectService(ITeamService teamService, IProjectRepository projectRepository)
     {
+        _projectRepository = projectRepository;
         _teamService = teamService;
     }
 
@@ -23,9 +25,9 @@ internal class ProjectService : IProjectService
     /// <param name="id">The ID of the project to retrieve.</param>
     /// <returns>The Project model if found.</returns>
     /// <exception cref="ProjectNotFoundException"></exception>
-    public Project GetProjectModelById(string id)
+    public async Task<Project> GetProjectModelById(string id)
     {
-        var project = _projects.FirstOrDefault(p => p.Id == id);
+        var project = await _projectRepository.GetProjectByIdAsync(id);
         if (project is null)
         {
             throw new ProjectNotFoundException($"Project with ID {id} not found.");
@@ -39,8 +41,8 @@ internal class ProjectService : IProjectService
     /// <returns>An IEnumerable collection of ProjectDTOs representing all projects.</returns>
     public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
     {
-        IEnumerable<ProjectDTO> projects = _projects.Select(p => new ProjectDTO(p));
-        return projects;
+        var projects = await _projectRepository.GetAllProjectsAsync();
+        return projects.Select(p => new ProjectDTO(p));
     }
 
     /// <summary>
@@ -51,7 +53,7 @@ internal class ProjectService : IProjectService
     /// <exception cref="ProjectNotFoundException"></exception>
     public async Task<ProjectDTO> GetProjectByIdAsync(string id)
     {
-        Project? project = _projects.FirstOrDefault(p => p.Id == id);
+        var project = await _projectRepository.GetProjectByIdAsync(id);
         if (project is not null) 
         {
             return new ProjectDTO(project);
@@ -62,52 +64,75 @@ internal class ProjectService : IProjectService
     /// <summary>
     /// Adds a new project to the list of projects. The method takes a ProjectDTO as input, generates a new unique ID for the project, and creates a new Project model based on the provided DTO. The new project is then added to the list of projects, and the original ProjectDTO (with the newly assigned ID) is returned. This allows for the creation of new project entries in the application while ensuring that each project has a unique identifier.
     /// </summary>
-    /// <param name="projectToAdd">The ProjectDTO to add.</param>
+    /// <param name="projectToAddDTO">The ProjectDTO to add.</param>
     /// <returns>The added ProjectDTO if successful.</returns>
-    public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd)
+    public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAddDTO)
     {
-        projectToAdd.Id = Guid.NewGuid().ToString();
-        _projects.Add(new Project
+        // id will be generated on other branch
+        var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Guid.NewGuid().ToString() : projectToAddDTO.Id;
+        var newProject = new Project
         {
-            Id = projectToAdd.Id,
-            Name = projectToAdd.Name,
-            ShortDescription = projectToAdd.Description,
-            ProjectLinks = projectToAdd.ProjectLinks.Select(l => new ProjectLink
+            Id = newId,
+            Name = projectToAddDTO.Name,
+            ShortDescription = projectToAddDTO.Description,
+            ProjectLinks = projectToAddDTO.ProjectLinks is not null ? projectToAddDTO.ProjectLinks
+            .Select(l => new ProjectLink
             {
                 Id = Guid.NewGuid().ToString(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
-                ProjectId = projectToAdd.Id
-            }).ToList(),
-            Teams = projectToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
-        });
-        return projectToAdd;
+                ProjectId = newId
+            })
+            .ToList()
+            : new List<ProjectLink>(),
+
+            Teams = projectToAddDTO.TeamIds is not null
+            ? projectToAddDTO.TeamIds
+            .Select(_teamService.GetTeamModelById)
+            .OfType<Team>()
+            .ToList()
+            : new List<Team>(),
+        };
+
+        await _projectRepository.AddProjectAsync(newProject);
+
+        projectToAddDTO.Id = newProject.Id;
+        return projectToAddDTO;
     }
 
     /// <summary>
     /// Updates an existing project with the specified ID using the provided ProjectDTO. The method first checks if a project with the given ID exists in the list of projects. If a project is found, its properties are updated with the values from the provided ProjectDTO, and the updated ProjectDTO is returned. If no project is found with the specified ID, a ProjectNotFoundException is thrown with an appropriate message. This allows for modifying existing project entries in the application while ensuring that only valid projects can be updated.
     /// </summary>
     /// <param name="id">The ID of the project to update.</param>
-    /// <param name="updatedProject">The updated project DTO.</param>
+    /// <param name="updatedProjectDTO">The updated project DTO.</param>
     /// <returns>The updated ProjectDTO if successful.</returns>
     /// <exception cref="ProjectNotFoundException"></exception>
-    public async Task<ProjectDTO> UpdateProjectAsync(string id, ProjectDTO updatedProject)
+    public async Task<ProjectDTO> UpdateProjectAsync(string id, ProjectDTO updatedProjectDTO)
     {
-        var existing = _projects.FirstOrDefault(p => p.Id == id);
-        if (existing is not null) 
+        var existingProject = await _projectRepository.GetProjectByIdAsync(id);
+        if (existingProject is not null) 
         {
-            existing.Id = updatedProject.Id;
-            existing.Name = updatedProject.Name;
-            existing.ShortDescription = updatedProject.Description;
-            existing.ProjectLinks = updatedProject.ProjectLinks.Select(l => new ProjectLink
+            existingProject.Name = updatedProjectDTO.Name;
+            existingProject.ShortDescription = updatedProjectDTO.Description;
+
+            existingProject.ProjectLinks = updatedProjectDTO.ProjectLinks is not null ? updatedProjectDTO.ProjectLinks
+                .Select(l => new ProjectLink
             {
                 Id = Guid.NewGuid().ToString(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
-                ProjectId = updatedProject.Id
-            }).ToList();
-            existing.Teams = updatedProject.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
-            return updatedProject;
+                ProjectId = existingProject.Id
+            }).ToList() : new List<ProjectLink>();
+
+            existingProject.Teams = updatedProjectDTO.TeamIds is not null ?  updatedProjectDTO.TeamIds
+                .Select(_teamService.GetTeamModelById)
+                .OfType<Team>()
+                .ToList()
+                :new List<Team>();
+
+            await _projectRepository.UpdateProjectAsync(existingProject);
+            updatedProjectDTO.Id = existingProject.Id;
+            return updatedProjectDTO;
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");
     }
@@ -120,10 +145,10 @@ internal class ProjectService : IProjectService
     /// <exception cref="ProjectNotFoundException"></exception>
     public async Task<bool> DeleteProjectAsync(string id)
     {
-        var existing = _projects.FirstOrDefault(p => p.Id == id);
+        var existing = await _projectRepository.GetProjectByIdAsync(id);
         if (existing is not null) 
         {
-            _projects.Remove(existing);
+            await _projectRepository.DeleteProjectAsync(id);
             return true;
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");

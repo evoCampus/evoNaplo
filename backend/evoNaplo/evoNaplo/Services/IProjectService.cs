@@ -5,7 +5,7 @@ namespace evoNaplo.Services;
 
 public interface IProjectService
 {
-    Project? GetProjectModelById(string id);
+    Task<Project> GetProjectModelById(string id);
     Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync();
     Task<ProjectDTO> GetProjectByIdAsync(string id);
     Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAdd);

@@ -1,3 +1,5 @@
+using evoNaplo.DAL.Interfaces;
+using evoNaplo.DAL.Repositories;
 using evoNaplo.Data;
 using evoNaplo.Services;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,10 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IExcelExportService, ExcelExportService>();
         services.AddScoped<ICsvImportService, CsvImportService>();
         services.AddScoped<ICsvExportService, CsvExportService>();
+        services.AddScoped<ITeamRepository, TeamRepository>();
+        services.AddScoped<IMentorRepository, MentorRepository>();
+        services.AddScoped<IStudentRepository, StudentRepository>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
 
         return services;
     }
