@@ -4,6 +4,15 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DayOfWeek.md
+docs/MentorDTO.md
+docs/MentorsApi.md
+docs/ProjectDTO.md
+docs/ProjectsApi.md
+docs/StudentDTO.md
+docs/StudentsApi.md
+docs/TeamDTO.md
+docs/TeamsApi.md
 docs/WeatherForecast.md
 docs/WeatherForecastApi.md
 git_push.sh
