@@ -60,6 +60,20 @@ export default function ProjectsPage() {
     return Promise.resolve(filtered);
   }, [allProjects, filters, initialPromise]);
 
+  const filteredProjectCount = useMemo(() => {
+    if (allProjects === null) return undefined;
+    return allProjects.filter((p) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = p[key as keyof ProjectDTO];
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    }).length;
+  }, [allProjects, filters]);
+
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as ProjectDTO | undefined;
 
@@ -154,6 +168,7 @@ export default function ProjectsPage() {
             fields={projectFilterFields}
             currentFilters={filters}
             onFilterChange={setFilters}
+            resultCount={filteredProjectCount}
           />
           <Button
             onClick={handleAdd}

@@ -28,11 +28,18 @@ export function SearchableCheckboxList({
   onToggle,
   emptyMessage,
 }: SearchableCheckboxListProps) {
-  const filteredItems = items.filter(
-    (item) =>
-      item.primaryText?.toLowerCase().includes(searchValue.toLowerCase()) ||
-      item.secondaryText?.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  const filteredItems = items
+    .filter(
+      (item) =>
+        item.primaryText?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        item.secondaryText?.toLowerCase().includes(searchValue.toLowerCase())
+    )
+    .sort((a, b) => {
+      const aChecked = selectedIds.includes(a.id);
+      const bChecked = selectedIds.includes(b.id);
+      if (aChecked !== bChecked) return aChecked ? -1 : 1;
+      return a.primaryText.localeCompare(b.primaryText);
+    });
 
   return (
     <div className="flex flex-col gap-2 pb-4 border-t border-foreground/5 pt-4">

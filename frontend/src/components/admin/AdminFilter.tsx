@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   Popover,
   PopoverContent,
@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@evonaplo/ui-library";
 import { SlidersHorizontal, X, RotateCcw } from "lucide-react";
+import { useDebounce } from "../../hooks/use-debounce";
 
 export type FilterField<T> = {
   key: keyof T;
@@ -25,14 +26,39 @@ interface AdminFilterProps<T> {
   fields: FilterField<T>[];
   onFilterChange: (filters: Partial<Record<keyof T, unknown>>) => void;
   currentFilters: Partial<Record<keyof T, unknown>>;
+  resultCount?: number;
 }
 
 export function AdminFilter<T>({
   fields,
   onFilterChange,
   currentFilters,
+  resultCount,
 }: AdminFilterProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const [textValues, setTextValues] = useState<Partial<Record<keyof T, string>>>({});
+
+  const currentFiltersRef = useRef(currentFilters);
+  useEffect(() => { currentFiltersRef.current = currentFilters; }, [currentFilters]);
+
+  const textFields = useMemo(
+    () => fields.filter((f) => f.type === "text").map((f) => f.key),
+    [fields]
+  );
+  const debouncedTextValues = useDebounce(textValues, 300);
+
+  useEffect(() => {
+    const merged = { ...currentFiltersRef.current };
+    for (const key of textFields) {
+      const val = debouncedTextValues[key];
+      if (val === undefined || val === "") {
+        delete merged[key];
+      } else {
+        merged[key] = val;
+      }
+    }
+    onFilterChange(merged);
+  }, [debouncedTextValues, onFilterChange, textFields]);
 
   const handleValueChange = (key: keyof T, value: unknown) => {
     const newValue = value === "all" ? undefined : value;
@@ -48,6 +74,7 @@ export function AdminFilter<T>({
   };
 
   const clearFilters = () => {
+    setTextValues({});
     onFilterChange({});
   };
 
@@ -102,8 +129,10 @@ export function AdminFilter<T>({
               {field.type === "text" && (
                 <Input
                   placeholder={`Search by ${field.label.toLowerCase()}...`}
-                  value={currentFilters[field.key] || ""}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleValueChange(field.key, e.target.value)}
+                  value={textValues[field.key] ?? ""}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTextValues((prev) => ({ ...prev, [field.key]: e.target.value }))
+                  }
                   className="bg-background border-none rounded-xl h-10 text-sm focus-visible:ring-1 focus-visible:ring-primary shadow-sm"
                 />
               )}
@@ -116,7 +145,8 @@ export function AdminFilter<T>({
                   <Checkbox
                     id={`filter-${String(field.key)}`}
                     checked={currentFilters[field.key] === true}
-                    onCheckedChange={(checked: React.ChangeEvent<HTMLInputElement>) => handleValueChange(field.key, checked.target.checked ? true : undefined)}
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                    onCheckedChange={(checked: boolean) => handleValueChange(field.key, checked ? true : undefined)}
                   />
                   <span className="text-sm text-foreground select-none font-medium">{field.label}</span>
                 </div>
@@ -143,6 +173,12 @@ export function AdminFilter<T>({
             </div>
           ))}
         </div>
+
+        {activeCount > 0 && resultCount === 0 && (
+          <p className="text-center text-sm text-muted-foreground mt-4 pt-4 border-t border-border/40">
+            No results match the current filters.
+          </p>
+        )}
       </PopoverContent>
     </Popover>
   );

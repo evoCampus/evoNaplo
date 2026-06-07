@@ -9,7 +9,7 @@ import {
 } from "@evonaplo/ui-library";
 import { Pencil, Save, X, AlertCircle } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
-import type { ProjectDTO, TeamDTO, StudentDTO, MentorDTO } from "../../api";
+import type { ProjectDTO, TeamDTO } from "../../api";
 import { SearchableCheckboxList } from "./SearchableCheckboxList";
 import { getDayName, formatTime } from "../../lib/date-utils";
 
@@ -40,8 +40,6 @@ export function ProjectDialog({
 
   const [teamSearch, setTeamSearch] = useState("");
   const [teamsList, setTeamsList] = useState<TeamDTO[]>([]);
-  const [studentsList, setStudentsList] = useState<StudentDTO[]>([]);
-  const [mentorsList, setMentorsList] = useState<MentorDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -61,29 +59,26 @@ export function ProjectDialog({
   }
 
   useEffect(() => {
-    if (isOpen) {
-      const fetchData = async () => {
-        setIsLoading(true);
-        try {
-          const [teamsRes, studentsRes, mentorsRes] = await Promise.all([
-            apiClient.teams.apiTeamsGet(),
-            apiClient.students.apiStudentsGet(),
-            apiClient.mentors.apiMentorsGet(),
-          ]);
+    if (!isOpen) return;
 
-          setTeamsList(teamsRes.data);
-          setStudentsList(studentsRes.data);
-          setMentorsList(mentorsRes.data);
-        } catch (error) {
-          console.error("Failed to load project references:", error);
-          setErrorMessage("Failed to load options from the system.");
-        } finally {
-          setIsLoading(false);
-        }
-      };
+    const controller = new AbortController();
 
-      fetchData();
-    }
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const teamsRes = await apiClient.teams.apiTeamsGet({ signal: controller.signal });
+        setTeamsList(teamsRes.data ?? []);
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === "CanceledError") return;
+        console.error("Failed to load project references:", error);
+        setErrorMessage("Failed to load options from the system.");
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
+    };
+
+    fetchData();
+    return () => controller.abort();
   }, [isOpen, apiClient]);
 
   const handleCancelEdit = () => {
@@ -147,29 +142,16 @@ export function ProjectDialog({
 
   const displayTitle = !isCreating && item ? item.name : "Create Project";
 
-  const mappedTeams = teamsList.map((team) => {
+  const mappedTeams = teamsList.filter((team): team is TeamDTO & { id: string } => team.id != null).map((team) => {
     const day = getDayName(team.weeklyMeetingDay);
     const time = formatTime(team.weeklyMeetingTime);
-    const studentNames = team.students
-      ?.map((id) => studentsList.find((s) => s.id === id)?.name || "")
-      .filter(Boolean)
-      .join(", ");
-    const mentorNames = team.mentors
-      ?.map((id) => mentorsList.find((m) => m.id === id)?.name || "")
-      .filter(Boolean)
-      .join(", ");
-
-    const secondaryDetails = [
-      studentNames ? `Students: ${studentNames}` : null,
-      mentorNames ? `Mentors: ${mentorNames}` : null,
-    ]
-      .filter(Boolean)
-      .join(" • ");
+    const studentCount = team.students?.length ?? 0;
+    const mentorCount = team.mentors?.length ?? 0;
 
     return {
-      id: team.id!,
+      id: team.id,
       primaryText: `Team - ${day} at ${time}`,
-      secondaryText: secondaryDetails || undefined,
+      secondaryText: `${studentCount} student${studentCount !== 1 ? "s" : ""} • ${mentorCount} mentor${mentorCount !== 1 ? "s" : ""}`,
     };
   });
 

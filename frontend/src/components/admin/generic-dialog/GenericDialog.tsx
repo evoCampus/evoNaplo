@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
     Dialog,
     DialogContent,
@@ -10,6 +10,7 @@ import {
 import { Pencil, Save, X, AlertCircle } from "lucide-react";
 import { FormField } from "./FormField";
 import { FormCheckbox } from "./FormCheckbox";
+import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 
 export interface FieldConfig<T> {
     key: keyof T;
@@ -43,7 +44,9 @@ export function GenericDialog<T extends object>({
         item ? { ...item } : {},
     );
     const [isSaving, setIsSaving] = useState<boolean>(false);
+    const isSavingRef = useRef(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
     const [prevIsOpen, setPrevIsOpen] = useState<boolean>(isOpen);
     const [prevItem, setPrevItem] = useState(item);
@@ -63,6 +66,8 @@ export function GenericDialog<T extends object>({
     };
 
     const handleSave = async () => {
+        if (isSavingRef.current) return;
+        isSavingRef.current = true;
         setIsSaving(true);
         setErrorMessage(null);
 
@@ -95,11 +100,23 @@ export function GenericDialog<T extends object>({
                 "An error occurred while saving. Please try again later.",
             );
         } finally {
+            isSavingRef.current = false;
             setIsSaving(false);
         }
     };
 
+    const hasUnsavedChanges = JSON.stringify(formData) !== JSON.stringify(item ?? {});
+
     const handleCancelEdit = () => {
+        if (hasUnsavedChanges) {
+            setShowCancelConfirm(true);
+        } else {
+            confirmCancel();
+        }
+    };
+
+    const confirmCancel = () => {
+        setShowCancelConfirm(false);
         setErrorMessage(null);
         if (isCreating) {
             onClose();
@@ -113,6 +130,17 @@ export function GenericDialog<T extends object>({
         !isCreating && item && "name" in item ? String(item.name) : title;
 
     return (
+        <>
+        <GenericConfirmDialog
+            isOpen={showCancelConfirm}
+            onClose={() => setShowCancelConfirm(false)}
+            onConfirm={confirmCancel}
+            title="Discard changes?"
+            description="You have unsaved changes. Are you sure you want to cancel?"
+            confirmText="Discard"
+            cancelText="Keep editing"
+            variant="destructive"
+        />
         <Dialog
             open={isOpen}
             onOpenChange={(open: boolean) => !open && onClose()}
@@ -229,5 +257,6 @@ export function GenericDialog<T extends object>({
                 </div>
             </DialogContent>
         </Dialog>
+        </>
     );
 }

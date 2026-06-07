@@ -8,7 +8,7 @@ const DEFAULT_PAGE_SIZE = 10;
 interface GenericEntityListProps<T extends { id?: string | null }> {
   dataPromise: Promise<T[]>;
   onEdit: (item: T) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => Promise<void> | void;
   renderContent: (item: T) => ReactNode;
   emptyMessage?: string;
   pageSize?: number;
@@ -87,10 +87,14 @@ export function GenericEntityList<T extends { id?: string | null }>({
           <Button
             variant="ghost"
             size="icon"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.stopPropagation();
               if (!item.id) return;
-              onDelete(item.id);
+              try {
+                await onDelete(item.id);
+              } catch (err) {
+                console.error("Delete failed:", err);
+              }
             }}
             className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 ml-4 shrink-0 rounded-full cursor-pointer"
           >

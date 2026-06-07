@@ -1,5 +1,5 @@
 import { Checkbox } from "@evonaplo/ui-library";
-import type { FieldConfig } from "./index";
+import type { FieldConfig } from "./GenericDialog";
 
 interface FormCheckboxProps<T> {
   field: FieldConfig<T>;

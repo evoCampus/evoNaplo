@@ -40,10 +40,10 @@ export default function DashboardQuickActions({ filteredActions }: DashboardQuic
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-foreground/90 group-hover:text-primary transition-colors">
+                  <h3 className="text-lg font-semibold text-foreground/90 group-hover:text-primary transition-colors truncate" title={action.title}>
                     {action.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-normal line-clamp-2">
+                  <p className="text-sm text-muted-foreground leading-normal line-clamp-2" title={action.description}>
                     {action.description}
                   </p>
                 </div>

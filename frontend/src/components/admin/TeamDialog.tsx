@@ -146,8 +146,9 @@ export function TeamDialog({
       return;
     }
 
-    if (!weeklyMeetingTime.trim()) {
-      setErrorMessage("Meeting time is required.");
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+    if (!weeklyMeetingTime.trim() || !timeRegex.test(weeklyMeetingTime)) {
+      setErrorMessage("Meeting time must be a valid time in HH:MM format (e.g. 14:30).");
       setIsSaving(false);
       return;
     }
@@ -229,7 +230,7 @@ export function TeamDialog({
                       value={String(weeklyMeetingDay)}
                       onValueChange={(val: string) => setWeeklyMeetingDay(Number(val) as DayOfWeek)}
                     >
-                      <SelectTrigger className="flex-1 border-none bg-transparent hover:bg-foreground/5 h-9 min-w-0 raw-tailwind-here text-sm text-foreground shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none w-full pl-3 pr-2 rounded-lg">
+                      <SelectTrigger className="flex-1 border-none bg-transparent hover:bg-foreground/5 h-9 min-w-0 text-sm text-foreground shadow-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none w-full pl-3 pr-2 rounded-lg">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

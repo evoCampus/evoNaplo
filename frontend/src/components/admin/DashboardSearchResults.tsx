@@ -1,7 +1,8 @@
-import { Users, UserSquare2, Users2, FolderRoot, ArrowRight, Loader2 } from "lucide-react";
+import { Users, UserSquare2, Users2, FolderRoot, Loader2 } from "lucide-react";
 import { Button } from "@evonaplo/ui-library";
 import type { StudentDTO, MentorDTO, TeamDTO, ProjectDTO } from "../../api";
 import { getDayName, formatTime } from "../../lib/date-utils";
+import { SearchResultGroup } from "./SearchResultGroup";
 
 function getTeamName(team: TeamDTO) {
   const dayStr = getDayName(team.weeklyMeetingDay);
@@ -59,111 +60,38 @@ export default function DashboardSearchResults({
         </div>
       ) : totalResults > 0 ? (
         <div className="space-y-6">
-          {/* Students Group */}
-          {filteredStudents.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <Users className="h-4 w-4" /> Students ({filteredStudents.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredStudents.map((student) => (
-                  <div
-                    key={student.id}
-                    onClick={() => onSelectStudent(student)}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-transparent hover:border-border/50 hover:shadow-sm transition-all cursor-pointer group"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium text-foreground/90 group-hover:text-primary transition-colors">
-                        {student.name || "Unknown"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{student.email}</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Mentors Group */}
-          {filteredMentors.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <UserSquare2 className="h-4 w-4" /> Mentors ({filteredMentors.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredMentors.map((mentor) => (
-                  <div
-                    key={mentor.id}
-                    onClick={() => onSelectMentor(mentor)}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-transparent hover:border-border/50 hover:shadow-sm transition-all cursor-pointer group"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium text-foreground/90 group-hover:text-primary transition-colors">
-                        {mentor.name || "Unknown"}
-                      </span>
-                      <span className="text-xs text-muted-foreground">{mentor.email}</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Teams Group */}
-          {filteredTeams.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <Users2 className="h-4 w-4" /> Teams ({filteredTeams.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredTeams.map((team) => (
-                  <div
-                    key={team.id}
-                    onClick={() => onSelectTeam(team)}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-transparent hover:border-border/50 hover:shadow-sm transition-all cursor-pointer group"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium text-foreground/90 group-hover:text-primary transition-colors">
-                        {getTeamName(team)}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {team.students?.length || 0} students • {team.mentors?.length || 0} mentors
-                      </span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Projects Group */}
-          {filteredProjects.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-muted-foreground flex items-center gap-2 px-1">
-                <FolderRoot className="h-4 w-4" /> Projects ({filteredProjects.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {filteredProjects.map((project) => (
-                  <div
-                    key={project.id}
-                    onClick={() => onSelectProject(project)}
-                    className="flex items-center justify-between p-4 bg-card rounded-xl border border-transparent hover:border-border/50 hover:shadow-sm transition-all cursor-pointer group"
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-medium text-foreground/90 group-hover:text-primary transition-colors">
-                        {project.name || "Unknown"}
-                      </span>
-                      <span className="text-xs text-muted-foreground line-clamp-1">{project.description}</span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          <SearchResultGroup
+            icon={Users}
+            label="Students"
+            items={filteredStudents}
+            onSelect={onSelectStudent}
+            primaryText={(s) => s.name || "Unknown"}
+            secondaryText={(s) => s.email ?? ""}
+          />
+          <SearchResultGroup
+            icon={UserSquare2}
+            label="Mentors"
+            items={filteredMentors}
+            onSelect={onSelectMentor}
+            primaryText={(m) => m.name || "Unknown"}
+            secondaryText={(m) => m.email ?? ""}
+          />
+          <SearchResultGroup
+            icon={Users2}
+            label="Teams"
+            items={filteredTeams}
+            onSelect={onSelectTeam}
+            primaryText={(t) => getTeamName(t)}
+            secondaryText={(t) => `${t.students?.length || 0} students • ${t.mentors?.length || 0} mentors`}
+          />
+          <SearchResultGroup
+            icon={FolderRoot}
+            label="Projects"
+            items={filteredProjects}
+            onSelect={onSelectProject}
+            primaryText={(p) => p.name || "Unknown"}
+            secondaryText={(p) => p.description ?? ""}
+          />
         </div>
       ) : (
         <div className="text-center p-12 bg-card rounded-2xl border border-dashed border-border/60 text-muted-foreground">

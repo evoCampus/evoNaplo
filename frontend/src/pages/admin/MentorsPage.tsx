@@ -4,7 +4,7 @@ import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { MentorDTO } from "../../api";
-import { GenericDialog, type FieldConfig } from "src/components/admin/GenericDialog";
+import { GenericDialog, type FieldConfig } from "src/components/admin/generic-dialog/GenericDialog";
 import MentorsList from "../../components/admin/MentorsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 import ErrorBoundary from "../../components/ErrorBoundary";
@@ -73,6 +73,20 @@ export default function MentorsPage() {
     });
     return Promise.resolve(filtered);
   }, [allMentors, filters, initialPromise]);
+
+  const filteredMentorCount = useMemo(() => {
+    if (allMentors === null) return undefined;
+    return allMentors.filter((m) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = m[key as keyof MentorDTO];
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    }).length;
+  }, [allMentors, filters]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as MentorDTO | undefined;
@@ -168,6 +182,7 @@ export default function MentorsPage() {
             fields={mentorFilterFields}
             currentFilters={filters}
             onFilterChange={setFilters}
+            resultCount={filteredMentorCount}
           />
           <Button
             onClick={handleAdd}

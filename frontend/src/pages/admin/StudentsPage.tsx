@@ -4,7 +4,7 @@ import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { StudentDTO } from "../../api";
-import { GenericDialog, type FieldConfig } from "src/components/admin/GenericDialog";
+import { GenericDialog, type FieldConfig } from "src/components/admin/generic-dialog/GenericDialog";
 import StudentsList from "../../components/admin/StudentsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
 import ErrorBoundary from "../../components/ErrorBoundary";
@@ -90,6 +90,20 @@ export default function StudentsPage() {
     });
     return Promise.resolve(filtered);
   }, [allStudents, filters, initialPromise]);
+
+  const filteredStudentCount = useMemo(() => {
+    if (allStudents === null) return undefined;
+    return allStudents.filter((s) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = s[key as keyof StudentDTO];
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    }).length;
+  }, [allStudents, filters]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as StudentDTO | undefined;
@@ -185,6 +199,7 @@ export default function StudentsPage() {
             fields={studentFilterFields}
             currentFilters={filters}
             onFilterChange={setFilters}
+            resultCount={filteredStudentCount}
           />
           <Button
             onClick={handleAdd}

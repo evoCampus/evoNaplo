@@ -58,8 +58,7 @@ export default function TeamsPage() {
       return Object.entries(filters).every(([key, value]) => {
         if (value === undefined || value === null || value === "") return true;
         const itemValue = t[key as keyof TeamDTO];
-        
-        // Handle numeric fields (like weeklyMeetingDay)
+
         if (typeof itemValue === "number") {
           return itemValue === Number(value);
         }
@@ -72,6 +71,25 @@ export default function TeamsPage() {
     });
     return Promise.resolve(filtered);
   }, [allTeams, filters, initialPromise]);
+
+  const filteredTeamCount = useMemo(() => {
+    if (allTeams === null) return undefined;
+    return allTeams.filter((t) => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (value === undefined || value === null || value === "") return true;
+        const itemValue = t[key as keyof TeamDTO];
+
+        if (typeof itemValue === "number") {
+          return itemValue === Number(value);
+        }
+
+        if (typeof value === "string") {
+          return itemValue?.toString().toLowerCase().includes(value.toLowerCase());
+        }
+        return itemValue === value;
+      });
+    }).length;
+  }, [allTeams, filters]);
 
   const shouldOpenAdd = location.state?.openAdd === true;
   const editItem = location.state?.editItem as TeamDTO | undefined;
@@ -196,6 +214,7 @@ export default function TeamsPage() {
             fields={teamFilterFields}
             currentFilters={filters}
             onFilterChange={setFilters}
+            resultCount={filteredTeamCount}
           />
           <Button
             onClick={handleAdd}

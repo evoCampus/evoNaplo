@@ -17,8 +17,8 @@ export default function MentorsList({
       onDelete={onDelete}
       renderContent={(mentor) => (
         <div className="flex flex-col gap-1">
-          <span className="text-lg font-medium text-foreground/90">{mentor.name || "Unknown"}</span>
-          <span className="text-sm text-muted-foreground">{mentor.email}</span>
+          <span className="text-lg font-medium text-foreground/90">{mentor.name ?? "Unknown"}</span>
+          <span className="text-sm text-muted-foreground">{mentor.email ?? "No email"}</span>
         </div>
       )}
       emptyMessage="No mentors found."
