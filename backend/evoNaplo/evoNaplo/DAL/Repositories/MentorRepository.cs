@@ -1,4 +1,5 @@
-﻿using evoNaplo.DAL.Interfaces;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using evoNaplo.DAL.Interfaces;
 using evoNaplo.Data;
 using evoNaplo.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,18 @@ namespace evoNaplo.DAL.Repositories
         }
         public async Task<IEnumerable<Mentor>> GetAllMentorsAsync()
         {
-            return await _context.Mentors.ToListAsync();
+            return await _context.Mentors
+                .Include(m => m.Teams)
+               .Include(m => m.Projects)
+               .AsSplitQuery()
+               .ToListAsync();
         }
         public async Task<Mentor?> GetMentorByIdAsync(string id)
         {
             return await _context.Mentors
                .Include(m => m.Teams)
                .Include(m => m.Projects)
+               .AsSplitQuery()
                .FirstOrDefaultAsync(m => m.Id == id);
         }
 

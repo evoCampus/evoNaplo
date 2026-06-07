@@ -16,13 +16,19 @@ namespace evoNaplo.DAL.Repositories
 
         public async Task<IEnumerable<Team>> GetAllTeamsAsync()
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Teams.Include(t => t.Mentors)
+                .Include(t => t.Students)
+                .Include(t => t.Project)
+                .Include(t => t.AttendanceSheets)
+                .AsSplitQuery()
+                .ToListAsync();
         }
         public async Task<Team?> GetTeamByIdAsync(string id) {
             return await _context.Teams
-                .Include(m => m.Mentors)
-                .Include(p => p.Mentors)
-                .Include(a => a.Mentors)
+                .Include(t => t.Students)
+                .Include(t => t.Project)
+                .Include(t => t.AttendanceSheets)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(t => t.Id == id);
         } 
         public async Task AddTeamAsync(Team team)

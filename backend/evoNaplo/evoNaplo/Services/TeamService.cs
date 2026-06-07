@@ -136,6 +136,10 @@ internal class TeamService : ITeamService
 
         if (existingTeam is not null)
         {
+            existingTeam.Mentors ??= new List<Mentor>();
+            existingTeam.Students ??= new List<Student>();
+            existingTeam.AttendanceSheets ??= new List<AttendanceSheet>();
+
             if (updatedTeamDTO.MentorIds is not null)
             {
                 foreach (var mentorId in updatedTeamDTO.MentorIds)

@@ -15,7 +15,9 @@ namespace evoNaplo.DAL.Repositories
         }
         public async Task<IEnumerable<Student>> GetAllStudentsAsync()
         {
-            return await _context.Students.ToListAsync();
+            return await _context.Students
+                .Include(s => s.Team)
+                .ToListAsync();
         }
         public async Task<Student?> GetStudentByIdAsync(string id)
         {

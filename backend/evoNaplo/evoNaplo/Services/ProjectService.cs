@@ -11,12 +11,12 @@ namespace evoNaplo.Services;
 internal class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly ITeamService _teamService;
+    private readonly ITeamRepository _teamRepository;
 
-    public ProjectService(ITeamService teamService, IProjectRepository projectRepository)
+    public ProjectService(ITeamRepository teamRepository, IProjectRepository projectRepository)
     {
         _projectRepository = projectRepository;
-        _teamService = teamService;
+        _teamRepository = teamRepository;
     }
 
     /// <summary>
@@ -70,6 +70,7 @@ internal class ProjectService : IProjectService
     {
         // id will be generated on other branch
         var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Guid.NewGuid().ToString() : projectToAddDTO.Id;
+
         var newProject = new Project
         {
             Id = newId,
@@ -86,13 +87,25 @@ internal class ProjectService : IProjectService
             .ToList()
             : new List<ProjectLink>(),
 
-            Teams = projectToAddDTO.TeamIds is not null
-            ? projectToAddDTO.TeamIds
-            .Select(_teamService.GetTeamModelById)
-            .OfType<Team>()
-            .ToList()
-            : new List<Team>(),
+            Teams = new List<Team>()
         };
+
+
+        if (projectToAddDTO.TeamIds is not null)
+        {
+            foreach (var teamId in projectToAddDTO.TeamIds)
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team is not null)
+                {
+                    team.ProjectId = newProject.Id;
+
+                    await _teamRepository.UpdateTeamAsync(team);
+
+                    newProject.Teams.Add(team);
+                }
+            }
+        }
 
         await _projectRepository.AddProjectAsync(newProject);
 
@@ -124,11 +137,23 @@ internal class ProjectService : IProjectService
                 ProjectId = existingProject.Id
             }).ToList() : new List<ProjectLink>();
 
-            existingProject.Teams = updatedProjectDTO.TeamIds is not null ?  updatedProjectDTO.TeamIds
-                .Select(_teamService.GetTeamModelById)
-                .OfType<Team>()
-                .ToList()
-                :new List<Team>();
+            if (updatedProjectDTO.TeamIds is not null)
+            {
+                foreach (var teamId in updatedProjectDTO.TeamIds)
+                {
+                    if (!existingProject.Teams.Any(t => t.Id == teamId))
+                    {
+                        var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                        if (team is not null)
+                        {
+                            team.ProjectId = existingProject.Id;
+                            await _teamRepository.UpdateTeamAsync(team);
+
+                            existingProject.Teams.Add(team);
+                        }
+                    }
+                }
+            }
 
             await _projectRepository.UpdateProjectAsync(existingProject);
             updatedProjectDTO.Id = existingProject.Id;

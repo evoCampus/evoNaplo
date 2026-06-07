@@ -16,7 +16,11 @@ namespace evoNaplo.DAL.Repositories
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await _context.Projects.ToListAsync();
+            return await _context.Projects
+                .Include(t => t.Teams)
+                .Include(pr => pr.ProjectLinks)
+                .AsSplitQuery()
+                .ToListAsync();
         }
 
         public async Task<Project?> GetProjectByIdAsync(string id)
@@ -24,6 +28,7 @@ namespace evoNaplo.DAL.Repositories
             return await _context.Projects
                 .Include(t => t.Teams)
                 .Include(pr => pr.ProjectLinks)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == id);
         }
 

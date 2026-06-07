@@ -11,14 +11,14 @@ namespace evoNaplo.Services;
 internal class MentorService : IMentorService
 {
     private readonly IMentorRepository _mentorRepository;
-    private readonly ITeamService _teamService;
-    private readonly IProjectService _projectService;
+    private readonly ITeamRepository _teamRepository;
+    private readonly IProjectRepository _projectRepository;
     
-    public MentorService(ITeamService teamService, IProjectService projectService, IMentorRepository mentorRepository)
+    public MentorService(ITeamRepository teamRepository, IProjectRepository projectRepository, IMentorRepository mentorRepository)
     {
         _mentorRepository = mentorRepository;
-        _teamService = teamService;
-        _projectService = projectService;
+        _teamRepository = teamRepository;
+        _projectRepository = projectRepository;
     }
     
     /// <summary>
@@ -73,24 +73,35 @@ internal class MentorService : IMentorService
     {
         // id will be generated on other branch
         var newId = string.IsNullOrWhiteSpace(mentorToAddDTO.Id) ? Guid.NewGuid().ToString() : mentorToAddDTO.Id;
+
         var newMentor = new Mentor
         {
             Id = newId,
             Name = mentorToAddDTO.Name,
             Email = mentorToAddDTO.Email,
             PhoneNumber = mentorToAddDTO.PhoneNumber,
-            Teams = mentorToAddDTO.TeamIds is not null ? mentorToAddDTO.TeamIds
-                .Select(_teamService.GetTeamModelById)
-                .OfType<Team>()
-                .ToList()
-                : new List<Team>(),
-
-            Projects = mentorToAddDTO.ProjectIds is not null ? mentorToAddDTO.ProjectIds
-                .Select(_projectService.GetProjectModelById)
-                .OfType<Project>()
-                .ToList()
-                : new List<Project>()
+            Teams = new List<Team>(),
+            Projects = new List<Project>()
         };
+
+        if (mentorToAddDTO.TeamIds is not null)
+        {
+            foreach (var teamId in mentorToAddDTO.TeamIds)
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team is not null) newMentor.Teams.Add(team);
+            }
+        }
+
+        if (mentorToAddDTO.ProjectIds is not null)
+        {
+            foreach (var projectId in mentorToAddDTO.ProjectIds)
+            {
+                var project = await _projectRepository.GetProjectByIdAsync(projectId);
+                if (project is not null) newMentor.Projects.Add(project);
+            }
+        }
+
         await _mentorRepository.AddMentorAsync(newMentor);
         mentorToAddDTO.Id = newMentor.Id;
         return mentorToAddDTO;
@@ -112,17 +123,29 @@ internal class MentorService : IMentorService
             existingMentor.Email = updatedMentorDTO.Email;
             existingMentor.PhoneNumber = updatedMentorDTO.PhoneNumber;
 
-            existingMentor.Teams = updatedMentorDTO.TeamIds is not null ? updatedMentorDTO.TeamIds
-                .Select(_teamService.GetTeamModelById)
-                .OfType<Team>()
-                .ToList() 
-                : new List<Team>();
+            if (updatedMentorDTO.TeamIds is not null)
+            {
+                foreach (var teamId in updatedMentorDTO.TeamIds)
+                {
+                    if (!existingMentor.Teams.Any(t => t.Id == teamId))
+                    {
+                        var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                        if (team is not null) existingMentor.Teams.Add(team);
+                    }
+                }
+            }
 
-            existingMentor.Projects = updatedMentorDTO.ProjectIds is not null ? updatedMentorDTO.ProjectIds
-                .Select(_projectService.GetProjectModelById)
-                .OfType<Project>()
-                .ToList()
-                : new List<Project>();
+            if (updatedMentorDTO.ProjectIds is not null)
+            {
+                foreach (var projectId in updatedMentorDTO.ProjectIds)
+                {
+                    if (!existingMentor.Projects.Any(p => p.Id == projectId))
+                    {
+                        var project = await _projectRepository.GetProjectByIdAsync(projectId);
+                        if (project is not null) existingMentor.Projects.Add(project);
+                    }
+                }
+            }
 
             await _mentorRepository.UpdateMentorAsync(existingMentor);
             updatedMentorDTO.Id = existingMentor.Id;
