@@ -19,10 +19,9 @@ import {
   CalendarDays,
   Settings,
   LayoutDashboard,
-  Calendar,
-  Loader2
+  Calendar
 } from "lucide-react";
-import { Suspense, useState, useTransition, useMemo } from "react";
+import { useState, useTransition, useMemo } from "react";
 import MentorDynamicProjectsList from "./mentor/MentorDynamicProjectsList";
 import { type UIMentorProject } from "../types";
 import { useApiClient } from "src/hooks/use-api-client";
@@ -126,18 +125,11 @@ export function DashboardSidebar() {
                     </SidebarMenuItem>
                   ))}
 
-                  <Suspense fallback={
-                    <div className="flex items-center gap-2 p-2 px-4 text-sm text-muted-foreground">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Loading projects...</span>
-                    </div>
-                  }>
-                    <MentorDynamicProjectsList
-                      projectsPromise={projectsPromise}
-                      expandedProjects={expandedProjects}
-                      onToggleProject={toggleProject}
-                    />
-                  </Suspense>
+                  <MentorDynamicProjectsList
+                    projectsPromise={projectsPromise}
+                    expandedProjects={expandedProjects}
+                    onToggleProject={toggleProject}
+                  />
 
                   {mentorFooterItems.map((item) => (
                     <SidebarMenuItem key={item.title}>

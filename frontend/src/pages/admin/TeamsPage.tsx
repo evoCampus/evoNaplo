@@ -1,4 +1,4 @@
-import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
@@ -44,7 +44,11 @@ export default function TeamsPage() {
   }, [apiClient]);
 
   useEffect(() => {
-    initialPromise.then((data) => setAllTeams(data));
+    let cancelled = false;
+    initialPromise
+      .then(data => { if (!cancelled) setAllTeams(data); })
+      .catch(err => { if (!cancelled) console.error("Failed to load teams:", err); });
+    return () => { cancelled = true; };
   }, [initialPromise]);
 
   const teamsPromise = useMemo(() => {
@@ -82,9 +86,14 @@ export default function TeamsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const triggerRefresh = async () => {
-    const res = await apiClient.teams.apiTeamsGet();
-    setAllTeams(res.data);
-    return res.data;
+    try {
+      const res = await apiClient.teams.apiTeamsGet();
+      setAllTeams(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to refresh teams:", error);
+      throw error;
+    }
   };
 
   const handleEdit = (team: TeamDTO) => {
@@ -112,7 +121,8 @@ export default function TeamsPage() {
         const res = await apiClient.teams.apiTeamsPost(team);
         savedTeamId = res.data.id;
       } else {
-        await apiClient.teams.apiTeamsIdPut(team.id!, team);
+        if (!team.id) throw new Error("Team ID is missing");
+        await apiClient.teams.apiTeamsIdPut(team.id, team);
       }
 
       if (savedTeamId) {
@@ -121,18 +131,19 @@ export default function TeamsPage() {
 
         await Promise.all(
           allProjects.map(async (project) => {
-            const isSelected = selectedProjectIds.includes(project.id!);
+            if (!project.id) return;
+            const isSelected = selectedProjectIds.includes(project.id);
             const hasTeam = project.teams?.includes(savedTeamId!) ?? false;
 
             if (isSelected && !hasTeam) {
               const updatedTeams = [...(project.teams || []), savedTeamId!];
-              await apiClient.projects.apiProjectsIdPut(project.id!, {
+              await apiClient.projects.apiProjectsIdPut(project.id, {
                 ...project,
                 teams: updatedTeams,
               });
             } else if (!isSelected && hasTeam) {
               const updatedTeams = (project.teams || []).filter((id) => id !== savedTeamId);
-              await apiClient.projects.apiProjectsIdPut(project.id!, {
+              await apiClient.projects.apiProjectsIdPut(project.id, {
                 ...project,
                 teams: updatedTeams,
               });
@@ -143,7 +154,11 @@ export default function TeamsPage() {
 
       setIsDialogOpen(false);
       startTransition(async () => {
-        await triggerRefresh();
+        try {
+          await triggerRefresh();
+        } catch (error) {
+          console.error("Failed to refresh after save:", error);
+        }
       });
     } catch (error) {
       console.error("Unsuccessful save:", error);
@@ -193,24 +208,15 @@ export default function TeamsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm font-medium">Loading teams...</span>
-            </div>
+        <div
+          className={
+            isPending
+              ? "opacity-50 pointer-events-none transition-opacity duration-200"
+              : "transition-opacity duration-200"
           }
         >
-          <div
-            className={
-              isPending
-                ? "opacity-50 pointer-events-none transition-opacity duration-200"
-                : "transition-opacity duration-200"
-            }
-          >
-            <TeamsList teamsPromise={teamsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
-          </div>
-        </Suspense>
+          <TeamsList teamsPromise={teamsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
+        </div>
       </ErrorBoundary>
 
       <TeamDialog

@@ -6,7 +6,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>({
     id: "1",
     name: "Teszt Mentor",
-    role: "mentor",
+    role: "admin",
     email: "mentor@test.com"
   });
 

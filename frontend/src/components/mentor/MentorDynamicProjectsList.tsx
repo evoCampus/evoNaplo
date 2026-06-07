@@ -1,7 +1,7 @@
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router";
-import { use } from "react";
 import { SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubItem, SidebarMenuSubButton } from "@evonaplo/ui-library";
-import { FolderRoot, ChevronDown } from "lucide-react";
+import { FolderRoot, ChevronDown, Loader2 } from "lucide-react";
 import { type UIMentorProject } from "../../types";
 
 export default function MentorDynamicProjectsList({
@@ -14,7 +14,44 @@ export default function MentorDynamicProjectsList({
   onToggleProject: (projectName: string) => void;
 }) {
   const location = useLocation();
-  const projects = use(projectsPromise);
+  const [projects, setProjects] = useState<UIMentorProject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    projectsPromise
+      .then(result => {
+        if (!cancelled) {
+          setError(null);
+          setProjects(result);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          console.error("Failed to load projects:", err);
+          setError("Failed to load projects.");
+          setIsLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [projectsPromise]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 p-2 px-4 text-sm text-muted-foreground">
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span>Loading projects...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="px-4 py-2 text-sm text-destructive">{error}</div>
+    );
+  }
 
   if (projects.length === 0) {
     return <div className="px-4 py-2 text-sm text-muted-foreground">No assigned projects found.</div>;

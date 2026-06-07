@@ -1,6 +1,5 @@
-import { Loader2 } from "lucide-react";
 import { useParams } from "react-router";
-import { useMemo, Suspense, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useApiClient } from "../../hooks/use-api-client";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { type ProjectDetailedData, type TeamWithMembers } from "../../types";
@@ -75,22 +74,19 @@ export default function ProjectDetailsPage() {
 
   const handleRefresh = () => {
     startTransition(async () => {
-      await triggerRefresh();
+      try {
+        await triggerRefresh();
+      } catch (error) {
+        console.error("Failed to refresh project details:", error);
+      }
     });
   };
 
   return (
     <ErrorBoundary onReset={handleRefresh}>
-      <Suspense fallback={
-        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground font-medium">Loading project details...</p>
-        </div>
-      }>
-        <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
-          <ProjectDetailsContent dataPromise={dataPromise} />
-        </div>
-      </Suspense>
+      <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <ProjectDetailsContent dataPromise={dataPromise} />
+      </div>
     </ErrorBoundary>
   );
 }

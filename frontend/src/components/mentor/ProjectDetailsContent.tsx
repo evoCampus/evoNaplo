@@ -1,7 +1,7 @@
-import { use } from "react";
+import { useState, useEffect } from "react";
 import { type ProjectDetailedData } from "../../types";
 import { Button } from "@evonaplo/ui-library";
-import { Plus, FileText, Users2 } from "lucide-react";
+import { Plus, FileText, Users2, Loader2, AlertCircle } from "lucide-react";
 import ProjectTeamCard from "./ProjectTeamCard";
 
 export default function ProjectDetailsContent({
@@ -9,7 +9,51 @@ export default function ProjectDetailsContent({
 }: {
   dataPromise: Promise<ProjectDetailedData>
 }) {
-  const { project, teams } = use(dataPromise);
+  const [data, setData] = useState<ProjectDetailedData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    dataPromise
+      .then(result => {
+        if (!cancelled) {
+          setError(null);
+          setData(result);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          console.error("Failed to load project details:", err);
+          setError("Failed to load project details. Please try again.");
+          setIsLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [dataPromise]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-96 gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground font-medium">Loading project details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-96 gap-4">
+        <AlertCircle className="w-8 h-8 text-destructive" />
+        <p className="text-destructive font-medium">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const { project, teams } = data;
 
   return (
     <div className="max-w-5xl mx-auto py-8 space-y-8">

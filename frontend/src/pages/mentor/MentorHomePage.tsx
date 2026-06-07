@@ -1,5 +1,4 @@
-import { Loader2 } from "lucide-react";
-import { useMemo, Suspense, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useApiClient } from "../../hooks/use-api-client";
 import { useUser } from "../../hooks/use-user";
 import ErrorBoundary from "../../components/ErrorBoundary";
@@ -82,22 +81,19 @@ export default function MentorHomePage() {
 
   const handleRefresh = () => {
     startTransition(async () => {
-      await triggerRefresh();
+      try {
+        await triggerRefresh();
+      } catch (error) {
+        console.error("Failed to refresh home data:", error);
+      }
     });
   };
 
   return (
     <ErrorBoundary onReset={handleRefresh}>
-      <Suspense fallback={
-        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground font-medium">Loading your dashboard...</p>
-        </div>
-      }>
-        <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
-          <MentorHomeContent dataPromise={dataPromise} />
-        </div>
-      </Suspense>
+      <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <MentorHomeContent dataPromise={dataPromise} />
+      </div>
     </ErrorBoundary>
   );
 }

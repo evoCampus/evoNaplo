@@ -1,4 +1,4 @@
-import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
@@ -68,7 +68,11 @@ export default function StudentsPage() {
   }, [apiClient]);
 
   useEffect(() => {
-    initialPromise.then((data) => setAllStudents(data));
+    let cancelled = false;
+    initialPromise
+      .then(data => { if (!cancelled) setAllStudents(data); })
+      .catch(err => { if (!cancelled) console.error("Failed to load students:", err); });
+    return () => { cancelled = true; };
   }, [initialPromise]);
 
   const studentsPromise = useMemo(() => {
@@ -100,9 +104,14 @@ export default function StudentsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const triggerRefresh = async () => {
-    const res = await apiClient.students.apiStudentsGet();
-    setAllStudents(res.data);
-    return res.data;
+    try {
+      const res = await apiClient.students.apiStudentsGet();
+      setAllStudents(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to refresh students:", error);
+      throw error;
+    }
   };
 
   const handleEdit = (student: StudentDTO) => {
@@ -128,12 +137,17 @@ export default function StudentsPage() {
       if (isCreating) {
         await apiClient.students.apiStudentsPost(student);
       } else {
-        await apiClient.students.apiStudentsIdPut(student.id!, student);
+        if (!student.id) throw new Error("Student ID is missing");
+        await apiClient.students.apiStudentsIdPut(student.id, student);
       }
 
       setIsDialogOpen(false);
       startTransition(async () => {
-        await triggerRefresh();
+        try {
+          await triggerRefresh();
+        } catch (error) {
+          console.error("Failed to refresh after save:", error);
+        }
       });
     } catch (error) {
       console.error("Unsuccessful save:", error);
@@ -183,24 +197,15 @@ export default function StudentsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm font-medium">Loading students...</span>
-            </div>
+        <div
+          className={
+            isPending
+              ? "opacity-50 pointer-events-none transition-opacity duration-200"
+              : "transition-opacity duration-200"
           }
         >
-          <div
-            className={
-              isPending
-                ? "opacity-50 pointer-events-none transition-opacity duration-200"
-                : "transition-opacity duration-200"
-            }
-          >
-            <StudentsList studentsPromise={studentsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
-          </div>
-        </Suspense>
+          <StudentsList studentsPromise={studentsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
+        </div>
       </ErrorBoundary>
 
       <GenericDialog<StudentDTO>

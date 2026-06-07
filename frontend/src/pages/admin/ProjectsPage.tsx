@@ -1,4 +1,4 @@
-import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
@@ -37,7 +37,11 @@ export default function ProjectsPage() {
   }, [apiClient]);
 
   useEffect(() => {
-    initialPromise.then((data) => setAllProjects(data));
+    let cancelled = false;
+    initialPromise
+      .then(data => { if (!cancelled) setAllProjects(data); })
+      .catch(err => { if (!cancelled) console.error("Failed to load projects:", err); });
+    return () => { cancelled = true; };
   }, [initialPromise]);
 
   const projectsPromise = useMemo(() => {
@@ -69,9 +73,14 @@ export default function ProjectsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const triggerRefresh = async () => {
-    const res = await apiClient.projects.apiProjectsGet();
-    setAllProjects(res.data);
-    return res.data;
+    try {
+      const res = await apiClient.projects.apiProjectsGet();
+      setAllProjects(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to refresh projects:", error);
+      throw error;
+    }
   };
 
   const handleEdit = (project: ProjectDTO) => {
@@ -97,12 +106,17 @@ export default function ProjectsPage() {
       if (isCreating) {
         await apiClient.projects.apiProjectsPost(project);
       } else {
-        await apiClient.projects.apiProjectsIdPut(project.id!, project);
+        if (!project.id) throw new Error("Project ID is missing");
+        await apiClient.projects.apiProjectsIdPut(project.id, project);
       }
 
       setIsDialogOpen(false);
       startTransition(async () => {
-        await triggerRefresh();
+        try {
+          await triggerRefresh();
+        } catch (error) {
+          console.error("Failed to refresh after save:", error);
+        }
       });
     } catch (error) {
       console.error("Unsuccessful save:", error);
@@ -152,24 +166,15 @@ export default function ProjectsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm font-medium">Loading projects...</span>
-            </div>
+        <div
+          className={
+            isPending
+              ? "opacity-50 pointer-events-none transition-opacity duration-200"
+              : "transition-opacity duration-200"
           }
         >
-          <div
-            className={
-              isPending
-                ? "opacity-50 pointer-events-none transition-opacity duration-200"
-                : "transition-opacity duration-200"
-            }
-          >
-            <ProjectsList projectsPromise={projectsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
-          </div>
-        </Suspense>
+          <ProjectsList projectsPromise={projectsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
+        </div>
       </ErrorBoundary>
 
       <ProjectDialog

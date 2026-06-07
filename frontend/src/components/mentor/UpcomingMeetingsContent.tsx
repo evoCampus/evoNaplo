@@ -1,4 +1,5 @@
-import { use, useState } from "react";
+import { useState, useEffect } from "react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import MeetingInfoDialog from "./MeetingInfoDialog";
 import UpcomingMeetingCard from "./UpcomingMeetingCard";
@@ -11,10 +12,32 @@ export default function UpcomingMeetingsContent({
   dataPromise: Promise<UpcomingMeetingsData>;
   onRefresh: () => void;
 }) {
-  const { mentorName, meetings } = use(dataPromise);
+  const [data, setData] = useState<UpcomingMeetingsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedMeeting, setSelectedMeeting] = useState<UIMeeting | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const apiClient = useApiClient();
+
+  useEffect(() => {
+    let cancelled = false;
+    dataPromise
+      .then(result => {
+        if (!cancelled) {
+          setError(null);
+          setData(result);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        if (!cancelled) {
+          console.error("Failed to load meetings:", err);
+          setError("Failed to load meetings. Please try again.");
+          setIsLoading(false);
+        }
+      });
+    return () => { cancelled = true; };
+  }, [dataPromise]);
 
   const handleMeetingClick = (meeting: UIMeeting) => {
     setSelectedMeeting(meeting);
@@ -51,6 +74,28 @@ export default function UpcomingMeetingsContent({
       throw error;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-96 gap-4">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground font-medium">Loading your meetings...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-96 gap-4">
+        <AlertCircle className="w-8 h-8 text-destructive" />
+        <p className="text-destructive font-medium">{error}</p>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  const { mentorName, meetings } = data;
 
   return (
     <div className="max-w-5xl mx-auto py-8">

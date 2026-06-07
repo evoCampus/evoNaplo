@@ -1,5 +1,4 @@
-import { Loader2 } from "lucide-react";
-import { useMemo, Suspense, useState, useTransition, useCallback } from "react";
+import { useMemo, useState, useTransition, useCallback } from "react";
 import { useApiClient } from "../../hooks/use-api-client";
 import ErrorBoundary from "../../components/ErrorBoundary";
 import { type UpcomingMeetingsData, type UIMeeting } from "../../types";
@@ -87,22 +86,19 @@ export default function UpcomingMeetingsPage() {
 
   const handleRefresh = () => {
     startTransition(async () => {
-      setMeetingsPromise(fetchAllData());
+      try {
+        setMeetingsPromise(fetchAllData());
+      } catch (error) {
+        console.error("Failed to refresh meetings:", error);
+      }
     });
   };
 
   return (
     <ErrorBoundary onReset={handleRefresh}>
-      <Suspense fallback={
-        <div className="flex flex-col items-center justify-center min-h-100 gap-4">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-muted-foreground font-medium">Loading your meetings...</p>
-        </div>
-      }>
-        <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
-          <UpcomingMeetingsContent dataPromise={meetingsPromise} onRefresh={handleRefresh} />
-        </div>
-      </Suspense>
+      <div className={isPending ? "opacity-50 pointer-events-none transition-opacity" : "transition-opacity"}>
+        <UpcomingMeetingsContent dataPromise={meetingsPromise} onRefresh={handleRefresh} />
+      </div>
     </ErrorBoundary>
   );
 }

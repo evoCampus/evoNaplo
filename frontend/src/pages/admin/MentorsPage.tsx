@@ -1,4 +1,4 @@
-import { useState, Suspense, useTransition, useMemo, useEffect } from "react";
+import { useState, useTransition, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
@@ -51,7 +51,11 @@ export default function MentorsPage() {
   }, [apiClient]);
 
   useEffect(() => {
-    initialPromise.then((data) => setAllMentors(data));
+    let cancelled = false;
+    initialPromise
+      .then(data => { if (!cancelled) setAllMentors(data); })
+      .catch(err => { if (!cancelled) console.error("Failed to load mentors:", err); });
+    return () => { cancelled = true; };
   }, [initialPromise]);
 
   const mentorsPromise = useMemo(() => {
@@ -83,9 +87,14 @@ export default function MentorsPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const triggerRefresh = async () => {
-    const res = await apiClient.mentors.apiMentorsGet();
-    setAllMentors(res.data);
-    return res.data;
+    try {
+      const res = await apiClient.mentors.apiMentorsGet();
+      setAllMentors(res.data);
+      return res.data;
+    } catch (error) {
+      console.error("Failed to refresh mentors:", error);
+      throw error;
+    }
   };
 
   const handleEdit = (mentor: MentorDTO) => {
@@ -111,12 +120,17 @@ export default function MentorsPage() {
       if (isCreating) {
         await apiClient.mentors.apiMentorsPost(mentor);
       } else {
-        await apiClient.mentors.apiMentorsIdPut(mentor.id!, mentor);
+        if (!mentor.id) throw new Error("Mentor ID is missing");
+        await apiClient.mentors.apiMentorsIdPut(mentor.id, mentor);
       }
 
       setIsDialogOpen(false);
       startTransition(async () => {
-        await triggerRefresh();
+        try {
+          await triggerRefresh();
+        } catch (error) {
+          console.error("Failed to refresh after save:", error);
+        }
       });
     } catch (error) {
       console.error("Unsuccessful save:", error);
@@ -166,24 +180,15 @@ export default function MentorsPage() {
       </div>
 
       <ErrorBoundary onReset={triggerRefresh}>
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center py-20 text-muted-foreground gap-3">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm font-medium">Loading mentors...</span>
-            </div>
+        <div
+          className={
+            isPending
+              ? "opacity-50 pointer-events-none transition-opacity duration-200"
+              : "transition-opacity duration-200"
           }
         >
-          <div
-            className={
-              isPending
-                ? "opacity-50 pointer-events-none transition-opacity duration-200"
-                : "transition-opacity duration-200"
-            }
-          >
-            <MentorsList mentorsPromise={mentorsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
-          </div>
-        </Suspense>
+          <MentorsList mentorsPromise={mentorsPromise} onEdit={handleEdit} onDelete={handleDeleteRequest} />
+        </div>
       </ErrorBoundary>
 
       <GenericDialog<MentorDTO>
