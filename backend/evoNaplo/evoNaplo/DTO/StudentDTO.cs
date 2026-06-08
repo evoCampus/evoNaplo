@@ -23,6 +23,11 @@ public class StudentDTO
     public required bool WantsToStayWithCurrentTeam { get; set; }
 
     [SetsRequiredMembers]
+    public StudentDTO()
+    {
+    }
+
+    [SetsRequiredMembers]
     public StudentDTO(Student student)
     {
         Id = student.Id;

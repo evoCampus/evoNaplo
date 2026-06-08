@@ -1,6 +1,8 @@
 ﻿using evoNaplo.DTO;
 using evoNaplo.Models;
 using evoNaplo.Exceptions;
+using evoNaplo.DAL.Interfaces;
+using NanoidDotNet;
 
 namespace evoNaplo.Services;
 
@@ -9,14 +11,15 @@ namespace evoNaplo.Services;
 /// </summary>
 internal class MentorService : IMentorService
 {
-    private static readonly List<Mentor> _mentors = new List<Mentor>();
-    private readonly ITeamService _teamService;
-    private readonly IProjectService _projectService;
+    private readonly IMentorRepository _mentorRepository;
+    private readonly ITeamRepository _teamRepository;
+    private readonly IProjectRepository _projectRepository;
     
-    public MentorService(ITeamService teamService, IProjectService projectService)
+    public MentorService(ITeamRepository teamRepository, IProjectRepository projectRepository, IMentorRepository mentorRepository)
     {
-        _teamService = teamService;
-        _projectService = projectService;
+        _mentorRepository = mentorRepository;
+        _teamRepository = teamRepository;
+        _projectRepository = projectRepository;
     }
     
     /// <summary>
@@ -25,9 +28,9 @@ internal class MentorService : IMentorService
     /// <param name="id">The ID of the mentor to retrieve.</param>
     /// <returns>The Mentor model if found.</returns>
     /// <exception cref="MentorNotFoundException"></exception>
-    public Mentor GetMentorModelById(string id)
+    public async Task<Mentor?> GetMentorModelById(string id)
     {
-        var mentor = _mentors.FirstOrDefault(m => m.Id == id);
+        var mentor = await _mentorRepository.GetMentorByIdAsync(id);
         if (mentor is null)
         {
             throw new MentorNotFoundException($"Mentor with ID {id} not found.");
@@ -41,8 +44,8 @@ internal class MentorService : IMentorService
     /// <returns>An IEnumerable collection of MentorDTOs representing all mentors.</returns>
     public async Task<IEnumerable<MentorDTO>> GetAllMentorsAsync()
     {
-        IEnumerable<MentorDTO> mentors = _mentors.Select(m => new MentorDTO(m));
-        return mentors;
+        var mentor = await _mentorRepository.GetAllMentorsAsync();
+        return mentor.Select(m => new MentorDTO(m));
     }
 
     /// <summary>
@@ -53,12 +56,12 @@ internal class MentorService : IMentorService
     /// <exception cref="MentorNotFoundException"></exception>
     public async Task<MentorDTO> GetMentorByIdAsync(string id)
     {
-        Mentor? mentor = _mentors.FirstOrDefault(m => m.Id == id);
-        if (mentor is not null) 
+        var mentor = await _mentorRepository.GetMentorByIdAsync(id);
+        if (mentor is null)
         {
-            return new MentorDTO(mentor);
+            throw new MentorNotFoundException($"Mentor with ID {id} not found.");
         }
-        throw new MentorNotFoundException($"Mentor with ID {id} not found.");
+        return new MentorDTO(mentor);
     }
 
     /// <summary>
@@ -66,19 +69,42 @@ internal class MentorService : IMentorService
     /// </summary>
     /// <param name="mentorToAdd">The MentorDTO to add.</param>
     /// <returns>The added MentorDTO if successful.</returns>
-    public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAdd)
+
+    public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAddDTO)
     {
-        mentorToAdd.Id = Guid.NewGuid().ToString();
-        _mentors.Add(new Mentor
+        var newId = string.IsNullOrWhiteSpace(mentorToAddDTO.Id) ? Nanoid.Generate() : mentorToAddDTO.Id;
+
+        var newMentor = new Mentor
         {
-            Id = mentorToAdd.Id,
-            Name = mentorToAdd.Name,
-            Email = mentorToAdd.Email,
-            PhoneNumber = mentorToAdd.PhoneNumber,
-            Teams = mentorToAdd.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList(),
-            Projects = mentorToAdd.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList(),
-        });
-        return mentorToAdd;
+            Id = newId,
+            Name = mentorToAddDTO.Name,
+            Email = mentorToAddDTO.Email,
+            PhoneNumber = mentorToAddDTO.PhoneNumber,
+            Teams = new List<Team>(),
+            Projects = new List<Project>()
+        };
+
+        if (mentorToAddDTO.TeamIds is not null)
+        {
+            foreach (var teamId in mentorToAddDTO.TeamIds)
+            {
+                var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                if (team is not null) newMentor.Teams.Add(team);
+            }
+        }
+
+        if (mentorToAddDTO.ProjectIds is not null)
+        {
+            foreach (var projectId in mentorToAddDTO.ProjectIds)
+            {
+                var project = await _projectRepository.GetProjectByIdAsync(projectId);
+                if (project is not null) newMentor.Projects.Add(project);
+            }
+        }
+
+        await _mentorRepository.AddMentorAsync(newMentor);
+        mentorToAddDTO.Id = newMentor.Id;
+        return mentorToAddDTO;
     }
 
     /// <summary>
@@ -88,18 +114,42 @@ internal class MentorService : IMentorService
     /// <param name="updatedMentor">The updated mentor DTO.</param>
     /// <returns>The updated MentorDTO if successful.</returns>
     /// <exception cref="MentorNotFoundException"></exception>
-    public async Task<MentorDTO> UpdateMentorAsync(string id, MentorDTO updatedMentor)
+    public async Task<MentorDTO> UpdateMentorAsync(string id, MentorDTO updatedMentorDTO)
     {
-        var existing = _mentors.FirstOrDefault(m => m.Id == id);
-        if (existing is not null) 
+        var existingMentor = await _mentorRepository.GetMentorByIdAsync(id);
+        if (existingMentor is not null) 
         {
-            existing.Id = updatedMentor.Id;
-            existing.Name = updatedMentor.Name;
-            existing.Email = updatedMentor.Email;
-            existing.PhoneNumber = updatedMentor.PhoneNumber;
-            existing.Teams = updatedMentor.TeamIds.Select(_teamService.GetTeamModelById).OfType<Team>().ToList();
-            existing.Projects = updatedMentor.ProjectIds.Select(_projectService.GetProjectModelById).OfType<Project>().ToList();
-            return updatedMentor;
+            existingMentor.Name = updatedMentorDTO.Name;
+            existingMentor.Email = updatedMentorDTO.Email;
+            existingMentor.PhoneNumber = updatedMentorDTO.PhoneNumber;
+
+            if (updatedMentorDTO.TeamIds is not null)
+            {
+                foreach (var teamId in updatedMentorDTO.TeamIds)
+                {
+                    if (!existingMentor.Teams.Any(t => t.Id == teamId))
+                    {
+                        var team = await _teamRepository.GetTeamByIdAsync(teamId);
+                        if (team is not null) existingMentor.Teams.Add(team);
+                    }
+                }
+            }
+
+            if (updatedMentorDTO.ProjectIds is not null)
+            {
+                foreach (var projectId in updatedMentorDTO.ProjectIds)
+                {
+                    if (!existingMentor.Projects.Any(p => p.Id == projectId))
+                    {
+                        var project = await _projectRepository.GetProjectByIdAsync(projectId);
+                        if (project is not null) existingMentor.Projects.Add(project);
+                    }
+                }
+            }
+
+            await _mentorRepository.UpdateMentorAsync(existingMentor);
+            updatedMentorDTO.Id = existingMentor.Id;
+            return updatedMentorDTO;
         }
         throw new MentorNotFoundException($"Mentor with ID {id} not found.");
     }
@@ -112,10 +162,10 @@ internal class MentorService : IMentorService
     /// <exception cref="MentorNotFoundException"></exception>
     public async Task<bool> DeleteMentorAsync(string id)
     {
-        var existing = _mentors.FirstOrDefault(m => m.Id == id);
-        if (existing is not null) 
+        var existingMentor = await _mentorRepository.GetMentorByIdAsync(id);
+        if (existingMentor is not null) 
         {
-            _mentors.Remove(existing);
+            await _mentorRepository.DeleteMentorAsync(id);
             return true;
         }
         throw new MentorNotFoundException($"Mentor with ID {id} not found.");

@@ -5,7 +5,7 @@ namespace evoNaplo.Services;
 
 public interface ITeamService
 {
-    Team? GetTeamModelById(string id);
+    Task<Team> GetTeamModelById(string id);
     Task<IEnumerable<TeamDTO>> GetAllTeamsAsync();
     Task<TeamDTO> GetTeamByIdAsync(string id);
     Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd);
