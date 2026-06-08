@@ -2,6 +2,7 @@
 using evoNaplo.Models;
 using evoNaplo.Exceptions;
 using evoNaplo.DAL.Interfaces;
+using NanoidDotNet;
 
 namespace evoNaplo.Services;
 
@@ -71,8 +72,7 @@ internal class MentorService : IMentorService
 
     public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAddDTO)
     {
-        // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(mentorToAddDTO.Id) ? Guid.NewGuid().ToString() : mentorToAddDTO.Id;
+        var newId = string.IsNullOrWhiteSpace(mentorToAddDTO.Id) ? Nanoid.Generate() : mentorToAddDTO.Id;
 
         var newMentor = new Mentor
         {

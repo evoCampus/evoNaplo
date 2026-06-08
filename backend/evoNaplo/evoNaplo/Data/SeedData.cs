@@ -4,6 +4,7 @@ using System.Linq;
 using Bogus;
 using Microsoft.Extensions.Logging;
 using evoNaplo.Models;
+using NanoidDotNet;
 
 namespace evoNaplo.Data
 {
@@ -44,7 +45,7 @@ namespace evoNaplo.Data
                 {
                     projects.Add(new Project
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Nanoid.Generate(),
                         Name = faker.Company.CatchPhrase(),
                         ShortDescription = faker.Lorem.Sentence(),
                         ProjectLinks = new List<ProjectLink>(),
@@ -63,7 +64,7 @@ namespace evoNaplo.Data
                     {
                         links.Add(new ProjectLink
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            Id = Nanoid.Generate(),
                             ProjectId = proj.Id,
                             LinkType = faker.PickRandom<LinkTypes>(),
                             Url = faker.Internet.Url()
@@ -79,7 +80,7 @@ namespace evoNaplo.Data
                 {
                     mentors.Add(new Mentor
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Nanoid.Generate(),
                         Name = faker.Name.FullName(),
                         Email = faker.Internet.Email(),
                         PhoneNumber = faker.Phone.PhoneNumber(),
@@ -97,7 +98,7 @@ namespace evoNaplo.Data
                     var proj = faker.PickRandom(projects);
                     teams.Add(new Team
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Nanoid.Generate(),
                         ProjectId = proj.Id,
                         Project = proj,
                         AttendanceSheets = new List<AttendanceSheet>(),
@@ -117,7 +118,7 @@ namespace evoNaplo.Data
                     var workDur = faker.Date.Between(DateTime.Now.AddMonths(-12), DateTime.Now.AddMonths(12));
                     students.Add(new Student
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Nanoid.Generate(),
                         Name = faker.Name.FullName(),
                         Email = faker.Internet.Email(),
                         PhoneNumber = faker.Random.Bool(7) ? faker.Phone.PhoneNumber() : null,
@@ -147,7 +148,7 @@ namespace evoNaplo.Data
                 {
                     var sheet = new AttendanceSheet
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Nanoid.Generate(),
                         WeeklyMeetingTime = DateTimeOffset.Now.AddDays(faker.Random.Int(-30, 30)),
                         LengthOfMeeting = TimeSpan.FromMinutes(faker.Random.Int(30, 120)),
                         DayOfWeek = (DayOfWeek)faker.Random.Int(0, 6),
@@ -190,13 +191,13 @@ namespace evoNaplo.Data
                     var fkBadStudents = students.Skip(Math.Max(0, students.Count - Math.Max(1, students.Count / 20))).ToList();
                     foreach (var s in fkBadStudents)
                     {
-                        s.TeamId = Guid.NewGuid().ToString(); 
+                        s.TeamId = Nanoid.Generate(); 
                     }
 
                     var fkBadSheets = attendanceSheets.Take(Math.Max(1, attendanceSheets.Count / 20)).ToList();
                     foreach (var sh in fkBadSheets)
                     {
-                        sh.TeamId = Guid.NewGuid().ToString();
+                        sh.TeamId = Nanoid.Generate();
                     }
                                        
                     var someSheets = attendanceSheets.Take(Math.Max(1, attendanceSheets.Count / 10)).ToList();

@@ -2,6 +2,7 @@
 using evoNaplo.Models;
 using evoNaplo.Exceptions;
 using evoNaplo.DAL.Interfaces;
+using NanoidDotNet;
 
 namespace evoNaplo.Services;
 
@@ -67,8 +68,8 @@ internal class StudentService : IStudentService
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAddDTO)
     {
         // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(studentToAddDTO.Id) ? Guid.NewGuid().ToString() : studentToAddDTO.Id;
-        var newStudent = new Student
+        var newId = string.IsNullOrWhiteSpace(studentToAddDTO.Id) ? Nanoid.Generate() : studentToAddDTO.Id;
+        var newStudent = new Student    
         {
             Id = newId,
             Name = studentToAddDTO.Name,

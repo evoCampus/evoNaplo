@@ -3,6 +3,7 @@ using evoNaplo.DAL.Repositories;
 using evoNaplo.DTO;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
+using NanoidDotNet;
 
 namespace evoNaplo.Services;
 
@@ -72,7 +73,7 @@ internal class TeamService : ITeamService
     public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAddDTO)
     {
         // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(teamToAddDTO.Id) ? Guid.NewGuid().ToString() : teamToAddDTO.Id;
+        var newId = string.IsNullOrWhiteSpace(teamToAddDTO.Id) ? Nanoid.Generate() : teamToAddDTO.Id;
 
         var newTeam = new Team
         {

@@ -13,9 +13,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.25">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="ClosedXML" Version="0.105.0" >
+    <PackageReference Include="ClosedXML" Version="0.105.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Nanoid" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 

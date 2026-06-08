@@ -2,6 +2,7 @@ using evoNaplo.DAL.Interfaces;
 using evoNaplo.DTO;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
+using NanoidDotNet;
 
 namespace evoNaplo.Services;
 
@@ -69,7 +70,7 @@ internal class ProjectService : IProjectService
     public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAddDTO)
     {
         // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Guid.NewGuid().ToString() : projectToAddDTO.Id;
+        var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Nanoid.Generate() : projectToAddDTO.Id;
 
         var newProject = new Project
         {
@@ -79,7 +80,7 @@ internal class ProjectService : IProjectService
             ProjectLinks = projectToAddDTO.ProjectLinks is not null ? projectToAddDTO.ProjectLinks
             .Select(l => new ProjectLink
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Nanoid.Generate(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
                 ProjectId = newId
@@ -131,7 +132,7 @@ internal class ProjectService : IProjectService
             existingProject.ProjectLinks = updatedProjectDTO.ProjectLinks is not null ? updatedProjectDTO.ProjectLinks
                 .Select(l => new ProjectLink
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Nanoid.Generate(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
                 ProjectId = existingProject.Id
