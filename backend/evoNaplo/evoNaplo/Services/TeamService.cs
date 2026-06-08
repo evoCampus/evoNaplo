@@ -72,7 +72,6 @@ internal class TeamService : ITeamService
     /// <returns>The added TeamDTO if successful.</returns>
     public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAddDTO)
     {
-        // id will be generated on other branch
         var newId = string.IsNullOrWhiteSpace(teamToAddDTO.Id) ? Nanoid.Generate() : teamToAddDTO.Id;
 
         var newTeam = new Team

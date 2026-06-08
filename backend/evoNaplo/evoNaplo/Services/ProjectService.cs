@@ -69,7 +69,6 @@ internal class ProjectService : IProjectService
     /// <returns>The added ProjectDTO if successful.</returns>
     public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAddDTO)
     {
-        // id will be generated on other branch
         var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Nanoid.Generate() : projectToAddDTO.Id;
 
         var newProject = new Project

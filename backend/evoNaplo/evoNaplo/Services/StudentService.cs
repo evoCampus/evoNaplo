@@ -67,7 +67,6 @@ internal class StudentService : IStudentService
     /// <returns>The added StudentDTO if successful.</returns>
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAddDTO)
     {
-        // id will be generated on other branch
         var newId = string.IsNullOrWhiteSpace(studentToAddDTO.Id) ? Nanoid.Generate() : studentToAddDTO.Id;
         var newStudent = new Student    
         {
