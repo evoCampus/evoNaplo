@@ -142,41 +142,73 @@ internal class TeamService : ITeamService
 
             if (updatedTeamDTO.MentorIds is not null)
             {
+                var mentorsToRemove = existingTeam.Mentors
+                .Where(m => !updatedTeamDTO.MentorIds.Contains(m.Id))
+                .ToList();
+
+                foreach (var mentorToRemove in mentorsToRemove)
+                {
+                    existingTeam.Mentors.Remove(mentorToRemove);
+                }
+
                 foreach (var mentorId in updatedTeamDTO.MentorIds)
                 {
                     if (!existingTeam.Mentors.Any(m => m.Id == mentorId))
                     {
                         var mentor = await _mentorRepository.GetMentorByIdAsync(mentorId);
-                        if (mentor is not null) existingTeam.Mentors.Add(mentor);
+                        if (mentor is not null)
+                        {
+                            existingTeam.Mentors.Add(mentor);
+                        } 
                     }
                 }
             }
 
         if (updatedTeamDTO.StudentIds is not null)
             {
-            foreach (var studentId in updatedTeamDTO.StudentIds)
-            {
-                if (!existingTeam.Students.Any(s => s.Id == studentId))
+                var studentsToRemove = existingTeam.Students
+                .Where(s => !updatedTeamDTO.StudentIds.Contains(s.Id))
+                .ToList();
+
+                foreach (var studentToRemove in studentsToRemove)
                 {
-                    var student = await _studentRepository.GetStudentByIdAsync(studentId);
-                    if (student is not null) existingTeam.Students.Add(student);
+                    existingTeam.Students.Remove(studentToRemove);
+                }
+
+                foreach (var studentId in updatedTeamDTO.StudentIds)
+                {
+                    if (!existingTeam.Students.Any(s => s.Id == studentId))
+                    {
+                        var student = await _studentRepository.GetStudentByIdAsync(studentId);
+                        if (student is not null)
+                        {
+                            existingTeam.Students.Add(student);
+                        } 
+                    }
                 }
             }
-        }
 
         if (updatedTeamDTO.AttendanceSheetIds is not null)
         {
-            foreach (var sheetId in updatedTeamDTO.AttendanceSheetIds)
+            var sheetsToRemove = existingTeam.AttendanceSheets
+            .Where(a => !updatedTeamDTO.AttendanceSheetIds.Contains(a.Id))
+            .ToList();
+
+            foreach (var sheetToRemove in sheetsToRemove)
             {
-                if (!existingTeam.AttendanceSheets.Any(a => a.Id == sheetId))
+                    existingTeam.AttendanceSheets.Remove(sheetToRemove);
+            }
+                foreach (var sheetId in updatedTeamDTO.AttendanceSheetIds)
                 {
-                    existingTeam.AttendanceSheets.Add(new AttendanceSheet
+                    if (!existingTeam.AttendanceSheets.Any(a => a.Id == sheetId))
                     {
+                    existingTeam.AttendanceSheets.Add(new AttendanceSheet
+                        { 
                         Id = sheetId,
                         TeamId = existingTeam.Id
-                    });
+                        });
+                    }
                 }
-            }
         }
             await _teamRepository.UpdateTeamAsync(existingTeam);
             updatedTeamDTO.Id = existingTeam.Id;

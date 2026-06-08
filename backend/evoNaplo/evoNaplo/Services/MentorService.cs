@@ -119,12 +119,23 @@ internal class MentorService : IMentorService
         var existingMentor = await _mentorRepository.GetMentorByIdAsync(id);
         if (existingMentor is not null) 
         {
+            existingMentor.Teams ??= new List<Team>();
+            existingMentor.Projects ??= new List<Project>();
             existingMentor.Name = updatedMentorDTO.Name;
             existingMentor.Email = updatedMentorDTO.Email;
             existingMentor.PhoneNumber = updatedMentorDTO.PhoneNumber;
 
             if (updatedMentorDTO.TeamIds is not null)
             {
+                var teamsToRemove = existingMentor.Teams
+                .Where(t => !updatedMentorDTO.TeamIds.Contains(t.Id))
+                .ToList();
+
+                foreach (var teamToRemove in teamsToRemove)
+                {
+                    existingMentor.Teams.Remove(teamToRemove);
+                }
+
                 foreach (var teamId in updatedMentorDTO.TeamIds)
                 {
                     if (!existingMentor.Teams.Any(t => t.Id == teamId))
@@ -137,6 +148,15 @@ internal class MentorService : IMentorService
 
             if (updatedMentorDTO.ProjectIds is not null)
             {
+                var projectsToRemove = existingMentor.Projects
+                .Where(p => !updatedMentorDTO.ProjectIds.Contains(p.Id))
+                .ToList();
+
+                foreach (var projectToRemove in projectsToRemove)
+                {
+                    existingMentor.Projects.Remove(projectToRemove);
+                }
+
                 foreach (var projectId in updatedMentorDTO.ProjectIds)
                 {
                     if (!existingMentor.Projects.Any(p => p.Id == projectId))
@@ -164,7 +184,7 @@ internal class MentorService : IMentorService
     {
         var existingMentor = await _mentorRepository.GetMentorByIdAsync(id);
         if (existingMentor is not null) 
-        {
+        {   
             await _mentorRepository.DeleteMentorAsync(id);
             return true;
         }

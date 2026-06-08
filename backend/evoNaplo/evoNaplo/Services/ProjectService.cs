@@ -125,20 +125,35 @@ internal class ProjectService : IProjectService
         var existingProject = await _projectRepository.GetProjectByIdAsync(id);
         if (existingProject is not null) 
         {
+            existingProject.Teams ??= new List<Team>();
+            existingProject.ProjectLinks ??= new List<ProjectLink>();   
             existingProject.Name = updatedProjectDTO.Name;
             existingProject.ShortDescription = updatedProjectDTO.Description;
 
-            existingProject.ProjectLinks = updatedProjectDTO.ProjectLinks is not null ? updatedProjectDTO.ProjectLinks
-                .Select(l => new ProjectLink
-            {
-                Id = Guid.NewGuid().ToString(),
-                LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
-                Url = l.Value,
-                ProjectId = existingProject.Id
-            }).ToList() : new List<ProjectLink>();
+            existingProject.ProjectLinks.Clear();
 
+            if (updatedProjectDTO.ProjectLinks is not null) {
+                foreach (var l in updatedProjectDTO.ProjectLinks)
+                {
+                    existingProject.ProjectLinks.Add(new ProjectLink
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
+                        Url = l.Value,
+                        ProjectId = existingProject.Id
+                    });
+                }
+            }
             if (updatedProjectDTO.TeamIds is not null)
             {
+                var teamsToRemove = existingProject.Teams
+                .Where(t => !updatedProjectDTO.TeamIds.Contains(t.Id))
+                .ToList();
+
+                foreach (var teamToRemove in teamsToRemove)
+                {
+                    existingProject.Teams.Remove(teamToRemove);
+                }
                 foreach (var teamId in updatedProjectDTO.TeamIds)
                 {
                     if (!existingProject.Teams.Any(t => t.Id == teamId))
