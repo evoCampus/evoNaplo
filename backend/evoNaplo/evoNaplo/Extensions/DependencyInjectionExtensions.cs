@@ -3,6 +3,8 @@ using evoNaplo.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Xml.Linq;
+using evoNaplo.DAL.Interfaces;
+using evoNaplo.DAL.Repositories;
 
 namespace evoNaplo.Extensions;
 
@@ -22,6 +24,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IExcelExportService, ExcelExportService>();
         services.AddScoped<ICsvImportService, CsvImportService>();
         services.AddScoped<ICsvExportService, CsvExportService>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
 
         return services;
     }

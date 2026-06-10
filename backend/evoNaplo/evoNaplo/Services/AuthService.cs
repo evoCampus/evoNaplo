@@ -5,26 +5,27 @@ using evoNaplo.Exceptions;
 using evoNaplo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using evoNaplo.DAL.Interfaces;
 
 namespace evoNaplo.Services;
 
 internal class AuthService : IAuthService
 {
     private readonly PasswordHasher<User> _passwordHasher = new();
-    private readonly AppDbContext _context;
+    private readonly IAuthRepository _authRepository;
     private readonly ILogger<AuthService> _logger;
     private readonly IAuditService _auditService;
 
-    public AuthService(AppDbContext context, ILogger<AuthService> logger, IAuditService auditService)
+    public AuthService(IAuthRepository authRepository, ILogger<AuthService> logger, IAuditService auditService)
     {
-        _context = context;
+        _authRepository = authRepository;
         _logger = logger;
         _auditService = auditService;
     }
 
     public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
     {
-        if (!await _context.Users.AnyAsync())
+        if ((await _authRepository.AnyUsersAsync()) == false)
         {
             User user = new User
             {
@@ -34,8 +35,7 @@ internal class AuthService : IAuthService
                 MentorId = null,
             };
             user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _authRepository.AddUserAsync(user);
             _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
             await _auditService.LogAsync(new AuditLog
             {
@@ -48,7 +48,7 @@ internal class AuthService : IAuthService
             });
             return new UserDTO(user);
         }
-        else if (await _context.Users.AnyAsync(user => user.Email == registerData.Email))
+        else if (await _authRepository.UserExistsAsync(registerData.Email))
         {
             _logger.LogWarning("Register attempt with already used email {Email}", registerData.Email);
             await _auditService.LogAsync(new AuditLog
@@ -61,9 +61,9 @@ internal class AuthService : IAuthService
             });
             throw new UserWithEmailAlreadyExistsException("Email already in use.");
         }
-        var mentor = await _context.Mentors.FirstOrDefaultAsync(m => m.Email == registerData.Email);
-        if (mentor != null)
+        try
         {
+            var mentor = await _authRepository.GetMentorByEmailAsync(registerData.Email);
             User user = new User
             {
                 Id = Guid.NewGuid().ToString(),
@@ -72,8 +72,7 @@ internal class AuthService : IAuthService
                 MentorId = mentor.Id,
             };
             user.PasswordHash = _passwordHasher.HashPassword(user, registerData.Password);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+            await _authRepository.AddUserAsync(user);
             _logger.LogInformation("User registered {UserId} {Email}", user.Id, user.Email);
             await _auditService.LogAsync(new AuditLog
             {
@@ -86,7 +85,7 @@ internal class AuthService : IAuthService
             });
             return new UserDTO(user);
         }
-        else
+        catch (MentorWithGivenEmailNotFoundException)
         {
             _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
             await _auditService.LogAsync(new AuditLog
@@ -97,14 +96,13 @@ internal class AuthService : IAuthService
                 Outcome = "Failure",
                 Details = $"Mentor with email {registerData.Email} not found"
             });
-            throw new MentorWithGivenEmailNotFoundException("Mentor with given email not found.");
+            throw;
         }
     }
 
     public async Task<UserDTO> LoginAsync(LoginDTO loginData)
     {
-        User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginData.Email) 
-            ?? throw new UserWithGivenEmailNotFoundException($"User with email '{loginData.Email}' not found.");
+        User user = await _authRepository.GetUserByEmailAsync(loginData.Email);
         if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
         {
             _logger.LogInformation("User login success {UserId} {Email}", user.Id, user.Email);
