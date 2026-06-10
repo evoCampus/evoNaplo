@@ -31,16 +31,14 @@ public class AuthRepository : IAuthRepository
         return await _context.Users.AnyAsync(u => u.Email == email);
     }
 
-    public async Task<Mentor> GetMentorByEmailAsync(string email)
+    public async Task<Mentor?> GetMentorByEmailAsync(string email)
     {
-        return await _context.Mentors.FirstOrDefaultAsync(m => m.Email == email)
-            ?? throw new MentorWithGivenEmailNotFoundException($"Mentor with email '{email}' not found.");
+        return await _context.Mentors.FirstOrDefaultAsync(m => m.Email == email);
     }
 
-    public async Task<User> GetUserByEmailAsync(string email)
+    public async Task<User?> GetUserByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email) 
-            ?? throw new UserWithGivenEmailNotFoundException($"User with email '{email}' not found.");
+        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
 }

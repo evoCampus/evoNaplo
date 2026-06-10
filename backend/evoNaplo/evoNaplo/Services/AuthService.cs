@@ -23,7 +23,7 @@ internal class AuthService : IAuthService
         _auditService = auditService;
     }
 
-    public async Task<UserDTO> RegisterAsync(RegisterDTO registerData)
+    public async Task<AuthResultDTO> RegisterAsync(RegisterDTO registerData)
     {
         if ((await _authRepository.AnyUsersAsync()) == false)
         {
@@ -46,7 +46,7 @@ internal class AuthService : IAuthService
                 UserId = user.Id,
                 Details = $"First user created: {user.Email}"
             });
-            return new UserDTO(user);
+            return new AuthResultDTO(AuthCode.Success, new UserDTO(user));
         }
         else if (await _authRepository.UserExistsAsync(registerData.Email))
         {
@@ -59,11 +59,11 @@ internal class AuthService : IAuthService
                 Outcome = "Failure",
                 Details = $"Email {registerData.Email} already in use"
             });
-            throw new UserWithEmailAlreadyExistsException("Email already in use.");
+            return new AuthResultDTO(AuthCode.EmailAlreadyInUse, "Email already in use.");
         }
-        try
+        var mentor = await _authRepository.GetMentorByEmailAsync(registerData.Email);
+        if (mentor != null)
         {
-            var mentor = await _authRepository.GetMentorByEmailAsync(registerData.Email);
             User user = new User
             {
                 Id = Guid.NewGuid().ToString(),
@@ -83,27 +83,24 @@ internal class AuthService : IAuthService
                 UserId = user.Id,
                 Details = $"User {user.Email} created"
             });
-            return new UserDTO(user);
+            return new AuthResultDTO(AuthCode.Success, new UserDTO(user));
         }
-        catch (MentorWithGivenEmailNotFoundException)
+        _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
+        await _auditService.LogAsync(new AuditLog
         {
-            _logger.LogWarning("Register attempt with non-mentor email {Email}", registerData.Email);
-            await _auditService.LogAsync(new AuditLog
-            {
-                EventType = "RegisterAttempt",
-                Resource = "User",
-                Action = "Register",
-                Outcome = "Failure",
-                Details = $"Mentor with email {registerData.Email} not found"
-            });
-            throw;
-        }
+            EventType = "RegisterAttempt",
+            Resource = "User",
+            Action = "Register",
+            Outcome = "Failure",
+            Details = $"Mentor with email {registerData.Email} not found"
+        });
+        return new AuthResultDTO(AuthCode.MentorNotFound, $"Mentor with email {registerData.Email} not found");
     }
 
-    public async Task<UserDTO> LoginAsync(LoginDTO loginData)
+    public async Task<AuthResultDTO> LoginAsync(LoginDTO loginData)
     {
-        User user = await _authRepository.GetUserByEmailAsync(loginData.Email);
-        if (_passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
+        User? user = await _authRepository.GetUserByEmailAsync(loginData.Email);
+        if (user != null && _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginData.Password) == PasswordVerificationResult.Success)
         {
             _logger.LogInformation("User login success {UserId} {Email}", user.Id, user.Email);
             await _auditService.LogAsync(new AuditLog
@@ -115,7 +112,20 @@ internal class AuthService : IAuthService
                 UserId = user.Id,
                 Details = $"User {user.Email} logged in"
             });
-            return new UserDTO(user);
+            return new AuthResultDTO(AuthCode.Success, new UserDTO(user));
+        }
+        else if (user == null)
+        {
+            _logger.LogWarning("User login failed (email not found) {Email}", loginData.Email);
+            await _auditService.LogAsync(new AuditLog
+            {
+                EventType = "Login",
+                Resource = "User",
+                Action = "Login",
+                Outcome = "Failure",
+                Details = $"Login attempt with non-existing email {loginData.Email}"
+            });
+            return new AuthResultDTO(AuthCode.MentorNotFound, "Invalid credentials.");
         }
         _logger.LogWarning("User login failed (invalid password) {Email}", loginData.Email);
         await _auditService.LogAsync(new AuditLog
@@ -126,7 +136,7 @@ internal class AuthService : IAuthService
             Outcome = "Failure",
             Details = $"Invalid password for {loginData.Email}"
         });
-        throw new InvalidPasswordException($"Invalid password for '{loginData.Email}'.");
+        return new AuthResultDTO(AuthCode.InvalidCredentials, "Invalid credentials.");
     }
 
 }

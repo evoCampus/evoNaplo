@@ -19,34 +19,32 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register(RegisterDTO registerData)
     {
-        try {
-            return Ok(await _authService.RegisterAsync(registerData));
-        }
-        catch (UserWithEmailAlreadyExistsException ex)
+        var result = await _authService.RegisterAsync(registerData);
+
+        if (result.AuthCode != AuthCode.Success)
         {
-            return Conflict(ex.Message);
+            if (result.AuthCode == AuthCode.EmailAlreadyInUse)
+            {
+                return Conflict(result.Message);
+            }
+
+            return NotFound(result.Message);
         }
-        catch (MentorWithGivenEmailNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        return Ok(result.User);
     }
 
     [HttpPost("login")]
     public async Task<ActionResult> Login(LoginDTO loginData)
     {
-        try
+        var result = await _authService.LoginAsync(loginData);
+        
+        if (result.AuthCode != AuthCode.Success)
         {
-            return Ok(await _authService.LoginAsync(loginData));
+            return Unauthorized(result.Message);
         }
-        catch (UserWithGivenEmailNotFoundException)
-        {
-            return Unauthorized("Invalid credentials");
-        }
-        catch (InvalidPasswordException)
-        {
-            return Unauthorized("Invalid credentials");
-        }
+
+        return Ok(result.User);
     }
 
 }

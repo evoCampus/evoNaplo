@@ -4,7 +4,7 @@ namespace evoNaplo.Services;
 
 public interface IAuthService
 {
-    Task<UserDTO> RegisterAsync(RegisterDTO registerData);
-    Task<UserDTO> LoginAsync(LoginDTO loginData);
+    Task<AuthResultDTO> RegisterAsync(RegisterDTO registerData);
+    Task<AuthResultDTO> LoginAsync(LoginDTO loginData);
 
 }
