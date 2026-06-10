@@ -3,6 +3,8 @@ using evoNaplo.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Xml.Linq;
+using evoNaplo.DAL.Interfaces;
+using evoNaplo.DAL.Repositories;
 
 namespace evoNaplo.Extensions;
 
@@ -12,6 +14,8 @@ public static class DependencyInjectionExtensions
         AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
+        services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IMentorService, MentorService>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IProjectService, ProjectService>();
@@ -20,6 +24,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IExcelExportService, ExcelExportService>();
         services.AddScoped<ICsvImportService, CsvImportService>();
         services.AddScoped<ICsvExportService, CsvExportService>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
 
         return services;
     }
