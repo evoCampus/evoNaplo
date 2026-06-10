@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { AlertCircle, Loader2, Download, CheckCircle2Icon } from "lucide-react";
+import { AlertCircle, Loader2, Download, CheckCircle2Icon, X } from "lucide-react";
 import {
     Button, Card, Alert, AlertDescription, AlertTitle,
     Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
@@ -7,9 +7,27 @@ import {
 } from "@evonaplo/ui-library";
 import { useApiClient } from "../../hooks/use-api-client";
 
+type ColumnConfig = {
+    id: string;
+    label: string;
+    backendKey: string;
+    type: "text" | "textarea";
+    colSpan?: number;
+};
+
+const STUDENT_COLUMNS: ColumnConfig[] = [
+    { id: "ts", label: "Timestamp", backendKey: "timestamp", type: "text" },
+    { id: "email", label: "Email Address", backendKey: "email", type: "text" },
+    { id: "phone", label: "Phone Number", backendKey: "phoneNumber", type: "text" },
+    { id: "program", label: "University / Program", backendKey: "major", type: "text" },
+    { id: "firstTime", label: "First time participant?", backendKey: "isFirstTime", type: "text" },
+    { id: "stayInTeam", label: "Staying in team?", backendKey: "stayInTeam", type: "text" },
+    { id: "goals", label: "Goals", backendKey: "goals", type: "textarea", colSpan: 2 }
+];
+
 export default function SpreadsheetImport() {
     const apiClient = useApiClient();
-    const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid" | "done">("idle");
+    const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid" | "done" | "aborted">("idle");
     const [action, setAction] = useState<"import" | "save">("import");
     const [rows, setRows] = useState<any[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +48,7 @@ export default function SpreadsheetImport() {
         if (status === "done") playSound("success");
         if (status === "loading" && action === "import") playSound("loading");
 
-        if (status === "invalid" || status === "done") {
+        if (status === "invalid" || status === "done" || status === "aborted") {
             const timer = setTimeout(() => setStatus("idle"), 3500);
             return () => clearTimeout(timer);
         }
@@ -61,18 +79,23 @@ export default function SpreadsheetImport() {
                         ))
                 );
 
-                const mappedRows = uniqueData.map((item: any, index: number) => ({
-                    id: index + 1,
-                    ts: item.timestamp ? new Date(item.timestamp).toLocaleString("hu-HU") : "-",
-                    name: item.name || "-",
-                    email: item.email || "-",
-                    phone: item.phoneNumber || "-",
-                    program: item.major || "-",
-                    firstTime: item.isFirstTime || "-",
-                    goals: item.goals || "-",
-                    stayInTeam: item.stayInTeam || "-",
-                    comments: item.otherComments || "-"
-                }));
+                const mappedRows = uniqueData.map((item: any, index: number) => {
+                    const rowData: any = {
+                        id: index + 1,
+                        name: item.name || "-",
+                        isError: false
+                    };
+
+                    STUDENT_COLUMNS.forEach(col => {
+                        if (col.id === "ts") {
+                            rowData[col.id] = item[col.backendKey] ? new Date(item[col.backendKey]).toLocaleString("hu-HU") : "-";
+                        } else {
+                            rowData[col.id] = item[col.backendKey] || "-";
+                        }
+                    });
+
+                    return rowData;
+                });
 
                 setRows(mappedRows);
                 setStatus("valid");
@@ -90,7 +113,7 @@ export default function SpreadsheetImport() {
     const handleFieldChange = (id: number, field: string, value: string) => {
         setRows((prevRows) =>
             prevRows.map((row) =>
-                row.id === id ? { ...row, [field]: value } : row
+                row.id === id ? { ...row, [field]: value, isError: false } : row
             )
         );
     };
@@ -144,6 +167,7 @@ export default function SpreadsheetImport() {
             console.error("Error saving student (Save):", error.response?.data || error.message || error);
             setAction("save");
             setStatus("invalid");
+            setRows((prevRows) => prevRows.map((r) => r.id === idToSave ? { ...r, isError: true } : r));
         }
     };
 
@@ -154,6 +178,7 @@ export default function SpreadsheetImport() {
         setStatus("loading");
 
         let successIds: number[] = [];
+        let errorIds: number[] = [];
 
         for (const row of rows) {
             try {
@@ -161,10 +186,14 @@ export default function SpreadsheetImport() {
                 successIds.push(row.id);
             } catch (error: any) {
                 console.error(`Error saving ${row.name} (Save All):`, error.response?.data || error.message || error);
+                errorIds.push(row.id);
             }
         }
 
-        const remainingRows = rows.filter((r) => !successIds.includes(r.id));
+        const remainingRows = rows.filter((r) => !successIds.includes(r.id)).map(r =>
+            errorIds.includes(r.id) ? { ...r, isError: true } : r
+        );
+
         setRows(remainingRows);
 
         if (remainingRows.length === 0) {
@@ -172,6 +201,11 @@ export default function SpreadsheetImport() {
         } else {
             setStatus("invalid");
         }
+    };
+
+    const handleAbort = () => {
+        setRows([]);
+        setStatus("aborted");
     };
 
     const isDialogOpen = rows.length > 0;
@@ -203,6 +237,13 @@ export default function SpreadsheetImport() {
                         <AlertDescription>{action === "import" ? "Spreadsheet processed successfully." : "All records successfully saved to the database!"}</AlertDescription>
                     </Alert>
                 </div>
+                <div className={`absolute w-full transition-all duration-500 ease-in-out ${status === "aborted" ? "translate-y-0 opacity-100 visible" : "-translate-y-24 opacity-0 invisible"}`}>
+                    <Alert className="bg-background/95 backdrop-blur shadow-xl border-border">
+                        <X className="h-4 w-4" />
+                        <AlertTitle>Aborted</AlertTitle>
+                        <AlertDescription>The import process was cancelled.</AlertDescription>
+                    </Alert>
+                </div>
             </div>
 
             <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="h-12 text-base font-medium border-border/50 hover:bg-muted/80 hover:text-foreground cursor-pointer rounded-xl flex items-center justify-center gap-2">
@@ -222,9 +263,17 @@ export default function SpreadsheetImport() {
                         <CarouselContent className="ml-0 outline-none focus:outline-none">
                             {rows.map((r) => (
                                 <CarouselItem key={r.id} className="pl-0 basis-full w-[850px] min-w-[850px] max-w-[850px] flex justify-center pb-4 pt-4 outline-none focus:outline-none">
-                                    <Card className="w-[750px] min-w-[750px] max-w-[750px] h-[550px] shrink-0 border border-border/50 bg-background shadow-2xl rounded-2xl p-8 flex flex-col gap-6 outline-none focus:outline-none">
+                                    <Card className={`relative w-[750px] min-w-[750px] max-w-[750px] h-[550px] shrink-0 bg-background shadow-2xl rounded-2xl p-8 flex flex-col gap-6 outline-none focus:outline-none transition-colors duration-300 ${r.isError ? "border-2 border-destructive" : "border border-border/50"}`}>
 
-                                        <div className="border-b border-border/40 pb-4">
+                                        <button
+                                            onClick={handleAbort}
+                                            className="absolute top-6 right-6 text-muted-foreground hover:text-foreground hover:bg-muted/50 p-1.5 rounded-full transition-colors cursor-pointer"
+                                            title="Cancel import"
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </button>
+
+                                        <div className="border-b border-border/40 pb-4 pr-8">
                                             <input
                                                 className="text-3xl font-bold tracking-tight w-full bg-transparent border border-transparent hover:border-border focus:border-ring focus:bg-background px-2 py-1 rounded-md outline-none transition-colors"
                                                 value={r.name}
@@ -232,45 +281,32 @@ export default function SpreadsheetImport() {
                                             />
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm max-h-[350px] overflow-y-auto pr-2">
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">Timestamp</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.ts} onChange={(e) => handleFieldChange(r.id, "ts", e.target.value)} />
-                                            </div>
+                                        <div className="grid grid-cols-2 gap-y-4 gap-x-8 text-sm max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {STUDENT_COLUMNS.map((col) => (
+                                                <div
+                                                    key={col.id}
+                                                    className={`space-y-1 ${col.colSpan === 2 ? "col-span-2 mt-2 p-3 bg-muted/30 rounded-lg" : ""}`}
+                                                >
+                                                    <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">
+                                                        {col.label}
+                                                    </label>
 
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">Email Address</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.email} onChange={(e) => handleFieldChange(r.id, "email", e.target.value)} />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">Phone Number</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.phone} onChange={(e) => handleFieldChange(r.id, "phone", e.target.value)} />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">University / Program</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.program} onChange={(e) => handleFieldChange(r.id, "program", e.target.value)} />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">First time participant?</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.firstTime} onChange={(e) => handleFieldChange(r.id, "firstTime", e.target.value)} />
-                                            </div>
-
-                                            <div className="space-y-1">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block px-2">Staying in team?</label>
-                                                <input className={`font-medium text-foreground ${inputClasses}`} value={r.stayInTeam} onChange={(e) => handleFieldChange(r.id, "stayInTeam", e.target.value)} />
-                                            </div>
-
-                                            <div className="col-span-2 space-y-1 mt-2 p-3 bg-muted/30 rounded-lg">
-                                                <label className="text-muted-foreground font-semibold text-xs uppercase tracking-wider block mb-1 px-2">Goals</label>
-                                                <textarea
-                                                    className="font-medium text-foreground italic w-full min-h-[60px] resize-none bg-transparent border border-transparent hover:border-border focus:border-ring focus:bg-background px-2 py-1 rounded-md outline-none transition-colors"
-                                                    value={r.goals}
-                                                    onChange={(e) => handleFieldChange(r.id, "goals", e.target.value)}
-                                                />
-                                            </div>
+                                                    {col.type === "textarea" ? (
+                                                        <textarea
+                                                            className="font-medium text-foreground italic w-full min-h-[60px] max-h-[100px] overflow-y-auto resize-none bg-transparent border border-transparent hover:border-border focus:border-ring focus:bg-background px-2 py-1 rounded-md outline-none transition-colors custom-scrollbar"
+                                                            value={r[col.id]}
+                                                            onChange={(e) => handleFieldChange(r.id, col.id, e.target.value)}
+                                                        />
+                                                    ) : (
+                                                        <textarea
+                                                            rows={1}
+                                                            className={`font-medium text-foreground overflow-x-auto overflow-y-hidden whitespace-nowrap resize-none custom-scrollbar ${inputClasses}`}
+                                                            value={r[col.id]}
+                                                            onChange={(e) => handleFieldChange(r.id, col.id, e.target.value)}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
                                         </div>
 
                                         <div className="flex justify-between gap-4 mt-auto pt-4 border-t border-border/40">

@@ -1,6 +1,7 @@
 using evoNaplo.DTO;
 using evoNaplo.Models;
 using evoNaplo.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace evoNaplo.Services;
 
@@ -10,14 +11,16 @@ namespace evoNaplo.Services;
 internal class TeamService : ITeamService
 {
     private static readonly List<Team> _teams = new List<Team>();
-    private readonly IMentorService _mentorService;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IStudentService _studentService;
 
-    public TeamService(/*IMentorService mentorService,*/ IStudentService studentService) // Temporary fix, doesn't build without it
+    public TeamService(IServiceProvider serviceProvider, IStudentService studentService)
     {
-        //_mentorService = mentorService;
+        _serviceProvider = serviceProvider;
         _studentService = studentService;
     }
+    
+    private IMentorService _mentorService => _serviceProvider.GetRequiredService<IMentorService>();
 
     /// <summary>
     /// Retrieves a team model by its ID. If a team with the specified ID is found in the list of teams, it is returned. If no team is found with the given ID, a TeamNotFoundException is thrown with an appropriate message.
