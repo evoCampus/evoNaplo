@@ -6,8 +6,8 @@ namespace evoNaplo.DAL.Interfaces
     {
         Task<IEnumerable<Mentor>> GetAllMentorsAsync();
         Task<Mentor?> GetMentorByIdAsync(string id);
-        Task AddMentorAsync(Mentor mentor);
-        Task UpdateMentorAsync(Mentor mentor);
-        Task DeleteMentorAsync(string id);
+        Task<Mentor> AddMentorAsync(Mentor mentor);
+        Task<Mentor> UpdateMentorAsync(Mentor mentor);
+        Task<bool> DeleteMentorAsync(string id);
     }
 }

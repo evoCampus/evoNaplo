@@ -68,12 +68,9 @@ internal class ProjectService : IProjectService
     /// <returns>The added ProjectDTO if successful.</returns>
     public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAddDTO)
     {
-        // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(projectToAddDTO.Id) ? Guid.NewGuid().ToString() : projectToAddDTO.Id;
-
         var newProject = new Project
         {
-            Id = newId,
+            Id = projectToAddDTO.Id,
             Name = projectToAddDTO.Name,
             ShortDescription = projectToAddDTO.Description,
             ProjectLinks = projectToAddDTO.ProjectLinks is not null ? projectToAddDTO.ProjectLinks
@@ -82,7 +79,7 @@ internal class ProjectService : IProjectService
                 Id = Guid.NewGuid().ToString(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
-                ProjectId = newId
+                ProjectId = projectToAddDTO.Id
             })
             .ToList()
             : new List<ProjectLink>(),
@@ -185,13 +182,8 @@ internal class ProjectService : IProjectService
     /// <exception cref="ProjectNotFoundException"></exception>
     public async Task<bool> DeleteProjectAsync(string id)
     {
-        var existing = await _projectRepository.GetProjectByIdAsync(id);
-        if (existing is not null) 
-        {
-            await _projectRepository.DeleteProjectAsync(id);
-            return true;
-        }
-        throw new ProjectNotFoundException($"Project with ID {id} not found.");
+        await _projectRepository.DeleteProjectAsync(id);
+        return true;
     }
     
 }

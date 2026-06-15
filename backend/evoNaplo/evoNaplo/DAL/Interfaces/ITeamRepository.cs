@@ -6,8 +6,8 @@ namespace evoNaplo.DAL.Interfaces
     {
         Task<IEnumerable<Team>> GetAllTeamsAsync();
         Task<Team?> GetTeamByIdAsync(string id);
-        Task AddTeamAsync(Team team);
-        Task UpdateTeamAsync(Team team);
-        Task DeleteTeamAsync(string id);
+        Task<Team> AddTeamAsync(Team team);
+        Task<Team> UpdateTeamAsync(Team team);
+        Task<bool> DeleteTeamAsync(string id);
     }
 }

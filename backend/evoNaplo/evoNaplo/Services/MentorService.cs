@@ -71,12 +71,9 @@ internal class MentorService : IMentorService
 
     public async Task<MentorDTO> AddMentorAsync(MentorDTO mentorToAddDTO)
     {
-        // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(mentorToAddDTO.Id) ? Guid.NewGuid().ToString() : mentorToAddDTO.Id;
-
         var newMentor = new Mentor
         {
-            Id = newId,
+            Id = mentorToAddDTO.Id,
             Name = mentorToAddDTO.Name,
             Email = mentorToAddDTO.Email,
             PhoneNumber = mentorToAddDTO.PhoneNumber,
@@ -182,13 +179,7 @@ internal class MentorService : IMentorService
     /// <exception cref="MentorNotFoundException"></exception>
     public async Task<bool> DeleteMentorAsync(string id)
     {
-        var existingMentor = await _mentorRepository.GetMentorByIdAsync(id);
-        if (existingMentor is not null) 
-        {   
-            await _mentorRepository.DeleteMentorAsync(id);
-            return true;
-        }
-        throw new MentorNotFoundException($"Mentor with ID {id} not found.");
+        await _mentorRepository.DeleteMentorAsync(id);
+        return true;
     }
-    
 }

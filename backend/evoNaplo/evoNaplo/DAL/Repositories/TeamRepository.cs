@@ -2,6 +2,8 @@
 using evoNaplo.Data;
 using evoNaplo.Models;
 using Microsoft.EntityFrameworkCore;
+using NanoidDotNet;
+using evoNaplo.Exceptions;
 
 namespace evoNaplo.DAL.Repositories
 {
@@ -16,39 +18,41 @@ namespace evoNaplo.DAL.Repositories
 
         public async Task<IEnumerable<Team>> GetAllTeamsAsync()
         {
-            return await _context.Teams.Include(t => t.Mentors)
-                .Include(t => t.Students)
-                .Include(t => t.Project)
-                .Include(t => t.AttendanceSheets)
-                .AsSplitQuery()
-                .ToListAsync();
+            return await _context.Teams.ToListAsync();
         }
         public async Task<Team?> GetTeamByIdAsync(string id) {
-            return await _context.Teams
-                .Include(t => t.Students)
-                .Include(t => t.Project)
-                .Include(t => t.AttendanceSheets)
-                .AsSplitQuery()
-                .FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.Teams.FirstOrDefaultAsync(t => t.Id == id);
         } 
-        public async Task AddTeamAsync(Team team)
+        public async Task<Team> AddTeamAsync(Team team)
         {
+            if (string.IsNullOrEmpty(team.Id))
+            {
+                team.Id = Nanoid.Generate();
+            }
             _context.Teams.Add(team);
             await _context.SaveChangesAsync();
+
+            return team;
         }
-        public async Task UpdateTeamAsync(Team team)
+        public async Task<Team> UpdateTeamAsync(Team team)
         {
             _context.Teams.Update(team);
             await _context.SaveChangesAsync();
+
+            return team;
         }
-        public async Task DeleteTeamAsync(string id)
+        public async Task<bool> DeleteTeamAsync(string id)
         {
             var existingTeam = await GetTeamByIdAsync(id);
-            if (existingTeam is not null)
+
+            if (existingTeam is null)
             {
-                _context.Teams.Remove(existingTeam);
-                await _context.SaveChangesAsync();
+                throw new TeamNotFoundException(id);
             }
+            _context.Remove(existingTeam);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

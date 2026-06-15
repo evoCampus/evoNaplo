@@ -1,8 +1,10 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using evoNaplo.DAL.Interfaces;
+﻿using evoNaplo.DAL.Interfaces;
 using evoNaplo.Data;
+using evoNaplo.Exceptions;
 using evoNaplo.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using NanoidDotNet;
 
 namespace evoNaplo.DAL.Repositories
 {
@@ -16,43 +18,46 @@ namespace evoNaplo.DAL.Repositories
         }
         public async Task<IEnumerable<Mentor>> GetAllMentorsAsync()
         {
-            return await _context.Mentors
-                .Include(m => m.Teams)
-               .Include(m => m.Projects)
-               .AsSplitQuery()
-               .ToListAsync();
+            return await _context.Mentors.ToListAsync();
         }
         public async Task<Mentor?> GetMentorByIdAsync(string id)
         {
-            return await _context.Mentors
-               .Include(m => m.Teams)
-               .Include(m => m.Projects)
-               .AsSplitQuery()
-               .FirstOrDefaultAsync(m => m.Id == id);
+            return await _context.Mentors.FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public async Task AddMentorAsync(Mentor mentor)
+        public async Task<Mentor> AddMentorAsync(Mentor mentor)
         {
+            if (string.IsNullOrEmpty(mentor.Id))
+            {
+                mentor.Id = Nanoid.Generate();
+            }
             await _context.Mentors.AddAsync(mentor);
             await _context.SaveChangesAsync();
+
+            return mentor;
         }
 
-        public async Task UpdateMentorAsync(Mentor mentor)
+        public async Task<Mentor> UpdateMentorAsync(Mentor mentor)
         {
             _context.Mentors.Update(mentor);
             await _context.SaveChangesAsync();
+
+            return mentor;
         }
 
-        public async Task DeleteMentorAsync(string id)
+        public async Task<bool> DeleteMentorAsync(string id)
         {
             var existingMentor = await GetMentorByIdAsync(id);
-            if (existingMentor is not null)
+
+            if (existingMentor is null)
             {
-                _context.Mentors.Remove(existingMentor);
-                await _context.SaveChangesAsync();
+                throw new MentorNotFoundException(id);
             }
+
+            _context.Mentors.Remove(existingMentor);
+            await _context.SaveChangesAsync();  
+
+            return true;
         }
-
-
     }
 }

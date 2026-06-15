@@ -66,11 +66,9 @@ internal class StudentService : IStudentService
     /// <returns>The added StudentDTO if successful.</returns>
     public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAddDTO)
     {
-        // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(studentToAddDTO.Id) ? Guid.NewGuid().ToString() : studentToAddDTO.Id;
         var newStudent = new Student
         {
-            Id = newId,
+            Id = studentToAddDTO.Id,
             Name = studentToAddDTO.Name,
             Email = studentToAddDTO.Email,
             PhoneNumber = studentToAddDTO.PhoneNumber,
@@ -87,9 +85,9 @@ internal class StudentService : IStudentService
             WantsToStayWithCurrentTeam = studentToAddDTO.WantsToStayWithCurrentTeam,
         };
 
-        await _studentRepository.AddStudentAsync(newStudent);
+        var addedStudent = await _studentRepository.AddStudentAsync(newStudent);
 
-        studentToAddDTO.Id = newStudent.Id;
+        studentToAddDTO.Id = addedStudent.Id;
 
         return studentToAddDTO;
     }
@@ -136,13 +134,8 @@ internal class StudentService : IStudentService
     /// <exception cref="StudentNotFoundException"></exception>
     public async Task<bool> DeleteStudentAsync(string id)
     {
-        var existingStudent = await _studentRepository.GetStudentByIdAsync(id);
-        if (existingStudent is not null) 
-        {
-            await _studentRepository.DeleteStudentAsync(id);
-            return true;
-        }
-        throw new StudentNotFoundException($"Student with ID {id} not found.");
+        await _studentRepository.DeleteStudentAsync(id);
+        return true;
     }
     
 }

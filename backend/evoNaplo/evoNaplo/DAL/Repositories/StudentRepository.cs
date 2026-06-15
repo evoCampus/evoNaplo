@@ -1,7 +1,9 @@
 ﻿using evoNaplo.DAL.Interfaces;
 using evoNaplo.Data;
+using evoNaplo.Exceptions;
 using evoNaplo.Models;
 using Microsoft.EntityFrameworkCore;
+using NanoidDotNet;
 
 namespace evoNaplo.DAL.Repositories
 {
@@ -15,34 +17,43 @@ namespace evoNaplo.DAL.Repositories
         }
         public async Task<IEnumerable<Student>> GetAllStudentsAsync()
         {
-            return await _context.Students
-                .Include(s => s.Team)
-                .ToListAsync();
+            return await _context.Students.ToListAsync();
         }
         public async Task<Student?> GetStudentByIdAsync(string id)
         {
-            return await _context.Students
-                .Include(t => t.Team)
-                .FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Students.FirstOrDefaultAsync(x => x.Id == id);
         } 
-        public async Task AddStudentAsync(Student student)
+        public async Task<Student> AddStudentAsync(Student student)
         {
+            if (string.IsNullOrEmpty(student.Id))
+            {
+                student.Id = Nanoid.Generate();
+            }
             _context.Students.Add(student);
             await _context.SaveChangesAsync();
+
+            return student;
         }
-        public async Task UpdateStudentAsync(Student student)
+        public async Task<Student> UpdateStudentAsync(Student student)
         {
             _context.Students.Update(student);
             await _context.SaveChangesAsync();
+            
+            return student;
         }
-        public async Task DeleteStudentAsync(string id)
+        public async Task<bool> DeleteStudentAsync(string id)
         {
             var existingStudent = await GetStudentByIdAsync(id);
-            if (existingStudent is not null)
+
+            if (existingStudent is null)
             {
-                _context.Students.Remove(existingStudent);
-                await _context.SaveChangesAsync();
+                throw new StudentNotFoundException(id);
             }
+
+            _context.Students.Remove(existingStudent);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }

@@ -71,12 +71,9 @@ internal class TeamService : ITeamService
     /// <returns>The added TeamDTO if successful.</returns>
     public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAddDTO)
     {
-        // id will be generated on other branch
-        var newId = string.IsNullOrWhiteSpace(teamToAddDTO.Id) ? Guid.NewGuid().ToString() : teamToAddDTO.Id;
-
         var newTeam = new Team
         {
-            Id = newId,
+            Id = teamToAddDTO.Id,
             Mentors = new List<Mentor>(),
             Students = new List<Student>(),
             AttendanceSheets = new List<AttendanceSheet>()
@@ -112,8 +109,7 @@ internal class TeamService : ITeamService
             {
                 newTeam.AttendanceSheets.Add(new AttendanceSheet
                 {
-                    Id = sheetId,
-                    TeamId = newId
+                    Id = sheetId
                 });
             }
         }
@@ -225,12 +221,7 @@ internal class TeamService : ITeamService
     /// <exception cref="TeamNotFoundException"></exception>
     public async Task<bool> DeleteTeamAsync(string id)
     {
-        var existingTeam = await _teamRepository.GetTeamByIdAsync(id);
-        if (existingTeam is not null) 
-        {
-            await _teamRepository.DeleteTeamAsync(id);
-            return true;
-        }
-        throw new TeamNotFoundException($"Team with ID {id} not found.");
+        await _teamRepository.DeleteTeamAsync(id);
+        return true;
     }
 }
