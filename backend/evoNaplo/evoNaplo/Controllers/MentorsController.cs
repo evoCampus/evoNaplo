@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.Services;
-using evoNaplo.DTO;
 using evoNaplo.Exceptions;
+using evoNaplo.DTO.MentorDTOs;
 
 
 namespace evoNaplo.Controllers;
@@ -43,7 +43,7 @@ public class MentorsController : ControllerBase
     /// <param name="mentorId">The unique identifier of the mentor to retrieve.</param>
     /// <returns>The MentorDTO if found; otherwise, a NotFound response.</returns>
     [HttpGet("{mentorId}")]
-    public async Task<ActionResult<MentorDTO>> GetMentor(string mentorId)
+    public async Task<ActionResult<MentorDetailsDTO>> GetMentor(string mentorId)
     {
         try
         {
@@ -61,7 +61,7 @@ public class MentorsController : ControllerBase
     /// <param name="mentorToCreate">The mentor data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor.</returns>
     [HttpPost]
-    public async Task<ActionResult<MentorDTO>> CreateMentor(MentorDTO mentorToCreate)
+    public async Task<ActionResult<MentorDTO>> CreateMentor(CreateMentorDTO mentorToCreate)
     {
         try
         {
@@ -80,7 +80,7 @@ public class MentorsController : ControllerBase
     /// <param name="updatedMentor">An object containing the updated mentor information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated mentor.</returns>
     [HttpPut("{mentorId}")]
-    public async Task<ActionResult> UpdateMentor(string mentorId, MentorDTO updatedMentor)
+    public async Task<ActionResult> UpdateMentor(string mentorId, UpdateMentorDTO    updatedMentor)
     {
         try
         {

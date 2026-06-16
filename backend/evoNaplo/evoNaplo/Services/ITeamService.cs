@@ -1,15 +1,15 @@
-using evoNaplo.DTO;
+using evoNaplo.DTO.TeamDTOs;
 using evoNaplo.Models;
 
 namespace evoNaplo.Services;
 
 public interface ITeamService
 {
-    Team? GetTeamModelById(string id);
+    Task<Team> GetTeamModelById(string id);
     Task<IEnumerable<TeamDTO>> GetAllTeamsAsync();
     Task<TeamDTO> GetTeamByIdAsync(string id);
-    Task<TeamDTO> AddTeamAsync(TeamDTO teamToAdd);
-    Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeam);
+    Task<TeamDTO> AddTeamAsync(CreateTeamDTO teamToAdd);
+    Task<TeamDTO> UpdateTeamAsync(string id, UpdateTeamDTO updatedTeam);
     Task<bool> DeleteTeamAsync(string id);
 
 }
