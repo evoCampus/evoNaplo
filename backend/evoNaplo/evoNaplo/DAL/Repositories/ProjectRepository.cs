@@ -1,4 +1,5 @@
-﻿using evoNaplo.DAL.Interfaces;
+﻿using evoNaplo.Controllers;
+using evoNaplo.DAL.Interfaces;
 using evoNaplo.Data;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
@@ -46,9 +47,11 @@ namespace evoNaplo.DAL.Repositories
             return project;
         }
 
-        public async Task<Project> AddTeamsToProjectAsync(string projectId, IEnumerable<Team> teams)
+        public async Task<Project> AddTeamToProjectAsync(string projectId, Team team)
         {
-            var project = await _context.Projects.Include(p => p.Teams).FirstOrDefaultAsync(p => p.Id == projectId);
+            var project = await _context.Projects
+                .Include(p => p.Teams)
+                .FirstOrDefaultAsync(p => p.Id == projectId);
 
             if (project is null)
             {
@@ -57,18 +60,17 @@ namespace evoNaplo.DAL.Repositories
 
             project.Teams ??= new List<Team>();
 
-            foreach (var team in teams) {
-                if (!project.Teams.Any(t => t.Id == team.Id))
-                {
-                    project.Teams.Add(team);
-                }
+            if (!project.Teams.Any(t => t.Id == team.Id))
+            {
+                project.Teams.Add(team);
             }
+
             await _context.SaveChangesAsync();
 
             return project;
         }
 
-        public async Task<bool> RemoveTeamsFromProjectAsync(string projectId, IEnumerable<Team> teams)
+        public async Task<bool> RemoveTeamFromProjectAsync(string projectId, Team team)
         {
             var project = await _context.Projects.Include(p => p.Teams).FirstOrDefaultAsync(p => p.Id == projectId);
 
@@ -79,15 +81,13 @@ namespace evoNaplo.DAL.Repositories
 
             project.Teams ??= new List<Team>();
 
-            foreach (var team in teams)
-            {
-                var teamToRemove = project.Teams.FirstOrDefault(t => t.Id == team.Id);
+            var teamToRemove = project.Teams.FirstOrDefault(t => t.Id == team.Id);
 
-                if (teamToRemove is not null)
-                {
-                    project.Teams.Remove(teamToRemove);
-                }
+            if (teamToRemove is not null)
+            {
+                project.Teams.Remove(teamToRemove);
             }
+
             await _context.SaveChangesAsync();
 
             return true;
@@ -106,6 +106,15 @@ namespace evoNaplo.DAL.Repositories
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        public async Task<Project?> GetProjectWithDetailsAsync(string id)
+        {
+            return await _context.Projects
+                .Include(t => t.Teams)
+                .Include(t => t.ProjectLinks)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
     }
 }

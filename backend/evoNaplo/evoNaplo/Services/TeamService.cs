@@ -1,6 +1,6 @@
 using evoNaplo.DAL.Interfaces;
-using evoNaplo.DAL.Repositories;
-using evoNaplo.DTO;
+using evoNaplo.DTO.MentorDTOs;
+using evoNaplo.DTO.TeamDTOs;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
 
@@ -45,7 +45,7 @@ internal class TeamService : ITeamService
     public async Task<IEnumerable<TeamDTO>> GetAllTeamsAsync()
     {
         var teams = await _teamRepository.GetAllTeamsAsync();
-        return teams.Select(t => new TeamDTO(t));
+        return teams?.Select(t => new TeamDTO(t)) ?? Enumerable.Empty<TeamDTO>();
     }
 
     /// <summary>
@@ -69,54 +69,44 @@ internal class TeamService : ITeamService
     /// </summary>
     /// <param name="teamToAddDTO">The TeamDTO to add.</param>
     /// <returns>The added TeamDTO if successful.</returns>
-    public async Task<TeamDTO> AddTeamAsync(TeamDTO teamToAddDTO)
+    public async Task<TeamDTO> AddTeamAsync(CreateTeamDTO teamToAddDTO)
     {
         var newTeam = new Team
         {
-            Id = teamToAddDTO.Id,
+            Id = string.Empty,
             Mentors = new List<Mentor>(),
             Students = new List<Student>(),
             AttendanceSheets = new List<AttendanceSheet>()
         };
 
-        if (teamToAddDTO.MentorIds is not null)
+        if (!string.IsNullOrEmpty(teamToAddDTO.MentorId))
         {
-            foreach (var mentorId in teamToAddDTO.MentorIds)
+            var mentor = await _mentorRepository.GetMentorByIdAsync(teamToAddDTO.MentorId);
+            if (mentor is not null)
             {
-                var mentor = await _mentorRepository.GetMentorByIdAsync(mentorId);
-                if (mentor is not null)
-                {
-                    newTeam.Mentors.Add(mentor);
-                }
+                newTeam.Mentors.Add(mentor);
             }
         }
 
-        if (teamToAddDTO.StudentIds is not null)
+        if (!string.IsNullOrEmpty(teamToAddDTO.StudentId))
         {
-            foreach (var studentId in teamToAddDTO.StudentIds)
+            var student = await _studentRepository.GetStudentByIdAsync(teamToAddDTO.StudentId);
+            if (student is not null)
             {
-                var student = await _studentRepository.GetStudentByIdAsync(studentId);
-                if (student is not null)
-                {
-                    newTeam.Students.Add(student);
-                }
+                newTeam.Students.Add(student);
             }
         }
 
-        if (teamToAddDTO.AttendanceSheetIds is not null)
+        if (!string.IsNullOrEmpty(teamToAddDTO.AttendanceSheetId))
         {
-            foreach (var sheetId in teamToAddDTO.AttendanceSheetIds)
-            {
-                newTeam.AttendanceSheets.Add(new AttendanceSheet
-                {
-                    Id = sheetId
-                });
-            }
+            newTeam.AttendanceSheets.Add(new AttendanceSheet
+            { 
+                Id = teamToAddDTO.AttendanceSheetId
+            });
         }
 
         await _teamRepository.AddTeamAsync(newTeam);
-        teamToAddDTO.Id = newTeam.Id;
-        return teamToAddDTO;
+        return new TeamDTO(newTeam);
     }
 
     /// <summary>
@@ -126,7 +116,7 @@ internal class TeamService : ITeamService
     /// <param name="updatedTeamDTO">The updated team DTO.</param>
     /// <returns>The updated TeamDTO if successful.</returns>
     /// <exception cref="TeamNotFoundException"></exception>
-    public async Task<TeamDTO> UpdateTeamAsync(string id, TeamDTO updatedTeamDTO)
+    public async Task<TeamDTO> UpdateTeamAsync(string id, UpdateTeamDTO updatedTeamDTO)
     {
         var existingTeam = await _teamRepository.GetTeamByIdAsync(id);
 
@@ -136,79 +126,39 @@ internal class TeamService : ITeamService
             existingTeam.Students ??= new List<Student>();
             existingTeam.AttendanceSheets ??= new List<AttendanceSheet>();
 
-            if (updatedTeamDTO.MentorIds is not null)
+            existingTeam.Mentors.Clear();
+            if (!string.IsNullOrEmpty(updatedTeamDTO.MentorId))
             {
-                var mentorsToRemove = existingTeam.Mentors
-                .Where(m => !updatedTeamDTO.MentorIds.Contains(m.Id))
-                .ToList();
-
-                foreach (var mentorToRemove in mentorsToRemove)
+                var mentor = await _mentorRepository.GetMentorByIdAsync(updatedTeamDTO.MentorId);
+                if (mentor is not null)
                 {
-                    existingTeam.Mentors.Remove(mentorToRemove);
-                }
-
-                foreach (var mentorId in updatedTeamDTO.MentorIds)
-                {
-                    if (!existingTeam.Mentors.Any(m => m.Id == mentorId))
-                    {
-                        var mentor = await _mentorRepository.GetMentorByIdAsync(mentorId);
-                        if (mentor is not null)
-                        {
-                            existingTeam.Mentors.Add(mentor);
-                        } 
-                    }
+                    existingTeam.Mentors.Add(mentor);
                 }
             }
 
-        if (updatedTeamDTO.StudentIds is not null)
+            existingTeam.Students.Clear();
+            if (!string.IsNullOrEmpty(updatedTeamDTO.StudentId))
             {
-                var studentsToRemove = existingTeam.Students
-                .Where(s => !updatedTeamDTO.StudentIds.Contains(s.Id))
-                .ToList();
-
-                foreach (var studentToRemove in studentsToRemove)
+                var student = await _studentRepository.GetStudentByIdAsync(updatedTeamDTO.StudentId);
+                if (student is not null)
                 {
-                    existingTeam.Students.Remove(studentToRemove);
-                }
-
-                foreach (var studentId in updatedTeamDTO.StudentIds)
-                {
-                    if (!existingTeam.Students.Any(s => s.Id == studentId))
-                    {
-                        var student = await _studentRepository.GetStudentByIdAsync(studentId);
-                        if (student is not null)
-                        {
-                            existingTeam.Students.Add(student);
-                        } 
-                    }
+                    existingTeam.Students.Add(student);
                 }
             }
 
-        if (updatedTeamDTO.AttendanceSheetIds is not null)
-        {
-            var sheetsToRemove = existingTeam.AttendanceSheets
-            .Where(a => !updatedTeamDTO.AttendanceSheetIds.Contains(a.Id))
-            .ToList();
-
-            foreach (var sheetToRemove in sheetsToRemove)
+            existingTeam.AttendanceSheets.Clear();
+            if (!string.IsNullOrEmpty(updatedTeamDTO.AttendanceSheetId))
             {
-                    existingTeam.AttendanceSheets.Remove(sheetToRemove);
-            }
-                foreach (var sheetId in updatedTeamDTO.AttendanceSheetIds)
+                existingTeam.AttendanceSheets.Add(new AttendanceSheet
                 {
-                    if (!existingTeam.AttendanceSheets.Any(a => a.Id == sheetId))
-                    {
-                    existingTeam.AttendanceSheets.Add(new AttendanceSheet
-                        { 
-                        Id = sheetId,
-                        TeamId = existingTeam.Id
-                        });
-                    }
-                }
-        }
+                    Id = updatedTeamDTO.AttendanceSheetId,
+                    TeamId = existingTeam.Id
+                });
+            }
+
             await _teamRepository.UpdateTeamAsync(existingTeam);
-            updatedTeamDTO.Id = existingTeam.Id;
-            return updatedTeamDTO;
+            
+            return new TeamDTO(existingTeam);
         }
         throw new TeamNotFoundException($"Team with ID {id} not found.");
     } 

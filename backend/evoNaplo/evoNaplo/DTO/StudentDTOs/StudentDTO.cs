@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using evoNaplo.Models;
 
-namespace evoNaplo.DTO;
+namespace evoNaplo.DTO.StudentDTOs;
 
 public class StudentDTO
 {
@@ -9,6 +9,7 @@ public class StudentDTO
     public required string Name { get; set; }
     public required string Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public string? UniversityName { get; set; }
     public string? UniversityProgramme { get; set; }
     public required int CurrentSemester { get; set; }
     public required bool IsInTheirFirstSemester { get; set; }
@@ -21,11 +22,6 @@ public class StudentDTO
     public required bool IsWorkingStudent { get; set; }
     public DateTime WorkExperienceInSemesters { get; set; }
     public required bool WantsToStayWithCurrentTeam { get; set; }
-
-    [SetsRequiredMembers]
-    public StudentDTO()
-    {
-    }
 
     [SetsRequiredMembers]
     public StudentDTO(Student student)

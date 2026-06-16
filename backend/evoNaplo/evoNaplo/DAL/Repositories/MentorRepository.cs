@@ -3,7 +3,6 @@ using evoNaplo.Data;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using NanoidDotNet;
 
 namespace evoNaplo.DAL.Repositories
@@ -58,6 +57,14 @@ namespace evoNaplo.DAL.Repositories
             await _context.SaveChangesAsync();  
 
             return true;
+        }
+        public async Task<Mentor?> GetMentorsWithDetails(string id)
+        {
+            return await _context.Mentors
+                .Include(t => t.Teams)
+                .Include(t => t.Projects)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
     }
 }

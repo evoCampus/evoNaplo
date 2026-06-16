@@ -1,7 +1,8 @@
-﻿using evoNaplo.DTO;
-using evoNaplo.Models;
+﻿using evoNaplo.DAL.Interfaces;
+using evoNaplo.DTO.MentorDTOs;
+using evoNaplo.DTO.StudentDTOs;
 using evoNaplo.Exceptions;
-using evoNaplo.DAL.Interfaces;
+using evoNaplo.Models;
 
 namespace evoNaplo.Services;
 
@@ -40,7 +41,7 @@ internal class StudentService : IStudentService
     public async Task<IEnumerable<StudentDTO>> GetAllStudentsAsync()
     {
         var students = await _studentRepository.GetAllStudentsAsync();
-        return students.Select(s => new StudentDTO(s));
+        return students?.Select(s => new StudentDTO(s)) ?? Enumerable.Empty<StudentDTO>();
     }
     
     /// <summary>
@@ -64,15 +65,16 @@ internal class StudentService : IStudentService
     /// </summary>
     /// <param name="studentToAddDTO">The StudentDTO to add.</param>
     /// <returns>The added StudentDTO if successful.</returns>
-    public async Task<StudentDTO> AddStudentAsync(StudentDTO studentToAddDTO)
+    public async Task<StudentDTO> AddStudentAsync(CreateStudentDTO studentToAddDTO)
     {
         var newStudent = new Student
         {
-            Id = studentToAddDTO.Id,
+            Id = string.Empty,
             Name = studentToAddDTO.Name,
             Email = studentToAddDTO.Email,
             PhoneNumber = studentToAddDTO.PhoneNumber,
             UniversityProgramme = studentToAddDTO.UniversityProgramme,
+            UniversityName = studentToAddDTO.UniversityName,
             CurrentSemester = studentToAddDTO.CurrentSemester,
             IsFirstEvoCampusSemester = studentToAddDTO.IsInTheirFirstSemester,
             PersonalGoals = studentToAddDTO.PersonalGoals,
@@ -83,13 +85,12 @@ internal class StudentService : IStudentService
             IsCurrentlyIntern = studentToAddDTO.HasInternship,
             IsWorkingStudent = studentToAddDTO.IsWorkingStudent,
             WantsToStayWithCurrentTeam = studentToAddDTO.WantsToStayWithCurrentTeam,
+            TeamId = studentToAddDTO.TeamId
         };
 
         var addedStudent = await _studentRepository.AddStudentAsync(newStudent);
 
-        studentToAddDTO.Id = addedStudent.Id;
-
-        return studentToAddDTO;
+        return new StudentDTO(addedStudent);
     }
 
     /// <summary>
@@ -99,7 +100,7 @@ internal class StudentService : IStudentService
     /// <param name="updatedStudentDTO">The updated student DTO.</param>
     /// <returns>The updated StudentDTO if successful.</returns>
     /// <exception cref="StudentNotFoundException"></exception>
-    public async Task<StudentDTO> UpdateStudentAsync(string id, StudentDTO updatedStudentDTO)
+    public async Task<StudentDTO> UpdateStudentAsync(string id, UpdateStudentDTO updatedStudentDTO)
     {
         var existingStudent = await _studentRepository.GetStudentByIdAsync(id);
         if (existingStudent is not null) 
@@ -108,6 +109,7 @@ internal class StudentService : IStudentService
             existingStudent.Email = updatedStudentDTO.Email;
             existingStudent.PhoneNumber = updatedStudentDTO.PhoneNumber;
             existingStudent.UniversityProgramme = updatedStudentDTO.UniversityProgramme;
+            existingStudent.UniversityName = updatedStudentDTO.UniversityName;
             existingStudent.CurrentSemester = updatedStudentDTO.CurrentSemester;
             existingStudent.IsFirstEvoCampusSemester = updatedStudentDTO.IsInTheirFirstSemester;
             existingStudent.PersonalGoals = updatedStudentDTO.PersonalGoals;
@@ -118,10 +120,11 @@ internal class StudentService : IStudentService
             existingStudent.IsCurrentlyIntern = updatedStudentDTO.HasInternship;
             existingStudent.IsWorkingStudent = updatedStudentDTO.IsWorkingStudent;
             existingStudent.WantsToStayWithCurrentTeam = updatedStudentDTO.WantsToStayWithCurrentTeam;
+            existingStudent.TeamId = updatedStudentDTO.TeamId;
 
             await _studentRepository.UpdateStudentAsync(existingStudent);
-            updatedStudentDTO.Id = existingStudent.Id;
-            return updatedStudentDTO;
+
+            return new StudentDTO(existingStudent);
         }
         throw new StudentNotFoundException($"Student with ID {id} not found.");
     }

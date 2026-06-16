@@ -1,5 +1,6 @@
 using evoNaplo.DAL.Interfaces;
-using evoNaplo.DTO;
+using evoNaplo.DTO.MentorDTOs;
+using evoNaplo.DTO.ProjectDTOs;
 using evoNaplo.Exceptions;
 using evoNaplo.Models;
 
@@ -42,7 +43,7 @@ internal class ProjectService : IProjectService
     public async Task<IEnumerable<ProjectDTO>> GetAllProjectsAsync()
     {
         var projects = await _projectRepository.GetAllProjectsAsync();
-        return projects.Select(p => new ProjectDTO(p));
+        return projects?.Select(p => new ProjectDTO(p)) ?? Enumerable.Empty<ProjectDTO>();
     }
 
     /// <summary>
@@ -66,11 +67,11 @@ internal class ProjectService : IProjectService
     /// </summary>
     /// <param name="projectToAddDTO">The ProjectDTO to add.</param>
     /// <returns>The added ProjectDTO if successful.</returns>
-    public async Task<ProjectDTO> AddProjectAsync(ProjectDTO projectToAddDTO)
+    public async Task<ProjectDTO> AddProjectAsync(CreateProjectDTO projectToAddDTO)
     {
         var newProject = new Project
         {
-            Id = projectToAddDTO.Id,
+            Id = string.Empty,
             Name = projectToAddDTO.Name,
             ShortDescription = projectToAddDTO.Description,
             ProjectLinks = projectToAddDTO.ProjectLinks is not null ? projectToAddDTO.ProjectLinks
@@ -79,7 +80,7 @@ internal class ProjectService : IProjectService
                 Id = Guid.NewGuid().ToString(),
                 LinkType = Enum.TryParse<LinkTypes>(l.Key, out var type) ? type : LinkTypes.GitHub,
                 Url = l.Value,
-                ProjectId = projectToAddDTO.Id
+                ProjectId = string.Empty
             })
             .ToList()
             : new List<ProjectLink>(),
@@ -88,26 +89,18 @@ internal class ProjectService : IProjectService
         };
 
 
-        if (projectToAddDTO.TeamIds is not null)
+        if (!string.IsNullOrEmpty(projectToAddDTO.TeamId))
         {
-            foreach (var teamId in projectToAddDTO.TeamIds)
+            var team = await _teamRepository.GetTeamByIdAsync(projectToAddDTO.TeamId);
+            if (team is not null)
             {
-                var team = await _teamRepository.GetTeamByIdAsync(teamId);
-                if (team is not null)
-                {
-                    team.ProjectId = newProject.Id;
-
-                    await _teamRepository.UpdateTeamAsync(team);
-
-                    newProject.Teams.Add(team);
-                }
+                newProject.Teams.Add(team);
             }
         }
 
         await _projectRepository.AddProjectAsync(newProject);
 
-        projectToAddDTO.Id = newProject.Id;
-        return projectToAddDTO;
+        return new ProjectDTO(newProject);
     }
 
     /// <summary>
@@ -117,7 +110,7 @@ internal class ProjectService : IProjectService
     /// <param name="updatedProjectDTO">The updated project DTO.</param>
     /// <returns>The updated ProjectDTO if successful.</returns>
     /// <exception cref="ProjectNotFoundException"></exception>
-    public async Task<ProjectDTO> UpdateProjectAsync(string id, ProjectDTO updatedProjectDTO)
+    public async Task<ProjectDTO> UpdateProjectAsync(string id, UpdateProjectDTO updatedProjectDTO)
     {
         var existingProject = await _projectRepository.GetProjectByIdAsync(id);
         if (existingProject is not null) 
@@ -141,35 +134,21 @@ internal class ProjectService : IProjectService
                     });
                 }
             }
-            if (updatedProjectDTO.TeamIds is not null)
+
+            existingProject.Teams.Clear();
+
+            if (!string.IsNullOrEmpty(updatedProjectDTO.TeamId))
             {
-                var teamsToRemove = existingProject.Teams
-                .Where(t => !updatedProjectDTO.TeamIds.Contains(t.Id))
-                .ToList();
-
-                foreach (var teamToRemove in teamsToRemove)
+                var team = await _teamRepository.GetTeamByIdAsync(updatedProjectDTO.TeamId);
+                if (team is not null)
                 {
-                    existingProject.Teams.Remove(teamToRemove);
-                }
-                foreach (var teamId in updatedProjectDTO.TeamIds)
-                {
-                    if (!existingProject.Teams.Any(t => t.Id == teamId))
-                    {
-                        var team = await _teamRepository.GetTeamByIdAsync(teamId);
-                        if (team is not null)
-                        {
-                            team.ProjectId = existingProject.Id;
-                            await _teamRepository.UpdateTeamAsync(team);
-
-                            existingProject.Teams.Add(team);
-                        }
-                    }
+                    existingProject.Teams.Add(team);
                 }
             }
 
             await _projectRepository.UpdateProjectAsync(existingProject);
-            updatedProjectDTO.Id = existingProject.Id;
-            return updatedProjectDTO;
+
+            return new ProjectDTO(existingProject);
         }
         throw new ProjectNotFoundException($"Project with ID {id} not found.");
     }
