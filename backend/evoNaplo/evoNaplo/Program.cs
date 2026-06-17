@@ -18,6 +18,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationServices();
+builder.Services.AddDatabaseServices(builder.Configuration);
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
