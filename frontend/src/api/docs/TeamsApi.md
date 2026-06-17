@@ -63,16 +63,16 @@ No authorization required
 import {
     TeamsApi,
     Configuration,
-    TeamDTO
+    CreateTeamDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new TeamsApi(configuration);
 
-let teamDTO: TeamDTO; // (optional)
+let createTeamDTO: CreateTeamDTO; // (optional)
 
 const { status, data } = await apiInstance.apiTeamsPost(
-    teamDTO
+    createTeamDTO
 );
 ```
 
@@ -80,7 +80,7 @@ const { status, data } = await apiInstance.apiTeamsPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **teamDTO** | **TeamDTO**|  | |
+| **createTeamDTO** | **CreateTeamDTO**|  | |
 
 
 ### Return type
@@ -214,18 +214,18 @@ No authorization required
 import {
     TeamsApi,
     Configuration,
-    TeamDTO
+    UpdateTeamDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new TeamsApi(configuration);
 
 let teamId: string; // (default to undefined)
-let teamDTO: TeamDTO; // (optional)
+let updateTeamDTO: UpdateTeamDTO; // (optional)
 
 const { status, data } = await apiInstance.apiTeamsTeamIdPut(
     teamId,
-    teamDTO
+    updateTeamDTO
 );
 ```
 
@@ -233,7 +233,7 @@ const { status, data } = await apiInstance.apiTeamsTeamIdPut(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **teamDTO** | **TeamDTO**|  | |
+| **updateTeamDTO** | **UpdateTeamDTO**|  | |
 | **teamId** | [**string**] |  | defaults to undefined|
 
 

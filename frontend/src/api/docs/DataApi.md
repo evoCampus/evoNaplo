@@ -88,7 +88,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **dataImportPost**
-> Array<ImportData> dataImportPost()
+> dataImportPost()
 
 
 ### Example
@@ -118,7 +118,7 @@ const { status, data } = await apiInstance.dataImportPost(
 
 ### Return type
 
-**Array<ImportData>**
+void (empty response body)
 
 ### Authorization
 
@@ -127,7 +127,7 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: multipart/form-data
- - **Accept**: text/plain, application/json, text/json
+ - **Accept**: Not defined
 
 
 ### HTTP response details

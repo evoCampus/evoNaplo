@@ -9,14 +9,12 @@ namespace evoNaplo.DTO.TeamDTOs
     {
         public IEnumerable<MentorDTO> Mentors { get; set; }
         public IEnumerable<StudentDTO> Students { get; set; }
-        public IEnumerable<string> AttendanceSheetIds { get; set; }
 
         [SetsRequiredMembers]
         public TeamDetailsDTO(Team team) : base(team)
         {
             Mentors = team.Mentors?.Select(m => new MentorDTO(m)) ?? Enumerable.Empty<MentorDTO>();
             Students = team.Students?.Select(s => new StudentDTO(s)) ?? Enumerable.Empty<StudentDTO>();
-            AttendanceSheetIds = team.AttendanceSheets?.Select(a => a.Id) ?? Enumerable.Empty<string>();
         }
     }
 }

@@ -82,7 +82,7 @@ export default function DashboardSearchResults({
             items={filteredTeams}
             onSelect={onSelectTeam}
             primaryText={(t) => getTeamName(t)}
-            secondaryText={(t) => `${t.students?.length || 0} students • ${t.mentors?.length || 0} mentors`}
+            secondaryText={(t) => `${t.studentIds?.length || 0} students • ${t.mentorIds?.length || 0} mentors`}
           />
           <SearchResultGroup
             icon={FolderRoot}

@@ -80,6 +80,7 @@ namespace evoNaplo.Data
                     mentors.Add(new Mentor
                     {
                         Id = Guid.NewGuid().ToString(),
+                        IsActive = faker.Random.Bool(),
                         Name = faker.Name.FullName(),
                         Email = faker.Internet.Email(),
                         PhoneNumber = faker.Phone.PhoneNumber(),

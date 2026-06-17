@@ -17,23 +17,25 @@ export default function UpcomingMeetingsPage() {
     const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
 
     const fetchStudentDetails = async (studentIds: string[]) => {
-      const promises = studentIds.map(sid =>
-        apiClient.students.apiStudentsIdGet(sid).then(res => ({
-          id: sid,
-          name: res.data.name || "Unknown Student"
-        }))
-      );
-      return Promise.all(promises);
-    };
+          const promises = studentIds.map(async (sid) => {
+            const { data: student } = await apiClient.students.apiStudentsStudentIdGet(sid);
+
+            return {
+              id: student.id,
+              name: student.name || "Unknown Student"
+            };
+          });
+          return Promise.all(promises);
+        };
 
     const fetchTeamMeeting = async (projectId: string, projectName: string, teamId: string): Promise<UIMeeting | null> => {
       try {
-        const { data: team } = await apiClient.teams.apiTeamsIdGet(teamId);
+        const { data: team } = await apiClient.teams.apiTeamsTeamIdGet(teamId);
         if (team.weeklyMeetingDay === undefined || !team.weeklyMeetingTime) return null;
 
-        const studentDetails = await fetchStudentDetails(team.students || []);
+        const studentDetails = await fetchStudentDetails(team.studentIds || []);
         const dates = getMeetingDates(team.weeklyMeetingDay);
-        const savedRecord = (team.attendance || []).find(record => record[0] === dates.raw);
+        const savedRecord = (team.attendanceSheetIds || []).find(record => record[0] === dates.raw);
         const presentStudentIds = savedRecord ? savedRecord.slice(1) : studentDetails.map(s => s.id);
 
         return {
@@ -58,11 +60,11 @@ export default function UpcomingMeetingsPage() {
 
     const fetchProjectMeetings = async (projectId: string): Promise<UIMeeting[]> => {
       try {
-        const { data: project } = await apiClient.projects.apiProjectsIdGet(projectId);
-        if (!project.teams || project.teams.length === 0) return [];
+        const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(projectId);
+        if (!project.teamIds || project.teamIds.length === 0) return [];
 
         const teamMeetings = await Promise.all(
-          project.teams.map(teamId => fetchTeamMeeting(projectId, project.name || "Unknown Project", teamId))
+          project.teamIds.map(teamId => fetchTeamMeeting(projectId, project.name || "Unknown Project", teamId))
         );
         return teamMeetings.filter((m): m is UIMeeting => m !== null);
       } catch (e) {
@@ -72,7 +74,7 @@ export default function UpcomingMeetingsPage() {
     };
 
     const meetingsByProject = await Promise.all(
-      (mentor.projects || []).map(fetchProjectMeetings)
+      (mentor.projectIds || []).map(fetchProjectMeetings)
     );
 
     return {

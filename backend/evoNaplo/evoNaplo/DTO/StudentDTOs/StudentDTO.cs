@@ -1,15 +1,16 @@
-using System.Diagnostics.CodeAnalysis;
 using evoNaplo.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace evoNaplo.DTO.StudentDTOs;
 
 public class StudentDTO
 {
+    [Required]
     public required string Id { get; set; }
     public required string Name { get; set; }
     public required string Email { get; set; }
     public string? PhoneNumber { get; set; }
-    public string? UniversityName { get; set; }
     public string? UniversityProgramme { get; set; }
     public required int CurrentSemester { get; set; }
     public required bool IsInTheirFirstSemester { get; set; }
@@ -23,6 +24,7 @@ public class StudentDTO
     public DateTime WorkExperienceInSemesters { get; set; }
     public required bool WantsToStayWithCurrentTeam { get; set; }
 
+    
     [SetsRequiredMembers]
     public StudentDTO(Student student)
     {
@@ -42,7 +44,5 @@ public class StudentDTO
         IsWorkingStudent = student.IsWorkingStudent;
         WorkExperienceInSemesters = student.WorkingStudentDuration;
         WantsToStayWithCurrentTeam = student.WantsToStayWithCurrentTeam;
-        
     }
-
 }

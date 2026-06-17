@@ -1,27 +1,25 @@
-# ProjectDTO
+# CreateProjectDTO
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **string** |  | [default to undefined]
-**name** | **string** |  | [optional] [default to undefined]
+**name** | **string** |  | [default to undefined]
 **description** | **string** |  | [optional] [default to undefined]
 **projectLinks** | **{ [key: string]: string; }** |  | [optional] [default to undefined]
-**teamIds** | **Array&lt;string&gt;** |  | [default to undefined]
+**teamId** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { ProjectDTO } from './api';
+import { CreateProjectDTO } from './api';
 
-const instance: ProjectDTO = {
-    id,
+const instance: CreateProjectDTO = {
     name,
     description,
     projectLinks,
-    teamIds,
+    teamId,
 };
 ```
 

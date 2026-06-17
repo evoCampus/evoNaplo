@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using evoNaplo.DTO;
+using evoNaplo.Services;
+using evoNaplo.DTO.MentorDTOs;
+using evoNaplo.Exceptions;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -36,11 +38,11 @@ public class MentorsController : ControllerBase
     /// <returns>A task that represents the asynchronous operation. The task result contains the mentor data as a MentorDTO.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if a mentor with the specified identifier does not exist.</exception>
     [HttpGet("{id}")]
-    public Task<MentorDTO> GetMentor(string id)
+    public async Task<ActionResult<MentorDTO>> GetMentor(string id)
     {
         try
         {
-            return Ok(await _mentorService.GetMentorByIdAsync(mentorId));
+            return Ok(await _mentorService.GetMentorByIdAsync(id));
         }
         catch (MentorNotFoundException ex)
         {
@@ -54,7 +56,7 @@ public class MentorsController : ControllerBase
     /// <param name="mentorToCreate">The mentor data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor.</returns>
     [HttpPost]
-    public Task<MentorDTO> CreateMentor(MentorDTO mentor)
+    public async Task<ActionResult<MentorDTO>> CreateMentor(CreateMentorDTO mentorToCreate)
     {
         try
         {
@@ -74,11 +76,11 @@ public class MentorsController : ControllerBase
     /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that is NoContent
     /// if the update is successful, or NotFound if no mentor with the specified identifier exists.</returns>
     [HttpPut("{id}")]
-    public Task UpdateMentor(string id, MentorDTO updatedMentor)
+    public async Task<ActionResult> UpdateMentor(string id, UpdateMentorDTO updatedMentor)
     {
         try
         {
-            return Ok(await _mentorService.UpdateMentorAsync(mentorId, updatedMentor));
+            return Ok(await _mentorService.UpdateMentorAsync(id, updatedMentor));
         }
         catch (MentorNotFoundException ex)
         {

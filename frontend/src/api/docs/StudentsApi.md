@@ -63,16 +63,16 @@ No authorization required
 import {
     StudentsApi,
     Configuration,
-    StudentDTO
+    CreateStudentDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new StudentsApi(configuration);
 
-let studentDTO: StudentDTO; // (optional)
+let createStudentDTO: CreateStudentDTO; // (optional)
 
 const { status, data } = await apiInstance.apiStudentsPost(
-    studentDTO
+    createStudentDTO
 );
 ```
 
@@ -80,7 +80,7 @@ const { status, data } = await apiInstance.apiStudentsPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **studentDTO** | **StudentDTO**|  | |
+| **createStudentDTO** | **CreateStudentDTO**|  | |
 
 
 ### Return type
@@ -214,18 +214,18 @@ No authorization required
 import {
     StudentsApi,
     Configuration,
-    StudentDTO
+    UpdateStudentDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new StudentsApi(configuration);
 
 let studentId: string; // (default to undefined)
-let studentDTO: StudentDTO; // (optional)
+let updateStudentDTO: UpdateStudentDTO; // (optional)
 
 const { status, data } = await apiInstance.apiStudentsStudentIdPut(
     studentId,
-    studentDTO
+    updateStudentDTO
 );
 ```
 
@@ -233,7 +233,7 @@ const { status, data } = await apiInstance.apiStudentsStudentIdPut(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **studentDTO** | **StudentDTO**|  | |
+| **updateStudentDTO** | **UpdateStudentDTO**|  | |
 | **studentId** | [**string**] |  | defaults to undefined|
 
 

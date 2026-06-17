@@ -63,16 +63,16 @@ No authorization required
 import {
     ProjectsApi,
     Configuration,
-    ProjectDTO
+    CreateProjectDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new ProjectsApi(configuration);
 
-let projectDTO: ProjectDTO; // (optional)
+let createProjectDTO: CreateProjectDTO; // (optional)
 
 const { status, data } = await apiInstance.apiProjectsPost(
-    projectDTO
+    createProjectDTO
 );
 ```
 
@@ -80,7 +80,7 @@ const { status, data } = await apiInstance.apiProjectsPost(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **projectDTO** | **ProjectDTO**|  | |
+| **createProjectDTO** | **CreateProjectDTO**|  | |
 
 
 ### Return type
@@ -214,18 +214,18 @@ No authorization required
 import {
     ProjectsApi,
     Configuration,
-    ProjectDTO
+    UpdateProjectDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new ProjectsApi(configuration);
 
 let projectId: string; // (default to undefined)
-let projectDTO: ProjectDTO; // (optional)
+let updateProjectDTO: UpdateProjectDTO; // (optional)
 
 const { status, data } = await apiInstance.apiProjectsProjectIdPut(
     projectId,
-    projectDTO
+    updateProjectDTO
 );
 ```
 
@@ -233,7 +233,7 @@ const { status, data } = await apiInstance.apiProjectsProjectIdPut(
 
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
-| **projectDTO** | **ProjectDTO**|  | |
+| **updateProjectDTO** | **UpdateProjectDTO**|  | |
 | **projectId** | [**string**] |  | defaults to undefined|
 
 

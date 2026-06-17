@@ -1,18 +1,27 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using evoNaplo.Models;
 
 namespace evoNaplo.DTO.TeamDTOs;
 
 public class TeamDTO
 {
+    [Required]
     public required string Id { get; set; }
-    public string? ProjectId { get; set; }
+    public required IEnumerable<string> MentorIds { get; set; }
+    public required IEnumerable<string> StudentIds { get; set; }
+    public DayOfWeek WeeklyMeetingDay { get; set; }
+    public TimeSpan WeeklyMeetingTime { get; set; }
+    public required IEnumerable<string> AttendanceSheetIds { get; set; }
 
     [SetsRequiredMembers]
     public TeamDTO(Team team)
     {
         Id = team.Id;
-        ProjectId = team.ProjectId;
+        MentorIds = team.Mentors.Select(m => m.Id).ToList();
+        StudentIds = team.Students.Select(s => s.Id).ToList();
+        //WeeklyMeetingDay = team.WeeklyMeetingDay;
+        //WeeklyMeetingTime = team.WeeklyMeetingTime;
+        AttendanceSheetIds = team.AttendanceSheets.Select(a => a.Id).ToList();
     }
-
 }

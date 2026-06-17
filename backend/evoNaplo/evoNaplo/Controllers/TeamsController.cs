@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.Services;
-using evoNaplo.DTO;
 using evoNaplo.Exceptions;
+using evoNaplo.DTO.TeamDTOs;
 
 namespace evoNaplo.Controllers;
 
@@ -60,7 +60,7 @@ public class TeamsController : ControllerBase
     /// <param name="teamToCreate">The team data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created team.</returns>
     [HttpPost]
-    public async Task<ActionResult<TeamDTO>> CreateTeam(TeamDTO teamToCreate)
+    public async Task<ActionResult<TeamDTO>> CreateTeam(CreateTeamDTO teamToCreate)
     {
         try
         {
@@ -79,7 +79,7 @@ public class TeamsController : ControllerBase
     /// <param name="updatedTeam">An object containing the updated team information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated team.</returns>
     [HttpPut("{teamId}")]
-    public async Task<ActionResult> UpdateTeam(string teamId, TeamDTO updatedTeam)
+    public async Task<ActionResult> UpdateTeam(string teamId, UpdateTeamDTO updatedTeam)
     {
         try
         {

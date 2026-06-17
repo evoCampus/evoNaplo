@@ -36,7 +36,7 @@ export function ProjectDialog({
   const [isEditing, setIsEditing] = useState(isCreating);
   const [name, setName] = useState(item?.name ?? "");
   const [description, setDescription] = useState(item?.description ?? "");
-  const [selectedTeams, setSelectedTeams] = useState<string[]>(item?.teams ?? []);
+  const [selectedTeams, setSelectedTeams] = useState<string[]>(item?.teamIds ?? []);
 
   const [teamSearch, setTeamSearch] = useState("");
   const [teamsList, setTeamsList] = useState<TeamDTO[]>([]);
@@ -54,7 +54,7 @@ export function ProjectDialog({
       setTeamSearch("");
       setName(item?.name ?? "");
       setDescription(item?.description ?? "");
-      setSelectedTeams(item?.teams ?? []);
+      setSelectedTeams(item?.teamIds ?? []);
     }
   }
 
@@ -90,7 +90,7 @@ export function ProjectDialog({
       if (item) {
         setName(item.name ?? "");
         setDescription(item.description ?? "");
-        setSelectedTeams(item.teams ?? []);
+        setSelectedTeams(item.teamIds ?? []);
       }
     }
   };
@@ -116,7 +116,7 @@ export function ProjectDialog({
       id: item?.id ?? null,
       name,
       description,
-      teams: selectedTeams,
+      teamIds: selectedTeams,
       projectLinks: item?.projectLinks || {},
     };
 
@@ -145,8 +145,8 @@ export function ProjectDialog({
   const mappedTeams = teamsList.filter((team): team is TeamDTO & { id: string } => team.id != null).map((team) => {
     const day = getDayName(team.weeklyMeetingDay);
     const time = formatTime(team.weeklyMeetingTime);
-    const studentCount = team.students?.length ?? 0;
-    const mentorCount = team.mentors?.length ?? 0;
+    const studentCount = team.studentIds?.length ?? 0;
+    const mentorCount = team.mentorIds?.length ?? 0;
 
     return {
       id: team.id,

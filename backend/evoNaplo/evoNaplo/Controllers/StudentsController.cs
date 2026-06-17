@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using evoNaplo.Services;
-using evoNaplo.DTO;
 using evoNaplo.Exceptions;
+using evoNaplo.DTO.StudentDTOs;
 
 namespace evoNaplo.Controllers;
 
@@ -60,7 +60,7 @@ public class StudentsController : ControllerBase
     /// <param name="studentToCreate">The student data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created student.</returns>
     [HttpPost]
-    public async Task<ActionResult<StudentDTO>> CreateStudent(StudentDTO studentToCreate)
+    public async Task<ActionResult<StudentDTO>> CreateStudent(CreateStudentDTO studentToCreate)
     {
         try
         {
@@ -79,7 +79,7 @@ public class StudentsController : ControllerBase
     /// <param name="updatedStudent">An object containing the updated student information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated student.</returns>
     [HttpPut("{studentId}")]
-    public async Task<ActionResult> UpdateStudent(string studentId, StudentDTO updatedStudent)
+    public async Task<ActionResult> UpdateStudent(string studentId, UpdateStudentDTO updatedStudent)
     {
         try
         {
