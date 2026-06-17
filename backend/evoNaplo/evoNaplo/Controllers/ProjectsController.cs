@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using evoNaplo.Services;
+using evoNaplo.DTO;
 using evoNaplo.Exceptions;
-using evoNaplo.DTO.ProjectDTOs;
 
 namespace evoNaplo.Controllers;
 
@@ -60,7 +60,7 @@ public class ProjectsController : ControllerBase
     /// <param name="projectToCreate">The project data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created project.</returns>
     [HttpPost]
-    public async Task<ActionResult<ProjectDTO>> CreateProject(CreateProjectDTO projectToCreate)
+    public async Task<ActionResult<ProjectDTO>> CreateProject(ProjectDTO projectToCreate)
     {
         try
         {
@@ -79,7 +79,7 @@ public class ProjectsController : ControllerBase
     /// <param name="updatedProject">An object containing the updated project information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated project.</returns>
     [HttpPut("{projectId}")]
-    public async Task<ActionResult> UpdateProject(string projectId, UpdateProjectDTO updatedProject)
+    public async Task<ActionResult> UpdateProject(string projectId, ProjectDTO updatedProject)
     {
         try
         {

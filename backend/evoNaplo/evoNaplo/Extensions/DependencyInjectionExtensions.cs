@@ -12,6 +12,8 @@ public static class DependencyInjectionExtensions
 {
     public static IServiceCollection 
         AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection 
+        AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IExampleService, ExampleService>();
         services.AddScoped<IMentorService, MentorService>();
@@ -35,11 +37,32 @@ public static class DependencyInjectionExtensions
         var host = configuration["EVONAPLO_DATABASE_HOST"];
         var dbName = configuration["EVONAPLO_DATABASE_NAME"];
         var port = configuration["EVONAPLO_DATABASE_PORT"];
+        var dbName = configuration["EVONAPLO_DATABASE_NAME"];
+        var port = configuration["EVONAPLO_DATABASE_PORT"];
         var userName = configuration["EVONAPLO_DATABASE_USER"];
         var pass = configuration["EVONAPLO_DATABASE_PASS"];
 
         string connectionString;
 
+        if (string.IsNullOrEmpty(host))
+        {
+            throw new Exception("Host was not found!");
+        }
+
+        if (string.IsNullOrEmpty(dbName))
+        {
+            throw new Exception("Database name was not found!");
+        }
+
+        if (string.IsNullOrEmpty(userName))
+        {
+            throw new Exception("User was not found!");
+        }
+
+        if (string.IsNullOrEmpty(pass))
+        {
+            throw new Exception("Password was not found!");
+        }
         if (string.IsNullOrEmpty(host))
         {
             throw new Exception("Host was not found!");
@@ -68,6 +91,7 @@ public static class DependencyInjectionExtensions
         connectionString = $"Server={host},{port};Database={dbName};User Id={userName};Password={pass};TrustServerCertificate=True;";
 
         services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(connectionString));
             options.UseSqlServer(connectionString));
 
         return services;

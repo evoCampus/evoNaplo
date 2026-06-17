@@ -1,14 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using evoNaplo.Services;
-using evoNaplo.Exceptions;
-using evoNaplo.DTO.MentorDTOs;
+using evoNaplo.DTO;
 
-
-namespace evoNaplo.Controllers;
-
-/// <summary>
-/// Controller for managing mentors in the application. Provides endpoints for retrieving, creating, updating, and deleting mentor records. Each endpoint interacts with the IMentorService to perform the necessary operations on the mentor data. The controller handles exceptions such as MentorNotFoundException and MentorAlreadyExistsException to return appropriate HTTP responses based on the outcome of each operation.
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class MentorsController : ControllerBase
@@ -40,10 +32,11 @@ public class MentorsController : ControllerBase
     /// <summary>
     /// Retrieves a specific mentor by their unique identifier. If a mentor with the given identifier exists, it is returned as a MentorDTO object. If no mentor is found with the provided identifier, a NotFound response is returned with an appropriate message.
     /// </summary>
-    /// <param name="mentorId">The unique identifier of the mentor to retrieve.</param>
-    /// <returns>The MentorDTO if found; otherwise, a NotFound response.</returns>
-    [HttpGet("{mentorId}")]
-    public async Task<ActionResult<MentorDetailsDTO>> GetMentor(string mentorId)
+    /// <param name="id">The unique identifier of the mentor to retrieve. Cannot be null.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mentor data as a MentorDTO.</returns>
+    /// <exception cref="KeyNotFoundException">Thrown if a mentor with the specified identifier does not exist.</exception>
+    [HttpGet("{id}")]
+    public Task<MentorDTO> GetMentor(string id)
     {
         try
         {
@@ -61,7 +54,7 @@ public class MentorsController : ControllerBase
     /// <param name="mentorToCreate">The mentor data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor.</returns>
     [HttpPost]
-    public async Task<ActionResult<MentorDTO>> CreateMentor(CreateMentorDTO mentorToCreate)
+    public Task<MentorDTO> CreateMentor(MentorDTO mentor)
     {
         try
         {
@@ -78,9 +71,10 @@ public class MentorsController : ControllerBase
     /// </summary>
     /// <param name="mentorId">The unique identifier of the mentor to update. Cannot be null or empty.</param>
     /// <param name="updatedMentor">An object containing the updated mentor information. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the updated mentor.</returns>
-    [HttpPut("{mentorId}")]
-    public async Task<ActionResult> UpdateMentor(string mentorId, UpdateMentorDTO    updatedMentor)
+    /// <returns>A task that represents the asynchronous operation. The task result contains an IActionResult that is NoContent
+    /// if the update is successful, or NotFound if no mentor with the specified identifier exists.</returns>
+    [HttpPut("{id}")]
+    public Task UpdateMentor(string id, MentorDTO updatedMentor)
     {
         try
         {

@@ -5,8 +5,11 @@ export * from "./lib/utils"
 
 export * from "./hooks/use-mobile"
 
+export * from "./components/ui/alert"
 export * from "./components/ui/button"
 export * from "./components/ui/calendar"
+export * from "./components/ui/card"
+export * from "./components/ui/carousel"
 export * from "./components/ui/checkbox"
 export * from "./components/ui/dialog"
 export * from "./components/ui/dropdown-menu"

@@ -1,4 +1,4 @@
-﻿using evoNaplo.DTO.StudentDTOs;
+using evoNaplo.DTO.StudentDTOs;
 using evoNaplo.Models;
 
 namespace evoNaplo.Services;
