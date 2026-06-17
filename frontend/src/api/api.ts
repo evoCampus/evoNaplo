@@ -68,6 +68,15 @@ export interface MentorDTO {
     'semesterNumber': number;
     'isActive': boolean;
 }
+export interface ProblemDetails {
+    [key: string]: any;
+
+    'type'?: string | null;
+    'title'?: string | null;
+    'status'?: number | null;
+    'detail'?: string | null;
+    'instance'?: string | null;
+}
 export interface ProjectDTO {
     'id': string | null;
     'name': string | null;
@@ -356,10 +365,11 @@ export const MentorsApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
+         * @param {MentorDTO} [mentorDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createMentor: async (mentorDTO?: MentorDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/Mentors`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -368,110 +378,12 @@ export const MentorsApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} mentorId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiMentorsMentorIdDelete: async (mentorId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'mentorId' is not null or undefined
-            assertParamExists('apiMentorsMentorIdDelete', 'mentorId', mentorId)
-            const localVarPath = `/api/Mentors/{mentorId}`
-                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} mentorId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiMentorsMentorIdGet: async (mentorId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'mentorId' is not null or undefined
-            assertParamExists('apiMentorsMentorIdGet', 'mentorId', mentorId)
-            const localVarPath = `/api/Mentors/{mentorId}`
-                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} mentorId 
-         * @param {MentorDTO} [mentorDTO] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiMentorsMentorIdPut: async (mentorId: string, mentorDTO?: MentorDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'mentorId' is not null or undefined
-            assertParamExists('apiMentorsMentorIdPut', 'mentorId', mentorId)
-            const localVarPath = `/api/Mentors/{mentorId}`
-                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -485,11 +397,76 @@ export const MentorsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @param {MentorDTO} [mentorDTO] 
+         * @param {string} mentorId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsPost: async (mentorDTO?: MentorDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        deleteMentor: async (mentorId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'mentorId' is not null or undefined
+            assertParamExists('deleteMentor', 'mentorId', mentorId)
+            const localVarPath = `/api/Mentors/{mentorId}`
+                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} mentorId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMentor: async (mentorId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'mentorId' is not null or undefined
+            assertParamExists('getMentor', 'mentorId', mentorId)
+            const localVarPath = `/api/Mentors/{mentorId}`
+                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMentors: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/Mentors`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -498,7 +475,41 @@ export const MentorsApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
 
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} mentorId 
+         * @param {MentorDTO} [mentorDTO] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateMentor: async (mentorId: string, mentorDTO?: MentorDTO, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'mentorId' is not null or undefined
+            assertParamExists('updateMentor', 'mentorId', mentorId)
+            const localVarPath = `/api/Mentors/{mentorId}`
+                .replace(`{${"mentorId"}}`, encodeURIComponent(String(mentorId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -526,13 +537,14 @@ export const MentorsApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @param {MentorDTO} [mentorDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiMentorsGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MentorDTO>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiMentorsGet(options);
+        async createMentor(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MentorDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createMentor(mentorDTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MentorsApi.apiMentorsGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MentorsApi.createMentor']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -541,10 +553,10 @@ export const MentorsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiMentorsMentorIdDelete(mentorId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiMentorsMentorIdDelete(mentorId, options);
+        async deleteMentor(mentorId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMentor(mentorId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MentorsApi.apiMentorsMentorIdDelete']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MentorsApi.deleteMentor']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -553,10 +565,21 @@ export const MentorsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiMentorsMentorIdGet(mentorId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MentorDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiMentorsMentorIdGet(mentorId, options);
+        async getMentor(mentorId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MentorDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMentor(mentorId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MentorsApi.apiMentorsMentorIdGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MentorsApi.getMentor']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMentors(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<MentorDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMentors(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['MentorsApi.getMentors']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -566,22 +589,10 @@ export const MentorsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiMentorsMentorIdPut(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiMentorsMentorIdPut(mentorId, mentorDTO, options);
+        async updateMentor(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateMentor(mentorId, mentorDTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MentorsApi.apiMentorsMentorIdPut']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {MentorDTO} [mentorDTO] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiMentorsPost(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MentorDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiMentorsPost(mentorDTO, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['MentorsApi.apiMentorsPost']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['MentorsApi.updateMentor']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -595,11 +606,12 @@ export const MentorsApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
+         * @param {MentorDTO} [mentorDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<MentorDTO>> {
-            return localVarFp.apiMentorsGet(options).then((request) => request(axios, basePath));
+        createMentor(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): AxiosPromise<MentorDTO> {
+            return localVarFp.createMentor(mentorDTO, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -607,8 +619,8 @@ export const MentorsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsMentorIdDelete(mentorId: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.apiMentorsMentorIdDelete(mentorId, options).then((request) => request(axios, basePath));
+        deleteMentor(mentorId: string, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteMentor(mentorId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -616,8 +628,16 @@ export const MentorsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsMentorIdGet(mentorId: string, options?: RawAxiosRequestConfig): AxiosPromise<MentorDTO> {
-            return localVarFp.apiMentorsMentorIdGet(mentorId, options).then((request) => request(axios, basePath));
+        getMentor(mentorId: string, options?: RawAxiosRequestConfig): AxiosPromise<MentorDTO> {
+            return localVarFp.getMentor(mentorId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMentors(options?: RawAxiosRequestConfig): AxiosPromise<Array<MentorDTO>> {
+            return localVarFp.getMentors(options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -626,17 +646,8 @@ export const MentorsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiMentorsMentorIdPut(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
-            return localVarFp.apiMentorsMentorIdPut(mentorId, mentorDTO, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {MentorDTO} [mentorDTO] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiMentorsPost(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): AxiosPromise<MentorDTO> {
-            return localVarFp.apiMentorsPost(mentorDTO, options).then((request) => request(axios, basePath));
+        updateMentor(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.updateMentor(mentorId, mentorDTO, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -647,11 +658,12 @@ export const MentorsApiFactory = function (configuration?: Configuration, basePa
 export class MentorsApi extends BaseAPI {
     /**
      * 
+     * @param {MentorDTO} [mentorDTO] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiMentorsGet(options?: RawAxiosRequestConfig) {
-        return MentorsApiFp(this.configuration).apiMentorsGet(options).then((request) => request(this.axios, this.basePath));
+    public createMentor(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig) {
+        return MentorsApiFp(this.configuration).createMentor(mentorDTO, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -660,8 +672,8 @@ export class MentorsApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiMentorsMentorIdDelete(mentorId: string, options?: RawAxiosRequestConfig) {
-        return MentorsApiFp(this.configuration).apiMentorsMentorIdDelete(mentorId, options).then((request) => request(this.axios, this.basePath));
+    public deleteMentor(mentorId: string, options?: RawAxiosRequestConfig) {
+        return MentorsApiFp(this.configuration).deleteMentor(mentorId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -670,8 +682,17 @@ export class MentorsApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiMentorsMentorIdGet(mentorId: string, options?: RawAxiosRequestConfig) {
-        return MentorsApiFp(this.configuration).apiMentorsMentorIdGet(mentorId, options).then((request) => request(this.axios, this.basePath));
+    public getMentor(mentorId: string, options?: RawAxiosRequestConfig) {
+        return MentorsApiFp(this.configuration).getMentor(mentorId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getMentors(options?: RawAxiosRequestConfig) {
+        return MentorsApiFp(this.configuration).getMentors(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -681,18 +702,8 @@ export class MentorsApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiMentorsMentorIdPut(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig) {
-        return MentorsApiFp(this.configuration).apiMentorsMentorIdPut(mentorId, mentorDTO, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {MentorDTO} [mentorDTO] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public apiMentorsPost(mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig) {
-        return MentorsApiFp(this.configuration).apiMentorsPost(mentorDTO, options).then((request) => request(this.axios, this.basePath));
+    public updateMentor(mentorId: string, mentorDTO?: MentorDTO, options?: RawAxiosRequestConfig) {
+        return MentorsApiFp(this.configuration).updateMentor(mentorId, mentorDTO, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -703,35 +714,6 @@ export class MentorsApi extends BaseAPI {
  */
 export const ProjectsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiProjectsGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/Projects`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
         /**
          * 
          * @param {ProjectDTO} [projectDTO] 
@@ -799,39 +781,6 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * 
          * @param {string} projectId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiProjectsProjectIdGet: async (projectId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'projectId' is not null or undefined
-            assertParamExists('apiProjectsProjectIdGet', 'projectId', projectId)
-            const localVarPath = `/api/Projects/{projectId}`
-                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @param {string} projectId 
          * @param {ProjectDTO} [projectDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -864,6 +813,68 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProject: async (projectId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'projectId' is not null or undefined
+            assertParamExists('getProject', 'projectId', projectId)
+            const localVarPath = `/api/Projects/{projectId}`
+                .replace(`{${"projectId"}}`, encodeURIComponent(String(projectId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjects: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/Projects`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -873,17 +884,6 @@ export const ProjectsApiAxiosParamCreator = function (configuration?: Configurat
 export const ProjectsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = ProjectsApiAxiosParamCreator(configuration)
     return {
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiProjectsGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProjectDTO>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiProjectsGet(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ProjectsApi.apiProjectsGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
         /**
          * 
          * @param {ProjectDTO} [projectDTO] 
@@ -911,18 +911,6 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} projectId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiProjectsProjectIdGet(projectId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiProjectsProjectIdGet(projectId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ProjectsApi.apiProjectsProjectIdGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @param {string} projectId 
          * @param {ProjectDTO} [projectDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -931,6 +919,29 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.apiProjectsProjectIdPut(projectId, projectDTO, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ProjectsApi.apiProjectsProjectIdPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProject(projectId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProjectDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProject(projectId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectsApi.getProject']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProjects(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ProjectDTO>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProjects(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ProjectsApi.getProjects']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -942,14 +953,6 @@ export const ProjectsApiFp = function(configuration?: Configuration) {
 export const ProjectsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = ProjectsApiFp(configuration)
     return {
-        /**
-         * 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiProjectsGet(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProjectDTO>> {
-            return localVarFp.apiProjectsGet(options).then((request) => request(axios, basePath));
-        },
         /**
          * 
          * @param {ProjectDTO} [projectDTO] 
@@ -971,21 +974,29 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
         /**
          * 
          * @param {string} projectId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiProjectsProjectIdGet(projectId: string, options?: RawAxiosRequestConfig): AxiosPromise<ProjectDTO> {
-            return localVarFp.apiProjectsProjectIdGet(projectId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @param {string} projectId 
          * @param {ProjectDTO} [projectDTO] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         apiProjectsProjectIdPut(projectId: string, projectDTO?: ProjectDTO, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.apiProjectsProjectIdPut(projectId, projectDTO, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} projectId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProject(projectId: string, options?: RawAxiosRequestConfig): AxiosPromise<ProjectDTO> {
+            return localVarFp.getProject(projectId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProjects(options?: RawAxiosRequestConfig): AxiosPromise<Array<ProjectDTO>> {
+            return localVarFp.getProjects(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -994,15 +1005,6 @@ export const ProjectsApiFactory = function (configuration?: Configuration, baseP
  * ProjectsApi - object-oriented interface
  */
 export class ProjectsApi extends BaseAPI {
-    /**
-     * 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public apiProjectsGet(options?: RawAxiosRequestConfig) {
-        return ProjectsApiFp(this.configuration).apiProjectsGet(options).then((request) => request(this.axios, this.basePath));
-    }
-
     /**
      * 
      * @param {ProjectDTO} [projectDTO] 
@@ -1026,22 +1028,31 @@ export class ProjectsApi extends BaseAPI {
     /**
      * 
      * @param {string} projectId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public apiProjectsProjectIdGet(projectId: string, options?: RawAxiosRequestConfig) {
-        return ProjectsApiFp(this.configuration).apiProjectsProjectIdGet(projectId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @param {string} projectId 
      * @param {ProjectDTO} [projectDTO] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     public apiProjectsProjectIdPut(projectId: string, projectDTO?: ProjectDTO, options?: RawAxiosRequestConfig) {
         return ProjectsApiFp(this.configuration).apiProjectsProjectIdPut(projectId, projectDTO, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} projectId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getProject(projectId: string, options?: RawAxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).getProject(projectId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getProjects(options?: RawAxiosRequestConfig) {
+        return ProjectsApiFp(this.configuration).getProjects(options).then((request) => request(this.axios, this.basePath));
     }
 }
 

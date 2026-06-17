@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
     Dialog,
     DialogContent,
@@ -95,7 +95,6 @@ export function GenericDialog<T extends object>({
                 onClose();
             }
         } catch (error: unknown) {
-            console.error(error);
             setErrorMessage(
                 "An error occurred while saving. Please try again later.",
             );
@@ -128,6 +127,23 @@ export function GenericDialog<T extends object>({
 
     const displayTitle =
         !isCreating && item && "name" in item ? String(item.name) : title;
+    
+    const { regularFields, checkboxFields } = useMemo(() => {
+        return fields.reduce(
+            (acc, field) => {
+                if (field.type === "checkbox") {
+                    acc.checkboxFields.push(field);
+                } else {
+                    acc.regularFields.push(field);
+                }
+                return acc;
+            },
+            {
+                regularFields: [] as FieldConfig<T>[],
+                checkboxFields: [] as FieldConfig<T>[]
+            }
+        );
+    }, [fields]);
 
     return (
         <>
@@ -148,7 +164,7 @@ export function GenericDialog<T extends object>({
             <DialogContent
                 className="max-w-md w-full sm:max-w-2xl bg-secondary text-foreground border-none shadow-lg rounded-3xl p-4 sm:p-8 flex flex-col max-h-[90dvh] overflow-hidden"
                 showCloseButton={false}
-                onOpenAutoFocus={(e: FocusEvent) => e.preventDefault()}
+                onOpenAutoFocus={(e: Event) => e.preventDefault()}
             >
                 {/* Header */}
                 <DialogHeader className="flex flex-row justify-between items-start mb-4 shrink-0">
@@ -175,17 +191,15 @@ export function GenericDialog<T extends object>({
                 {/* Scrollable body */}
                 <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20 scrollbar-track-transparent">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-4 px-1 pt-1">
-                        {fields
-                            .filter((field) => field.type !== "checkbox")
-                            .map((field) => (
-                                <FormField
-                                    key={String(field.key)}
-                                    field={field}
-                                    value={formData[field.key]}
-                                    isEditing={isEditing}
-                                    onChange={handleValueChange}
-                                />
-                            ))}
+                        {regularFields.map((field) => (
+                            <FormField
+                                key={String(field.key)}
+                                field={field}
+                                value={formData[field.key]}
+                                isEditing={isEditing}
+                                onChange={handleValueChange}
+                            />
+                        ))}
                     </div>
 
                     {/* Checkboxes */}
@@ -194,17 +208,15 @@ export function GenericDialog<T extends object>({
                             Additional details
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {fields
-                                .filter((field) => field.type === "checkbox")
-                                .map((field) => (
-                                    <FormCheckbox
-                                        key={String(field.key)}
-                                        field={field}
-                                        value={!!formData[field.key]}
-                                        isEditing={isEditing}
-                                        onChange={handleValueChange}
-                                    />
-                                ))}
+                            {checkboxFields.map((field) => (
+                                <FormCheckbox
+                                    key={String(field.key)}
+                                    field={field}
+                                    value={!!formData[field.key]}
+                                    isEditing={isEditing}
+                                    onChange={handleValueChange}
+                                />
+                            ))}
                         </div>
                     </div>
                 </div>

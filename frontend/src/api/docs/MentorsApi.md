@@ -4,14 +4,14 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
-|[**apiMentorsGet**](#apimentorsget) | **GET** /api/Mentors | |
-|[**apiMentorsMentorIdDelete**](#apimentorsmentoriddelete) | **DELETE** /api/Mentors/{mentorId} | |
-|[**apiMentorsMentorIdGet**](#apimentorsmentoridget) | **GET** /api/Mentors/{mentorId} | |
-|[**apiMentorsMentorIdPut**](#apimentorsmentoridput) | **PUT** /api/Mentors/{mentorId} | |
-|[**apiMentorsPost**](#apimentorspost) | **POST** /api/Mentors | |
+|[**createMentor**](#creatementor) | **POST** /api/Mentors | |
+|[**deleteMentor**](#deletementor) | **DELETE** /api/Mentors/{mentorId} | |
+|[**getMentor**](#getmentor) | **GET** /api/Mentors/{mentorId} | |
+|[**getMentors**](#getmentors) | **GET** /api/Mentors | |
+|[**updateMentor**](#updatementor) | **PUT** /api/Mentors/{mentorId} | |
 
-# **apiMentorsGet**
-> Array<MentorDTO> apiMentorsGet()
+# **createMentor**
+> MentorDTO createMentor()
 
 
 ### Example
@@ -19,22 +19,30 @@ All URIs are relative to *http://localhost*
 ```typescript
 import {
     MentorsApi,
-    Configuration
+    Configuration,
+    MentorDTO
 } from './api';
 
 const configuration = new Configuration();
 const apiInstance = new MentorsApi(configuration);
 
-const { status, data } = await apiInstance.apiMentorsGet();
+let mentorDTO: MentorDTO; // (optional)
+
+const { status, data } = await apiInstance.createMentor(
+    mentorDTO
+);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **mentorDTO** | **MentorDTO**|  | |
 
 
 ### Return type
 
-**Array<MentorDTO>**
+**MentorDTO**
 
 ### Authorization
 
@@ -42,19 +50,20 @@ No authorization required
 
 ### HTTP request headers
 
- - **Content-Type**: Not defined
- - **Accept**: text/plain, application/json, text/json
+ - **Content-Type**: application/json, text/json, application/*+json
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
+|**409** | Conflict |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsMentorIdDelete**
-> apiMentorsMentorIdDelete()
+# **deleteMentor**
+> deleteMentor()
 
 
 ### Example
@@ -70,7 +79,7 @@ const apiInstance = new MentorsApi(configuration);
 
 let mentorId: string; // (default to undefined)
 
-const { status, data } = await apiInstance.apiMentorsMentorIdDelete(
+const { status, data } = await apiInstance.deleteMentor(
     mentorId
 );
 ```
@@ -93,18 +102,19 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: Not defined
+ - **Accept**: text/plain, application/json, text/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
+|**404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsMentorIdGet**
-> MentorDTO apiMentorsMentorIdGet()
+# **getMentor**
+> MentorDTO getMentor()
 
 
 ### Example
@@ -120,7 +130,7 @@ const apiInstance = new MentorsApi(configuration);
 
 let mentorId: string; // (default to undefined)
 
-const { status, data } = await apiInstance.apiMentorsMentorIdGet(
+const { status, data } = await apiInstance.getMentor(
     mentorId
 );
 ```
@@ -143,18 +153,63 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: text/plain, application/json, text/json
+ - **Accept**: application/json
 
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
+|**404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **apiMentorsMentorIdPut**
-> apiMentorsMentorIdPut()
+# **getMentors**
+> Array<MentorDTO> getMentors()
+
+
+### Example
+
+```typescript
+import {
+    MentorsApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new MentorsApi(configuration);
+
+const { status, data } = await apiInstance.getMentors();
+```
+
+### Parameters
+This endpoint does not have any parameters.
+
+
+### Return type
+
+**Array<MentorDTO>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | OK |  -  |
+|**404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateMentor**
+> updateMentor()
 
 
 ### Example
@@ -172,7 +227,7 @@ const apiInstance = new MentorsApi(configuration);
 let mentorId: string; // (default to undefined)
 let mentorDTO: MentorDTO; // (optional)
 
-const { status, data } = await apiInstance.apiMentorsMentorIdPut(
+const { status, data } = await apiInstance.updateMentor(
     mentorId,
     mentorDTO
 );
@@ -197,57 +252,6 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json, text/json, application/*+json
- - **Accept**: Not defined
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-|**200** | OK |  -  |
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-# **apiMentorsPost**
-> MentorDTO apiMentorsPost()
-
-
-### Example
-
-```typescript
-import {
-    MentorsApi,
-    Configuration,
-    MentorDTO
-} from './api';
-
-const configuration = new Configuration();
-const apiInstance = new MentorsApi(configuration);
-
-let mentorDTO: MentorDTO; // (optional)
-
-const { status, data } = await apiInstance.apiMentorsPost(
-    mentorDTO
-);
-```
-
-### Parameters
-
-|Name | Type | Description  | Notes|
-|------------- | ------------- | ------------- | -------------|
-| **mentorDTO** | **MentorDTO**|  | |
-
-
-### Return type
-
-**MentorDTO**
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json, text/json, application/*+json
  - **Accept**: text/plain, application/json, text/json
 
 
@@ -255,6 +259,7 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 |**200** | OK |  -  |
+|**404** | Not Found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

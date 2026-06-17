@@ -27,7 +27,7 @@ namespace evoNaplo.Controllers
         }
         
         [HttpPost("import")]
-        public ActionResult<List<ImportData>> ImportExcel(IFormFile file)
+        public ActionResult<IEnumerable<ImportData>> ImportExcel(IFormFile file)
         {
             if (file is null || file.Length == 0)
             {

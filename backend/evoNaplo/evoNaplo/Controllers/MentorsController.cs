@@ -2,6 +2,7 @@
 using evoNaplo.Services;
 using evoNaplo.DTO;
 using evoNaplo.Exceptions;
+using System.Net.Mime;
 
 
 namespace evoNaplo.Controllers;
@@ -24,7 +25,10 @@ public class MentorsController : ControllerBase
     /// Retrieves a list of all mentors. If mentors are found, they are returned as a list of MentorDTO objects. If no mentors are found, a NotFound response is returned with an appropriate message.
     /// </summary>
     /// <returns>A list of MentorDTO objects if mentors are found; otherwise, a NotFound response.</returns>
-    [HttpGet]
+    [HttpGet(Name = nameof(GetMentors))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<MentorDTO>>> GetMentors()
     {
         try
@@ -42,7 +46,10 @@ public class MentorsController : ControllerBase
     /// </summary>
     /// <param name="mentorId">The unique identifier of the mentor to retrieve.</param>
     /// <returns>The MentorDTO if found; otherwise, a NotFound response.</returns>
-    [HttpGet("{mentorId}")]
+    [HttpGet("{mentorId}", Name = nameof(GetMentor))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<MentorDTO>> GetMentor(string mentorId)
     {
         try
@@ -60,7 +67,10 @@ public class MentorsController : ControllerBase
     /// </summary>
     /// <param name="mentorToCreate">The mentor data to create. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the created mentor.</returns>
-    [HttpPost]
+    [HttpPost(Name = nameof(CreateMentor))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<MentorDTO>> CreateMentor(MentorDTO mentorToCreate)
     {
         try
@@ -79,7 +89,9 @@ public class MentorsController : ControllerBase
     /// <param name="mentorId">The unique identifier of the mentor to update. Cannot be null or empty.</param>
     /// <param name="updatedMentor">An object containing the updated mentor information. Cannot be null.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated mentor.</returns>
-    [HttpPut("{mentorId}")]
+    [HttpPut("{mentorId}", Name = nameof(UpdateMentor))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> UpdateMentor(string mentorId, MentorDTO updatedMentor)
     {
         try
@@ -97,7 +109,9 @@ public class MentorsController : ControllerBase
     /// </summary>
     /// <param name="mentorId">The unique identifier of the mentor to delete. Cannot be null or empty.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains an HTTP 200 response if the deletion is successful; otherwise, an HTTP 404 response if the mentor is not found.</returns>
-    [HttpDelete("{mentorId}")]
+    [HttpDelete("{mentorId}", Name = nameof(DeleteMentor))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteMentor(string mentorId)
     {
         try
@@ -109,5 +123,4 @@ public class MentorsController : ControllerBase
             return NotFound(ex.Message);
         }
     }
-    
 }

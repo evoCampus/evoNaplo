@@ -3,7 +3,7 @@ using evoNaplo.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddHealthChecks(); // Temporary fix, doesn't build without it
+builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
@@ -24,7 +24,7 @@ var app = builder.Build();
 app.MapHealthChecks("/healthz");
 
 // Synchronously seed database on startup. This will clear existing data and insert new fake data every run.
-/*using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var db = services.GetRequiredService<evoNaplo.Data.AppDbContext>();
@@ -34,7 +34,7 @@ app.MapHealthChecks("/healthz");
 
     var logger = services.GetRequiredService<ILoggerFactory>().CreateLogger("SeedData");
     evoNaplo.Data.SeedData.Seed(db, includeInvalid, logger);
-}*/
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -2,6 +2,7 @@
 using evoNaplo.Services;
 using evoNaplo.DTO;
 using evoNaplo.Exceptions;
+using System.Net.Mime;
 
 namespace evoNaplo.Controllers;
 
@@ -23,7 +24,10 @@ public class ProjectsController : ControllerBase
     /// Retrieves a list of all projects. If projects are found, they are returned as a list of ProjectDTO objects. If no projects are found, a NotFound response is returned with an appropriate message.
     /// </summary>
     /// <returns>A list of ProjectDTO objects if projects are found; otherwise, a NotFound response.</returns>
-    [HttpGet]
+    [HttpGet(Name = nameof(GetProjects))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<IEnumerable<ProjectDTO>>> GetProjects()
     {
         try
@@ -41,7 +45,10 @@ public class ProjectsController : ControllerBase
     /// </summary>
     /// <param name="projectId">The unique identifier of the project to retrieve.</param>
     /// <returns>The ProjectDTO if found; otherwise, a NotFound response.</returns>
-    [HttpGet("{projectId}")]
+    [HttpGet("{projectId}", Name = nameof(GetProject))]
+    [Produces(MediaTypeNames.Application.Json)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProjectDTO>> GetProject(string projectId)
     {
         try
