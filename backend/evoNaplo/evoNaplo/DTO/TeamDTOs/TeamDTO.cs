@@ -21,8 +21,8 @@ public class TeamDTO
         Id = team.Id;
         MentorIds = team.Mentors?.Select(m => m.Id) ?? [];
         StudentIds = team.Students?.Select(s => s.Id) ?? [];
-        WeeklyMeetingDay = team.WeeklyMeetingDay;
-        WeeklyMeetingTime = team.WeeklyMeetingTime;
+        //WeeklyMeetingDay = team.WeeklyMeetingDay;
+        //WeeklyMeetingTime = team.WeeklyMeetingTime;
         AttendanceSheetIds = team.AttendanceSheets?.Select(a => a.Id) ?? [];
         ProjectId = team.ProjectId;
     }
