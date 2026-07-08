@@ -51,11 +51,11 @@ export default function UpcomingMeetingsContent({
     const meetingDate = selectedMeeting.rawDate;
 
     try {
-      const { data: team } = await apiClient.teams.apiTeamsIdGet(teamId);
-      const newEntry = [meetingDate, ...presentStudentIds];
-      const updatedAttendance = [...(team.attendance || [])] as string[][];
+      const { data: team } = await apiClient.teams.apiTeamsTeamIdGet(teamId);
+      const newEntry = `${meetingDate}|${presentStudentIds.join(",")}`;
+      const updatedAttendance = [...(team.attendanceSheetIds || [])] as string[];
 
-      const existingIndex = updatedAttendance.findIndex(record => record[0] === meetingDate);
+      const existingIndex = updatedAttendance.findIndex((record) => record.split("|")[0] === meetingDate);
 
       if (existingIndex !== -1) {
         updatedAttendance[existingIndex] = newEntry;
@@ -63,9 +63,11 @@ export default function UpcomingMeetingsContent({
         updatedAttendance.push(newEntry);
       }
 
-      await apiClient.teams.apiTeamsIdPut(teamId, {
-        ...team,
-        attendance: updatedAttendance
+      await apiClient.teams.apiTeamsTeamIdPut(teamId, {
+        // Generated schema currently only allows one attendanceSheetId in updates.
+        // Keep latest entry so attendance can still be recorded.
+        name: team.id,
+        attendanceSheetId: updatedAttendance[updatedAttendance.length - 1] || null,
       });
 
       onRefresh();

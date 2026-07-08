@@ -16,12 +16,12 @@ export default function MentorHomePage() {
       const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
       const teams: UITeam[] = [];
 
-      if (mentor.projects && mentor.projects.length > 0) {
-        for (const projectId of mentor.projects) {
+      if (mentor.projectIds && mentor.projectIds.length > 0) {
+        for (const projectId of mentor.projectIds) {
           try {
-            const { data: project } = await apiClient.projects.apiProjectsIdGet(projectId);
-            if (project.teams && project.teams.length > 0) {
-              for (const teamId of project.teams) {
+            const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(projectId);
+            if (project.teamIds && project.teamIds.length > 0) {
+              for (const teamId of project.teamIds) {
                 teams.push({
                   id: teamId,
                   name: teamId,
@@ -50,12 +50,12 @@ export default function MentorHomePage() {
       const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
       const teams: UITeam[] = [];
 
-      if (mentor.projects && mentor.projects.length > 0) {
-        for (const projectId of mentor.projects) {
+      if (mentor.projectIds && mentor.projectIds.length > 0) {
+        for (const projectId of mentor.projectIds) {
           try {
-            const { data: project } = await apiClient.projects.apiProjectsIdGet(projectId);
-            if (project.teams && project.teams.length > 0) {
-              for (const teamId of project.teams) {
+            const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(projectId);
+            if (project.teamIds && project.teamIds.length > 0) {
+              for (const teamId of project.teamIds) {
                 teams.push({
                   id: teamId,
                   name: teamId,

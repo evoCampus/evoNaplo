@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
-import type { ProjectDTO } from "../../api";
+import type { CreateProjectDTO, ProjectDTO, UpdateProjectDTO } from "../../api";
 import { ProjectDialog } from "../../components/admin/ProjectDialog";
 import ProjectsList from "../../components/admin/ProjectsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
@@ -19,9 +19,16 @@ const DEFAULT_PROJECT: ProjectDTO = {
   id: null,
   name: "",
   description: "",
-  teams: [],
+  teamIds: [],
   projectLinks: {},
 };
+
+const toProjectPayload = (project: ProjectDTO): CreateProjectDTO | UpdateProjectDTO => ({
+  name: project.name ?? null,
+  description: project.description ?? null,
+  projectLinks: project.projectLinks ?? null,
+  teamId: project.teamIds?.[0] ?? null,
+});
 
 export default function ProjectsPage() {
   const apiClient = useApiClient();
@@ -117,11 +124,12 @@ export default function ProjectsPage() {
 
   const handleSave = async (project: ProjectDTO) => {
     try {
+      const payload = toProjectPayload(project);
       if (isCreating) {
-        await apiClient.projects.apiProjectsPost(project);
+        await apiClient.projects.apiProjectsPost(payload);
       } else {
         if (!project.id) throw new Error("Project ID is missing");
-        await apiClient.projects.apiProjectsIdPut(project.id, project);
+        await apiClient.projects.apiProjectsProjectIdPut(project.id, payload);
       }
 
       setIsDialogOpen(false);
@@ -149,7 +157,7 @@ export default function ProjectsPage() {
 
     startTransition(async () => {
       try {
-        await apiClient.projects.apiProjectsIdDelete(projectToDelete);
+        await apiClient.projects.apiProjectsProjectIdDelete(projectToDelete);
         await triggerRefresh();
         setProjectToDelete(null);
       } catch (error) {

@@ -5,6 +5,7 @@ import {
     Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious,
     Dialog, DialogContent
 } from "@evonaplo/ui-library";
+import type { CreateStudentDTO } from "../../api";
 import { useApiClient } from "../../hooks/use-api-client";
 
 type ColumnConfig = {
@@ -13,6 +14,27 @@ type ColumnConfig = {
     backendKey: string;
     type: "text" | "textarea";
     colSpan?: number;
+};
+
+type EditableStudentRow = {
+    [key: string]: string | number | boolean;
+    id: number;
+    name: string;
+    email: string;
+    phone: string;
+    program: string;
+    firstTime: string;
+    stayInTeam: string;
+    goals: string;
+    ts: string;
+    isError: boolean;
+};
+
+type ApiError = {
+    response?: {
+        data?: unknown;
+    };
+    message?: string;
 };
 
 const STUDENT_COLUMNS: ColumnConfig[] = [
@@ -29,7 +51,7 @@ export default function SpreadsheetImport() {
     const apiClient = useApiClient();
     const [status, setStatus] = useState<"idle" | "loading" | "valid" | "invalid" | "done" | "aborted">("idle");
     const [action, setAction] = useState<"import" | "save">("import");
-    const [rows, setRows] = useState<any[]>([]);
+    const [rows, setRows] = useState<EditableStudentRow[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const lastSoundRef = useRef<{ type: string, time: number }>({ type: "", time: 0 });
@@ -69,40 +91,12 @@ export default function SpreadsheetImport() {
 
         try {
             await new Promise((resolve) => setTimeout(resolve, 1200));
-            const response = await apiClient.data.dataImportPost(file as any);
-            const importedData = response.data;
+            await apiClient.data.dataImportPost(file);
 
-            if (importedData && importedData.length > 0) {
-                const uniqueData = importedData.filter((value: any, index: number, self: any[]) =>
-                        index === self.findIndex((t) => (
-                            t.email === value.email
-                        ))
-                );
-
-                const mappedRows = uniqueData.map((item: any, index: number) => {
-                    const rowData: any = {
-                        id: index + 1,
-                        name: item.name || "-",
-                        isError: false
-                    };
-
-                    STUDENT_COLUMNS.forEach(col => {
-                        if (col.id === "ts") {
-                            rowData[col.id] = item[col.backendKey] ? new Date(item[col.backendKey]).toLocaleString("hu-HU") : "-";
-                        } else {
-                            rowData[col.id] = item[col.backendKey] || "-";
-                        }
-                    });
-
-                    return rowData;
-                });
-
-                setRows(mappedRows);
-                setStatus("valid");
-            } else {
-                setStatus("invalid");
-                setRows([]);
-            }
+            // Generated API currently types this endpoint as void, so there is no preview payload.
+            // We mark import complete and keep the manual save carousel closed.
+            setRows([]);
+            setStatus("done");
         } catch (error) {
             console.error("Import error:", error);
             setStatus("invalid");
@@ -118,7 +112,7 @@ export default function SpreadsheetImport() {
         );
     };
 
-    const saveStudentToDb = async (row: any) => {
+    const saveStudentToDb = async (row: EditableStudentRow) => {
         const semesterMatch = String(row.program).match(/(\d+)/);
         const currentSemester = semesterMatch ? parseInt(semesterMatch[1], 10) : 1;
 
@@ -128,11 +122,12 @@ export default function SpreadsheetImport() {
         const isFirstTime = String(row.firstTime || "").toLowerCase().includes("igen");
         const stayInTeam = String(row.stayInTeam || "").toLowerCase().includes("igen");
 
-        const studentPayload = {
+        const studentPayload: CreateStudentDTO = {
             id: crypto.randomUUID(),
             name: row.name,
             email: row.email,
             phoneNumber: row.phone,
+            universityName: null,
             universityProgramme: universityProgramme,
             currentSemester: currentSemester,
             isInTheirFirstSemester: isFirstTime,
@@ -143,11 +138,12 @@ export default function SpreadsheetImport() {
             hasAppliedForInternship: false,
             hasInternship: false,
             isWorkingStudent: false,
-            workExperienceInSemesters: new Date().toISOString(),
-            wantsToStayWithCurrentTeam: stayInTeam
+            workExperienceInSemesters: "0",
+            wantsToStayWithCurrentTeam: stayInTeam,
+            teamId: null,
         };
 
-        await apiClient.students.apiStudentsPost(studentPayload as any);
+        await apiClient.students.apiStudentsPost(studentPayload);
     };
 
     const handleSave = async (idToSave: number) => {
@@ -163,8 +159,9 @@ export default function SpreadsheetImport() {
             if (newRows.length === 0) {
                 setStatus("done");
             }
-        } catch (error: any) {
-            console.error("Error saving student (Save):", error.response?.data || error.message || error);
+        } catch (error: unknown) {
+            const err = error as ApiError;
+            console.error("Error saving student (Save):", err.response?.data || err.message || err);
             setAction("save");
             setStatus("invalid");
             setRows((prevRows) => prevRows.map((r) => r.id === idToSave ? { ...r, isError: true } : r));
@@ -177,15 +174,16 @@ export default function SpreadsheetImport() {
         setAction("save");
         setStatus("loading");
 
-        let successIds: number[] = [];
-        let errorIds: number[] = [];
+        const successIds: number[] = [];
+        const errorIds: number[] = [];
 
         for (const row of rows) {
             try {
                 await saveStudentToDb(row);
                 successIds.push(row.id);
-            } catch (error: any) {
-                console.error(`Error saving ${row.name} (Save All):`, error.response?.data || error.message || error);
+            } catch (error: unknown) {
+                const err = error as ApiError;
+                console.error(`Error saving ${row.name} (Save All):`, err.response?.data || err.message || err);
                 errorIds.push(row.id);
             }
         }
@@ -256,8 +254,8 @@ export default function SpreadsheetImport() {
                 <DialogContent
                     style={{ border: "none", boxShadow: "none", background: "transparent" }}
                     className="max-w-[1000px] w-full flex justify-center bg-transparent border-none shadow-none p-0 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 [&>button]:hidden"
-                    onInteractOutside={(e: any) => e.preventDefault()}
-                    onOpenAutoFocus={(e: any) => e.preventDefault()}
+                    onInteractOutside={(e: Event) => e.preventDefault()}
+                    onOpenAutoFocus={(e: Event) => e.preventDefault()}
                 >
                     <Carousel key={rows.length} className="w-[850px] min-w-[850px] max-w-[850px] relative outline-none focus:outline-none">
                         <CarouselContent className="ml-0 outline-none focus:outline-none">
@@ -294,14 +292,14 @@ export default function SpreadsheetImport() {
                                                     {col.type === "textarea" ? (
                                                         <textarea
                                                             className="font-medium text-foreground italic w-full min-h-[60px] max-h-[100px] overflow-y-auto resize-none bg-transparent border border-transparent hover:border-border focus:border-ring focus:bg-background px-2 py-1 rounded-md outline-none transition-colors custom-scrollbar"
-                                                            value={r[col.id]}
+                                                            value={String(r[col.id] ?? "")}
                                                             onChange={(e) => handleFieldChange(r.id, col.id, e.target.value)}
                                                         />
                                                     ) : (
                                                         <textarea
                                                             rows={1}
                                                             className={`font-medium text-foreground overflow-x-auto overflow-y-hidden whitespace-nowrap resize-none custom-scrollbar ${inputClasses}`}
-                                                            value={r[col.id]}
+                                                            value={String(r[col.id] ?? "")}
                                                             onChange={(e) => handleFieldChange(r.id, col.id, e.target.value)}
                                                         />
                                                     )}

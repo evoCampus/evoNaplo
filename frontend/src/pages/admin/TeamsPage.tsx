@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
-import type { TeamDTO } from "../../api";
+import type { CreateTeamDTO, ProjectDTO, TeamDTO, UpdateProjectDTO, UpdateTeamDTO } from "../../api";
 import { TeamDialog } from "../../components/admin/TeamDialog";
 import TeamsList from "../../components/admin/TeamsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
@@ -25,10 +25,31 @@ const DEFAULT_TEAM: TeamDTO = {
   id: null,
   weeklyMeetingDay: 0,
   weeklyMeetingTime: "12:00",
-  mentors: [],
-  students: [],
-  attendance: [],
+  mentorIds: [],
+  studentIds: [],
+  attendanceSheetIds: [],
 };
+
+const toCreateTeamPayload = (team: TeamDTO): CreateTeamDTO => ({
+  projectId: team.projectId,
+  mentorId: team.mentorIds?.[0],
+  studentId: team.studentIds?.[0],
+  attendanceSheetId: team.attendanceSheetIds?.[0],
+});
+
+const toUpdateTeamPayload = (team: TeamDTO): UpdateTeamDTO => ({
+  name: team.id,
+  mentorId: team.mentorIds?.[0],
+  studentId: team.studentIds?.[0],
+  attendanceSheetId: team.attendanceSheetIds?.[0],
+});
+
+const toProjectUpdatePayload = (project: ProjectDTO, teamId: string | null): UpdateProjectDTO => ({
+  name: project.name ?? null,
+  description: project.description ?? null,
+  projectLinks: project.projectLinks ?? null,
+  teamId,
+});
 
 export default function TeamsPage() {
   const apiClient = useApiClient();
@@ -136,11 +157,11 @@ export default function TeamsPage() {
     try {
       let savedTeamId = team.id;
       if (isCreating) {
-        const res = await apiClient.teams.apiTeamsPost(team);
+        const res = await apiClient.teams.apiTeamsPost(toCreateTeamPayload(team));
         savedTeamId = res.data.id;
       } else {
         if (!team.id) throw new Error("Team ID is missing");
-        await apiClient.teams.apiTeamsIdPut(team.id, team);
+        await apiClient.teams.apiTeamsTeamIdPut(team.id, toUpdateTeamPayload(team));
       }
 
       if (savedTeamId) {
@@ -151,20 +172,12 @@ export default function TeamsPage() {
           allProjects.map(async (project) => {
             if (!project.id) return;
             const isSelected = selectedProjectIds.includes(project.id);
-            const hasTeam = project.teams?.includes(savedTeamId!) ?? false;
+            const hasTeam = project.teamIds?.includes(savedTeamId!) ?? false;
 
             if (isSelected && !hasTeam) {
-              const updatedTeams = [...(project.teams || []), savedTeamId!];
-              await apiClient.projects.apiProjectsIdPut(project.id, {
-                ...project,
-                teams: updatedTeams,
-              });
+              await apiClient.projects.apiProjectsProjectIdPut(project.id, toProjectUpdatePayload(project, savedTeamId!));
             } else if (!isSelected && hasTeam) {
-              const updatedTeams = (project.teams || []).filter((id) => id !== savedTeamId);
-              await apiClient.projects.apiProjectsIdPut(project.id, {
-                ...project,
-                teams: updatedTeams,
-              });
+              await apiClient.projects.apiProjectsProjectIdPut(project.id, toProjectUpdatePayload(project, null));
             }
           })
         );
@@ -195,7 +208,7 @@ export default function TeamsPage() {
 
     startTransition(async () => {
       try {
-        await apiClient.teams.apiTeamsIdDelete(teamToDelete);
+        await apiClient.teams.apiTeamsTeamIdDelete(teamToDelete);
         await triggerRefresh();
         setTeamToDelete(null);
       } catch (error) {

@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
-import type { MentorDTO } from "../../api";
+import type { CreateMentorDTO, MentorDTO, UpdateMentorDTO } from "../../api";
 import { GenericDialog, type FieldConfig } from "src/components/admin/generic-dialog/GenericDialog";
 import MentorsList from "../../components/admin/MentorsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
@@ -33,9 +33,17 @@ const DEFAULT_MENTOR: MentorDTO = {
   mentorProfile: "",
   semesterNumber: 1,
   isActive: true,
-  teams: [],
-  projects: [],
+  teamIds: [],
+  projectIds: [],
 };
+
+const toMentorPayload = (mentor: MentorDTO): CreateMentorDTO | UpdateMentorDTO => ({
+  name: mentor.name,
+  email: mentor.email,
+  phoneNumber: mentor.phoneNumber ?? null,
+  teamId: mentor.teamIds?.[0] ?? null,
+  projectId: mentor.projectIds?.[0] ?? null,
+});
 
 export default function MentorsPage() {
   const apiClient = useApiClient();
@@ -131,11 +139,12 @@ export default function MentorsPage() {
 
   const handleSave = async (mentor: MentorDTO) => {
     try {
+      const payload = toMentorPayload(mentor);
       if (isCreating) {
-        await apiClient.mentors.apiMentorsPost(mentor);
+        await apiClient.mentors.apiMentorsPost(payload);
       } else {
         if (!mentor.id) throw new Error("Mentor ID is missing");
-        await apiClient.mentors.apiMentorsIdPut(mentor.id, mentor);
+        await apiClient.mentors.apiMentorsIdPut(mentor.id, payload);
       }
 
       setIsDialogOpen(false);
@@ -163,7 +172,7 @@ export default function MentorsPage() {
 
     startTransition(async () => {
       try {
-        await apiClient.mentors.apiMentorsIdDelete(mentorToDelete);
+        await apiClient.mentors.apiMentorsMentorIdDelete(mentorToDelete);
         await triggerRefresh();
         setMentorToDelete(null);
       } catch (error) {

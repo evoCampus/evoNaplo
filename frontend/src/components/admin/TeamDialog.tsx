@@ -41,8 +41,8 @@ export function TeamDialog({
   const [isEditing, setIsEditing] = useState(isCreating);
   const [weeklyMeetingDay, setWeeklyMeetingDay] = useState<DayOfWeek>(item?.weeklyMeetingDay ?? 0);
   const [weeklyMeetingTime, setWeeklyMeetingTime] = useState<string>(item?.weeklyMeetingTime ?? "12:00");
-  const [selectedStudents, setSelectedStudents] = useState<string[]>(item?.students || []);
-  const [selectedMentors, setSelectedMentors] = useState<string[]>(item?.mentors || []);
+  const [selectedStudents, setSelectedStudents] = useState<string[]>(item?.studentIds || []);
+  const [selectedMentors, setSelectedMentors] = useState<string[]>(item?.mentorIds || []);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
 
   const [studentSearch, setStudentSearch] = useState("");
@@ -70,8 +70,8 @@ export function TeamDialog({
       if (item) {
         setWeeklyMeetingDay(item.weeklyMeetingDay ?? 1);
         setWeeklyMeetingTime(item.weeklyMeetingTime ?? "12:00");
-        setSelectedStudents(item.students || []);
-        setSelectedMentors(item.mentors || []);
+        setSelectedStudents(item.studentIds || []);
+        setSelectedMentors(item.mentorIds || []);
       } else {
         setWeeklyMeetingDay(1);
         setWeeklyMeetingTime("12:00");
@@ -99,7 +99,7 @@ export function TeamDialog({
 
           if (item?.id) {
             const teamProjects = projectsRes.data
-              .filter((p) => p.teams?.includes(item.id!))
+              .filter((p) => p.teamIds?.includes(item.id!))
               .map((p) => p.id!);
             setSelectedProjects(teamProjects);
           } else {
@@ -126,10 +126,10 @@ export function TeamDialog({
       if (item) {
         setWeeklyMeetingDay(item.weeklyMeetingDay ?? 0);
         setWeeklyMeetingTime(item.weeklyMeetingTime ?? "12:00");
-        setSelectedStudents(item.students || []);
-        setSelectedMentors(item.mentors || []);
+        setSelectedStudents(item.studentIds || []);
+        setSelectedMentors(item.mentorIds || []);
         const teamProjects = projectsList
-          .filter((p) => p.teams?.includes(item.id!))
+          .filter((p) => p.teamIds?.includes(item.id!))
           .map((p) => p.id!);
         setSelectedProjects(teamProjects);
       }
@@ -158,9 +158,9 @@ export function TeamDialog({
       id: item?.id ?? null,
       weeklyMeetingDay,
       weeklyMeetingTime,
-      mentors: selectedMentors,
-      students: selectedStudents,
-      attendance: item?.attendance || [],
+      mentorIds: selectedMentors,
+      studentIds: selectedStudents,
+      attendanceSheetIds: item?.attendanceSheetIds || [],
     };
 
     try {

@@ -5,7 +5,6 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **string** |  | [default to undefined]
 **name** | **string** |  | [default to undefined]
 **email** | **string** |  | [default to undefined]
 **phoneNumber** | **string** |  | [optional] [default to undefined]
@@ -30,7 +29,6 @@ Name | Type | Description | Notes
 import { CreateStudentDTO } from './api';
 
 const instance: CreateStudentDTO = {
-    id,
     name,
     email,
     phoneNumber,

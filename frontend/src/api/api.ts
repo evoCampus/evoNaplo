@@ -53,7 +53,6 @@ export interface CreateProjectDTO {
     'teamId'?: string | null;
 }
 export interface CreateStudentDTO {
-    'id': string | null;
     'name': string | null;
     'email': string | null;
     'phoneNumber'?: string | null;
@@ -106,7 +105,7 @@ export interface LoginDTO {
     'password': string | null;
 }
 export interface MentorDTO {
-    'id': string | null;
+    'id': string;
     'name': string | null;
     'email': string | null;
     'phoneNumber'?: string | null;
@@ -117,7 +116,7 @@ export interface MentorDTO {
     'isActive': boolean;
 }
 export interface ProjectDTO {
-    'id': string | null;
+    'id': string;
     'name'?: string | null;
     'description'?: string | null;
     'projectLinks'?: { [key: string]: string; } | null;
@@ -128,7 +127,7 @@ export interface RegisterDTO {
     'password': string | null;
 }
 export interface StudentDTO {
-    'id': string | null;
+    'id': string;
     'name': string | null;
     'email': string | null;
     'phoneNumber'?: string | null;
@@ -146,9 +145,10 @@ export interface StudentDTO {
     'wantsToStayWithCurrentTeam': boolean;
 }
 export interface TeamDTO {
-    'id': string | null;
+    'id': string;
     'mentorIds': Array<string> | null;
     'studentIds': Array<string> | null;
+    'projectId'?: string | null;
     'weeklyMeetingDay'?: DayOfWeek;
     'weeklyMeetingTime'?: string;
     'attendanceSheetIds': Array<string> | null;

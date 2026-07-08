@@ -22,7 +22,7 @@ export default function TeamsList({
             Team - {getDayName(team.weeklyMeetingDay)} at {formatTime(team.weeklyMeetingTime)}
           </span>
           <span className="text-xs text-muted-foreground">
-            {team.students?.length || 0} students • {team.mentors?.length || 0} mentors
+            {team.studentIds?.length || 0} students • {team.mentorIds?.length || 0} mentors
           </span>
         </div>
       )}

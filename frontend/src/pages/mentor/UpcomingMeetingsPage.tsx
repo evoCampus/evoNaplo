@@ -21,7 +21,7 @@ export default function UpcomingMeetingsPage() {
             const { data: student } = await apiClient.students.apiStudentsStudentIdGet(sid);
 
             return {
-              id: student.id,
+              id: student.id ?? sid,
               name: student.name || "Unknown Student"
             };
           });
@@ -35,8 +35,10 @@ export default function UpcomingMeetingsPage() {
 
         const studentDetails = await fetchStudentDetails(team.studentIds || []);
         const dates = getMeetingDates(team.weeklyMeetingDay);
-        const savedRecord = (team.attendanceSheetIds || []).find(record => record[0] === dates.raw);
-        const presentStudentIds = savedRecord ? savedRecord.slice(1) : studentDetails.map(s => s.id);
+        const savedRecord = (team.attendanceSheetIds || []).find((record) => record.split("|")[0] === dates.raw);
+        const presentStudentIds = savedRecord
+          ? (savedRecord.split("|")[1] || "").split(",").filter(Boolean)
+          : studentDetails.map((s) => s.id);
 
         return {
           id: `${projectId}-${teamId}`,

@@ -14,17 +14,17 @@ export default function ProjectDetailsPage() {
     if (!id) return Promise.reject(new Error("Project ID is required"));
 
     return (async (): Promise<ProjectDetailedData> => {
-      const { data: project } = await apiClient.projects.apiProjectsIdGet(id);
+      const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(id);
 
       let teamsWithMembers: TeamWithMembers[] = [];
-      if (project.teams && project.teams.length > 0) {
-        const teamPromises = project.teams.map(async (teamId) => {
-          const { data: teamData } = await apiClient.teams.apiTeamsIdGet(teamId);
+      if (project.teamIds && project.teamIds.length > 0) {
+        const teamPromises = project.teamIds.map(async (teamId: string) => {
+          const { data: teamData } = await apiClient.teams.apiTeamsTeamIdGet(teamId);
 
           let memberNames: string[] = [];
-          if (teamData.students && teamData.students.length > 0) {
-            const studentPromises = teamData.students.map(sid =>
-              apiClient.students.apiStudentsIdGet(sid).then(res => res.data.name || "Unknown Student")
+          if (teamData.studentIds && teamData.studentIds.length > 0) {
+            const studentPromises = teamData.studentIds.map((sid: string) =>
+              apiClient.students.apiStudentsStudentIdGet(sid).then((res) => res.data.name || "Unknown Student")
             );
             memberNames = await Promise.all(studentPromises);
           }
@@ -44,17 +44,17 @@ export default function ProjectDetailsPage() {
   const triggerRefresh = () => {
     if (!id) return;
     const promise = (async (): Promise<ProjectDetailedData> => {
-      const { data: project } = await apiClient.projects.apiProjectsIdGet(id);
+      const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(id);
 
       let teamsWithMembers: TeamWithMembers[] = [];
-      if (project.teams && project.teams.length > 0) {
-        const teamPromises = project.teams.map(async (teamId) => {
-          const { data: teamData } = await apiClient.teams.apiTeamsIdGet(teamId);
+      if (project.teamIds && project.teamIds.length > 0) {
+        const teamPromises = project.teamIds.map(async (teamId: string) => {
+          const { data: teamData } = await apiClient.teams.apiTeamsTeamIdGet(teamId);
 
           let memberNames: string[] = [];
-          if (teamData.students && teamData.students.length > 0) {
-            const studentPromises = teamData.students.map(sid =>
-              apiClient.students.apiStudentsIdGet(sid).then(res => res.data.name || "Unknown Student")
+          if (teamData.studentIds && teamData.studentIds.length > 0) {
+            const studentPromises = teamData.studentIds.map((sid: string) =>
+              apiClient.students.apiStudentsStudentIdGet(sid).then((res) => res.data.name || "Unknown Student")
             );
             memberNames = await Promise.all(studentPromises);
           }

@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **id** | **string** |  | [default to undefined]
 **mentorIds** | **Array&lt;string&gt;** |  | [default to undefined]
 **studentIds** | **Array&lt;string&gt;** |  | [default to undefined]
+**projectId** | **string** |  | [optional] [default to undefined]
 **weeklyMeetingDay** | [**DayOfWeek**](DayOfWeek.md) |  | [optional] [default to undefined]
 **weeklyMeetingTime** | **string** |  | [optional] [default to undefined]
 **attendanceSheetIds** | **Array&lt;string&gt;** |  | [default to undefined]
@@ -21,6 +22,7 @@ const instance: TeamDTO = {
     id,
     mentorIds,
     studentIds,
+    projectId,
     weeklyMeetingDay,
     weeklyMeetingTime,
     attendanceSheetIds,

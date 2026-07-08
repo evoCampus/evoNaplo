@@ -40,10 +40,10 @@ export function DashboardSidebar() {
 
     return (async (): Promise<UIMentorProject[]> => {
       const { data: mentor } = await apiClient.mentors.apiMentorsIdGet(user.id);
-      if (!mentor.projects || mentor.projects.length === 0) return [];
+      if (!mentor.projectIds || mentor.projectIds.length === 0) return [];
 
-      const projectPromises = mentor.projects.map(async (projectId) => {
-        const { data: project } = await apiClient.projects.apiProjectsIdGet(projectId);
+      const projectPromises = mentor.projectIds.map(async (projectId: string) => {
+        const { data: project } = await apiClient.projects.apiProjectsProjectIdGet(projectId);
 
         const mappedProject: UIMentorProject = {
           id: project.id || projectId,

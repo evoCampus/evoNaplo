@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import { Button } from "@evonaplo/ui-library";
 import { Plus } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
-import type { StudentDTO } from "../../api";
+import type { CreateStudentDTO, StudentDTO, UpdateStudentDTO } from "../../api";
 import { GenericDialog, type FieldConfig } from "src/components/admin/generic-dialog/GenericDialog";
 import StudentsList from "../../components/admin/StudentsList";
 import GenericConfirmDialog from "src/components/GenericConfirmDialog";
@@ -15,7 +15,7 @@ const studentFields: FieldConfig<StudentDTO>[] = [
   { key: "phoneNumber", label: "Phone", type: "text", required: true },
   { key: "email", label: "Email", type: "text", fullWidth: true, required: true },
   { key: "currentSemester", label: "Semester", type: "number", required: true },
-  { key: "scholarshipDurationInSemesters", label: "Scholarship Duration", type: "number", required: true },
+  { key: "scholarshipDuration", label: "Scholarship Duration", type: "text", required: true },
   { key: "universityProgramme", label: "University Programme", type: "text", fullWidth: true, required: true },
   { key: "personalGoals", label: "Personal Goals", type: "text", fullWidth: true, required: true },
   { key: "isInTheirFirstSemester", label: "Is in their first semester", type: "checkbox" },
@@ -24,7 +24,7 @@ const studentFields: FieldConfig<StudentDTO>[] = [
   { key: "hasAppliedForInternship", label: "Has applied for internship", type: "checkbox" },
   { key: "hasInternship", label: "Has internship", type: "checkbox" },
   { key: "isWorkingStudent", label: "Is working student", type: "checkbox" },
-  { key: "workExperienceInSemesters", label: "Work Experience", type: "number", fullWidth: true, required: true },
+  { key: "workExperienceInSemesters", label: "Work Experience", type: "text", fullWidth: true, required: true },
   { key: "wantsToStayWithCurrentTeam", label: "Wants to stay with current team", type: "checkbox" },
 ];
 
@@ -46,13 +46,34 @@ const DEFAULT_STUDENT: StudentDTO = {
   personalGoals: "",
   hasAppliedForScholarship: false,
   hasScholarship: false,
-  scholarshipDurationInSemesters: 0,
+  scholarshipDuration: "0",
   hasAppliedForInternship: false,
   hasInternship: false,
   isWorkingStudent: false,
-  workExperienceInSemesters: 0,
+  workExperienceInSemesters: "0",
   wantsToStayWithCurrentTeam: false,
 };
+
+const toStudentPayload = (student: StudentDTO): CreateStudentDTO | UpdateStudentDTO => ({
+  // id: student.id,
+  name: student.name,
+  email: student.email,
+  phoneNumber: student.phoneNumber ?? null,
+  universityProgramme: student.universityProgramme ?? null,
+  currentSemester: student.currentSemester,
+  isInTheirFirstSemester: student.isInTheirFirstSemester,
+  personalGoals: student.personalGoals ?? null,
+  hasAppliedForScholarship: student.hasAppliedForScholarship,
+  hasScholarship: student.hasScholarship,
+  // scholarshipDuration: student.scholarshipDuration ?? "0",
+  hasAppliedForInternship: student.hasAppliedForInternship,
+  hasInternship: student.hasInternship,
+  isWorkingStudent: student.isWorkingStudent,
+  // workExperienceInSemesters: student.workExperienceInSemesters ?? "0",
+  wantsToStayWithCurrentTeam: student.wantsToStayWithCurrentTeam,
+  teamId: null,
+  universityName: null,
+});
 
 export default function StudentsPage() {
   const apiClient = useApiClient();
@@ -148,11 +169,12 @@ export default function StudentsPage() {
 
   const handleSave = async (student: StudentDTO) => {
     try {
+      const payload = toStudentPayload(student);
       if (isCreating) {
-        await apiClient.students.apiStudentsPost(student);
+        await apiClient.students.apiStudentsPost(payload);
       } else {
         if (!student.id) throw new Error("Student ID is missing");
-        await apiClient.students.apiStudentsIdPut(student.id, student);
+        await apiClient.students.apiStudentsStudentIdPut(student.id, payload);
       }
 
       setIsDialogOpen(false);
@@ -180,7 +202,7 @@ export default function StudentsPage() {
 
     startTransition(async () => {
       try {
-        await apiClient.students.apiStudentsIdDelete(studentToDelete);
+        await apiClient.students.apiStudentsStudentIdDelete(studentToDelete);
         await triggerRefresh();
         setStudentToDelete(null);
       } catch (error) {
