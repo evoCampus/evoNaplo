@@ -65,22 +65,7 @@ export default function SpreadsheetImport() {
     const [rows, setRows] = useState<EditableStudentRow[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const lastSoundRef = useRef<{ type: string, time: number }>({ type: "", time: 0 });
-
-    const playSound = (type: "error" | "success" | "loading") => {
-        const now = Date.now();
-        if (lastSoundRef.current.type === type && now - lastSoundRef.current.time < 500) return;
-
-        lastSoundRef.current = { type, time: now };
-        const audio = new Audio(`/sounds/${type}.mp3`);
-        audio.play().catch(error => console.warn("Sound blocked by browser: ", error));
-    };
-
     useEffect(() => {
-        if (status === "invalid") playSound("error");
-        if (status === "done") playSound("success");
-        if (status === "loading" && action === "import") playSound("loading");
-
         if (status === "invalid" || status === "done" || status === "aborted") {
             const timer = setTimeout(() => setStatus("idle"), 3500);
             return () => clearTimeout(timer);
@@ -145,7 +130,6 @@ export default function SpreadsheetImport() {
         const stayInTeam = String(row.stayInTeam || "").toLowerCase().includes("igen");
 
         const studentPayload: CreateStudentDTO = {
-            id: crypto.randomUUID(),
             name: row.name,
             email: row.email,
             phoneNumber: row.phone,
