@@ -170,9 +170,11 @@ const configuration = new Configuration();
 const apiInstance = new TeamsApi(configuration);
 
 let teamId: string; // (default to undefined)
+let includeStudents: boolean; // (optional) (default to false)
 
 const { status, data } = await apiInstance.apiTeamsTeamIdGet(
-    teamId
+    teamId,
+    includeStudents
 );
 ```
 
@@ -181,6 +183,7 @@ const { status, data } = await apiInstance.apiTeamsTeamIdGet(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **teamId** | [**string**] |  | defaults to undefined|
+| **includeStudents** | [**boolean**] |  | (optional) defaults to false|
 
 
 ### Return type

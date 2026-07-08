@@ -1918,10 +1918,11 @@ export const TeamsApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * 
          * @param {string} teamId 
+         * @param {boolean} [includeStudents] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTeamsTeamIdGet: async (teamId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiTeamsTeamIdGet: async (teamId: string, includeStudents?: boolean, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'teamId' is not null or undefined
             assertParamExists('apiTeamsTeamIdGet', 'teamId', teamId)
             const localVarPath = `/api/Teams/{teamId}`
@@ -1936,6 +1937,10 @@ export const TeamsApiAxiosParamCreator = function (configuration?: Configuration
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (includeStudents !== undefined) {
+                localVarQueryParameter['includeStudents'] = includeStudents;
+            }
 
             localVarHeaderParameter['Accept'] = 'text/plain,application/json,text/json';
 
@@ -2030,11 +2035,12 @@ export const TeamsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @param {string} teamId 
+         * @param {boolean} [includeStudents] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiTeamsTeamIdGet(teamId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TeamDTO>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTeamsTeamIdGet(teamId, options);
+        async apiTeamsTeamIdGet(teamId: string, includeStudents?: boolean, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TeamDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.apiTeamsTeamIdGet(teamId, includeStudents, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TeamsApi.apiTeamsTeamIdGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -2090,11 +2096,12 @@ export const TeamsApiFactory = function (configuration?: Configuration, basePath
         /**
          * 
          * @param {string} teamId 
+         * @param {boolean} [includeStudents] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTeamsTeamIdGet(teamId: string, options?: RawAxiosRequestConfig): AxiosPromise<TeamDTO> {
-            return localVarFp.apiTeamsTeamIdGet(teamId, options).then((request) => request(axios, basePath));
+        apiTeamsTeamIdGet(teamId: string, includeStudents?: boolean, options?: RawAxiosRequestConfig): AxiosPromise<TeamDTO> {
+            return localVarFp.apiTeamsTeamIdGet(teamId, includeStudents, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2145,11 +2152,12 @@ export class TeamsApi extends BaseAPI {
     /**
      * 
      * @param {string} teamId 
+     * @param {boolean} [includeStudents] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public apiTeamsTeamIdGet(teamId: string, options?: RawAxiosRequestConfig) {
-        return TeamsApiFp(this.configuration).apiTeamsTeamIdGet(teamId, options).then((request) => request(this.axios, this.basePath));
+    public apiTeamsTeamIdGet(teamId: string, includeStudents?: boolean, options?: RawAxiosRequestConfig) {
+        return TeamsApiFp(this.configuration).apiTeamsTeamIdGet(teamId, includeStudents, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

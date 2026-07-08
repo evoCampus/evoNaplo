@@ -42,7 +42,7 @@ public class TeamsController : ControllerBase
     /// <param name="teamId">The unique identifier of the team to retrieve.</param>
     /// <returns>The TeamDTO if found; otherwise, a NotFound response.</returns>
     [HttpGet("{teamId}")]
-    public async Task<ActionResult<TeamDTO>> GetTeam(string teamId)
+    public async Task<ActionResult<TeamDTO>> GetTeam(string teamId, [FromQuery] bool includeStudents = false)
     {
         try
         {
