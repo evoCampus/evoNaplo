@@ -184,11 +184,9 @@ namespace evoNaplo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TeamId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UniversityName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UniversityProgramme")

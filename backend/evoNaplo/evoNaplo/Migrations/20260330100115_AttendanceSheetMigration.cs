@@ -53,7 +53,7 @@ namespace evoNaplo.Migrations
                 name: "UniversityName",
                 table: "Students",
                 type: "nvarchar(max)",
-                nullable: false,
+                nullable: true,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(

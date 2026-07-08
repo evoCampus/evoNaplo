@@ -19,8 +19,8 @@ public class ProjectDTO
         Id = project.Id;
         Name = project.Name;
         Description = project.ShortDescription;
-        ProjectLinks = project.ProjectLinks.ToDictionary(l => l.LinkType.ToString(), l => l.Url);
-        TeamIds = project.Teams.Select(t => t.Id).ToList();
+        ProjectLinks = project.ProjectLinks?.ToDictionary(l => l.LinkType.ToString(), l => l.Url) ?? new Dictionary<string, string>();
+        TeamIds = project.Teams?.Select(t => t.Id) ?? [];
         
     }
 }

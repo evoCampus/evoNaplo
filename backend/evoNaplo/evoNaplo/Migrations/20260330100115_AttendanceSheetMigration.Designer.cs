@@ -191,7 +191,6 @@ namespace evoNaplo.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UniversityName")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UniversityProgramme")

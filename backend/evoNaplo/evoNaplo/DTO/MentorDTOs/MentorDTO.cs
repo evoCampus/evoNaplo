@@ -24,9 +24,9 @@ public class MentorDTO
         Name = mentor.Name;
         Email = mentor.Email;
         PhoneNumber = mentor.PhoneNumber;
-        MentorProfile = mentor.MentorProfile;
-        TeamIds = mentor.Teams.Select(t => t.Id).ToList();
-        ProjectIds = mentor.Projects.Select(p => p.Id).ToList();
-        IsActive = mentor.IsActive;
+        // MentorProfile = mentor.MentorProfile;
+        TeamIds = mentor.Teams?.Select(t => t.Id) ?? [];
+        ProjectIds = mentor.Projects?.Select(p => p.Id) ?? [];
+        // IsActive = mentor.IsActive;
     }
 }

@@ -14,7 +14,7 @@ namespace evoNaplo.DTO.MentorDTOs
         {
             return new Mentor
             {
-                IsActive = true,
+                // IsActive = true,
                 Id = string.Empty,
                 Name = this.Name,
                 Email = this.Email,

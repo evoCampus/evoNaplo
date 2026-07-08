@@ -160,7 +160,6 @@ namespace evoNaplo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TeamId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UniversityProgramme")
@@ -191,7 +190,6 @@ namespace evoNaplo.Migrations
                         .HasColumnType("time");
 
                     b.Property<string>("ProjectId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("WeeklyMeetingTime")

@@ -90,7 +90,7 @@ namespace evoNaplo.Migrations
                     WeeklyMeetingTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     LengthOfMeeting = table.Column<TimeSpan>(type: "time", nullable: false),
                     DayOfWeek = table.Column<int>(type: "int", nullable: false),
-                    ProjectId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    ProjectId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -147,7 +147,7 @@ namespace evoNaplo.Migrations
                     IsWorkingStudent = table.Column<bool>(type: "bit", nullable: false),
                     WorkingStudentDuration = table.Column<DateTime>(type: "datetime2", nullable: false),
                     WantsToStayWithCurrentTeam = table.Column<bool>(type: "bit", nullable: false),
-                    TeamId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    TeamId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
