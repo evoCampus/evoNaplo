@@ -30,11 +30,18 @@ const DEFAULT_TEAM: TeamDTO = {
   attendanceSheetIds: [],
 };
 
+const toTeamMeetingTime = (time?: string | null) => {
+  if (!time) return undefined;
+  return time.length === 5 ? `${time}:00` : time;
+};
+
 const toCreateTeamPayload = (team: TeamDTO): CreateTeamDTO => ({
   projectId: team.projectId,
   mentorId: team.mentorIds?.[0],
   studentId: team.studentIds?.[0],
   attendanceSheetId: team.attendanceSheetIds?.[0],
+  weeklyMeetingDay: team.weeklyMeetingDay,
+  weeklyMeetingTime: toTeamMeetingTime(team.weeklyMeetingTime),
 });
 
 const toUpdateTeamPayload = (team: TeamDTO): UpdateTeamDTO => ({
@@ -42,6 +49,8 @@ const toUpdateTeamPayload = (team: TeamDTO): UpdateTeamDTO => ({
   mentorId: team.mentorIds?.[0],
   studentId: team.studentIds?.[0],
   attendanceSheetId: team.attendanceSheetIds?.[0],
+  weeklyMeetingDay: team.weeklyMeetingDay,
+  weeklyMeetingTime: toTeamMeetingTime(team.weeklyMeetingTime),
 });
 
 const toProjectUpdatePayload = (project: ProjectDTO, teamId: string | null): UpdateProjectDTO => ({

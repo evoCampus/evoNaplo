@@ -13,11 +13,11 @@ public class Student
     public string? PersonalGoals { get; set; }
     public bool HasAppliedForScholarship { get; set; }
     public bool HasActiveScholarship { get; set; }
-    public DateTime ScholarshipDuration { get; set; }
+    public DateTime? ScholarshipDuration { get; set; }
     public bool HasAppliedForInternship { get; set; }
     public bool IsCurrentlyIntern { get; set; }
     public bool IsWorkingStudent { get; set; }
-    public DateTime WorkingStudentDuration { get; set; }
+    public DateTime? WorkingStudentDuration { get; set; }
     public bool WantsToStayWithCurrentTeam { get; set; }
     public string? TeamId { get; set; }
     public Team? Team { get; set; }

@@ -76,7 +76,9 @@ internal class TeamService : ITeamService
             Id = string.Empty,
             Mentors = new List<Mentor>(),
             Students = new List<Student>(),
-            AttendanceSheets = new List<AttendanceSheet>()
+            AttendanceSheets = new List<AttendanceSheet>(),
+            WeeklyMeetingDay = teamToAddDTO.WeeklyMeetingDay,
+            WeeklyMeetingTime = teamToAddDTO.WeeklyMeetingTime
         };
 
         if (!string.IsNullOrEmpty(teamToAddDTO.MentorId))
@@ -125,6 +127,8 @@ internal class TeamService : ITeamService
             existingTeam.Mentors ??= new List<Mentor>();
             existingTeam.Students ??= new List<Student>();
             existingTeam.AttendanceSheets ??= new List<AttendanceSheet>();
+            existingTeam.WeeklyMeetingDay = updatedTeamDTO.WeeklyMeetingDay;
+            existingTeam.WeeklyMeetingTime = updatedTeamDTO.WeeklyMeetingTime;
 
             existingTeam.Mentors.Clear();
             if (!string.IsNullOrEmpty(updatedTeamDTO.MentorId))

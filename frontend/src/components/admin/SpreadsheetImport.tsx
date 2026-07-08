@@ -30,6 +30,17 @@ type EditableStudentRow = {
     isError: boolean;
 };
 
+type ImportedStudentRow = {
+    timestamp?: string;
+    name?: string;
+    email?: string;
+    phoneNumber?: string;
+    major?: string;
+    isFirstTime?: string;
+    goals?: string;
+    stayInTeam?: string;
+};
+
 type ApiError = {
     response?: {
         data?: unknown;
@@ -91,12 +102,25 @@ export default function SpreadsheetImport() {
 
         try {
             await new Promise((resolve) => setTimeout(resolve, 1200));
-            await apiClient.data.dataImportPost(file);
+            const response = await apiClient.data.dataImportPost(file) as unknown as {
+                data?: ImportedStudentRow[];
+            };
 
-            // Generated API currently types this endpoint as void, so there is no preview payload.
-            // We mark import complete and keep the manual save carousel closed.
-            setRows([]);
-            setStatus("done");
+            const importedRows = (response.data ?? []).map((row, index) => ({
+                id: index + 1,
+                ts: row.timestamp ?? "",
+                name: row.name ?? "",
+                email: row.email ?? "",
+                phone: row.phoneNumber ?? "",
+                program: row.major ?? "",
+                firstTime: row.isFirstTime ?? "",
+                stayInTeam: row.stayInTeam ?? "",
+                goals: row.goals ?? "",
+                isError: false,
+            }));
+
+            setRows(importedRows);
+            setStatus(importedRows.length > 0 ? "valid" : "invalid");
         } catch (error) {
             console.error("Import error:", error);
             setStatus("invalid");
@@ -115,9 +139,7 @@ export default function SpreadsheetImport() {
     const saveStudentToDb = async (row: EditableStudentRow) => {
         const semesterMatch = String(row.program).match(/(\d+)/);
         const currentSemester = semesterMatch ? parseInt(semesterMatch[1], 10) : 1;
-
-        const programParts = String(row.program).split(',');
-        const universityProgramme = programParts.length > 1 ? programParts[1].trim() : String(row.program);
+        const universityProgramme = String(row.program).trim();
 
         const isFirstTime = String(row.firstTime || "").toLowerCase().includes("igen");
         const stayInTeam = String(row.stayInTeam || "").toLowerCase().includes("igen");
@@ -134,11 +156,11 @@ export default function SpreadsheetImport() {
             personalGoals: row.goals,
             hasAppliedForScholarship: false,
             hasScholarship: false,
-            scholarshipDuration: new Date().toISOString(),
+            scholarshipDuration: undefined,
             hasAppliedForInternship: false,
             hasInternship: false,
             isWorkingStudent: false,
-            workExperienceInSemesters: "0",
+            workExperienceInSemesters: undefined,
             wantsToStayWithCurrentTeam: stayInTeam,
             teamId: null,
         };

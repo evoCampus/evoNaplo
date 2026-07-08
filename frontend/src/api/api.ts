@@ -76,6 +76,8 @@ export interface CreateTeamDTO {
     'mentorId'?: string | null;
     'studentId'?: string | null;
     'attendanceSheetId'?: string | null;
+    'weeklyMeetingDay'?: DayOfWeek;
+    'weeklyMeetingTime'?: string;
 }
 
 export const DayOfWeek = {
@@ -193,6 +195,8 @@ export interface UpdateTeamDTO {
     'mentorId'?: string | null;
     'studentId'?: string | null;
     'attendanceSheetId'?: string | null;
+    'weeklyMeetingDay'?: DayOfWeek;
+    'weeklyMeetingTime'?: string;
 }
 
 /**

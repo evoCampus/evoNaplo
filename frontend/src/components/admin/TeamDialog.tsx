@@ -16,7 +16,7 @@ import { Pencil, Save, X, AlertCircle } from "lucide-react";
 import { useApiClient } from "../../hooks/use-api-client";
 import type { TeamDTO, StudentDTO, MentorDTO, ProjectDTO, DayOfWeek } from "../../api";
 import { SearchableCheckboxList } from "./SearchableCheckboxList";
-import { getDayName, DAYS_OF_WEEK } from "../../lib/date-utils";
+import { formatTime, getDayName, DAYS_OF_WEEK } from "../../lib/date-utils";
 
 interface TeamDialogProps {
   isOpen: boolean;
@@ -40,7 +40,7 @@ export function TeamDialog({
 
   const [isEditing, setIsEditing] = useState(isCreating);
   const [weeklyMeetingDay, setWeeklyMeetingDay] = useState<DayOfWeek>(item?.weeklyMeetingDay ?? 0);
-  const [weeklyMeetingTime, setWeeklyMeetingTime] = useState<string>(item?.weeklyMeetingTime ?? "12:00");
+  const [weeklyMeetingTime, setWeeklyMeetingTime] = useState<string>(formatTime(item?.weeklyMeetingTime) ?? "12:00");
   const [selectedStudents, setSelectedStudents] = useState<string[]>(item?.studentIds || []);
   const [selectedMentors, setSelectedMentors] = useState<string[]>(item?.mentorIds || []);
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
@@ -69,7 +69,7 @@ export function TeamDialog({
 
       if (item) {
         setWeeklyMeetingDay(item.weeklyMeetingDay ?? 1);
-        setWeeklyMeetingTime(item.weeklyMeetingTime ?? "12:00");
+        setWeeklyMeetingTime(formatTime(item.weeklyMeetingTime) || "12:00");
         setSelectedStudents(item.studentIds || []);
         setSelectedMentors(item.mentorIds || []);
       } else {
@@ -125,7 +125,7 @@ export function TeamDialog({
       setIsEditing(false);
       if (item) {
         setWeeklyMeetingDay(item.weeklyMeetingDay ?? 0);
-        setWeeklyMeetingTime(item.weeklyMeetingTime ?? "12:00");
+        setWeeklyMeetingTime(formatTime(item.weeklyMeetingTime) || "12:00");
         setSelectedStudents(item.studentIds || []);
         setSelectedMentors(item.mentorIds || []);
         const teamProjects = projectsList
@@ -153,15 +153,14 @@ export function TeamDialog({
       return;
     }
 
-    const updatedTeam: TeamDTO = {
-      ...item,
-      id: item?.id ?? null,
+    const updatedTeam = {
+      id: item?.id ?? "",
       weeklyMeetingDay,
       weeklyMeetingTime,
       mentorIds: selectedMentors,
       studentIds: selectedStudents,
       attendanceSheetIds: item?.attendanceSheetIds || [],
-    };
+    } as TeamDTO;
 
     try {
       await onSave(updatedTeam, selectedProjects);
@@ -260,7 +259,7 @@ export function TeamDialog({
                       className="flex-1 bg-transparent border-none outline-none text-foreground text-sm p-0 focus:ring-0 min-w-0 cursor-pointer"
                     />
                   ) : (
-                    <span className="text-sm text-foreground">{weeklyMeetingTime}</span>
+                    <span className="text-sm text-foreground">{formatTime(weeklyMeetingTime)}</span>
                   )}
                 </div>
               </div>

@@ -8,6 +8,8 @@ namespace evoNaplo.DTO.TeamDTOs
         public string? MentorId { get; set; }
         public string? StudentId { get; set; }
         public string? AttendanceSheetId { get; set; }
+        public DayOfWeek WeeklyMeetingDay { get; set; }
+        public TimeSpan WeeklyMeetingTime { get; set; }
 
         public Team ToTeam()
         {
@@ -17,7 +19,9 @@ namespace evoNaplo.DTO.TeamDTOs
                 ProjectId = this.ProjectId,
                 Mentors = new List<Mentor>(),
                 Students = new List<Student>(),
-                AttendanceSheets = new List<AttendanceSheet>()
+                AttendanceSheets = new List<AttendanceSheet>(),
+                WeeklyMeetingDay = WeeklyMeetingDay,
+                WeeklyMeetingTime = WeeklyMeetingTime
             };
         }
     }

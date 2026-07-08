@@ -6,5 +6,7 @@
         public string? MentorId { get; set; }
         public string? StudentId { get; set; }
         public string? AttendanceSheetId { get; set; }
+        public DayOfWeek WeeklyMeetingDay { get; set; }
+        public TimeSpan WeeklyMeetingTime { get; set; }
     }
 }

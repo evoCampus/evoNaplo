@@ -17,7 +17,7 @@ public class CsvImportService : ICsvImportService
         using (var parser = new TextFieldParser(stream))
         {
             parser.TextFieldType = FieldType.Delimited;
-            parser.SetDelimiters(",");
+            parser.SetDelimiters(DetectDelimiter(stream));
             
             if (parser.EndOfData)
                 return list;
@@ -64,6 +64,34 @@ public class CsvImportService : ICsvImportService
             }
         }
         return list;
+    }
+
+    private string DetectDelimiter(Stream stream)
+    {
+        if (!stream.CanSeek)
+        {
+            return ";";
+        }
+
+        long originalPosition = stream.Position;
+
+        try
+        {
+            using var reader = new StreamReader(stream, leaveOpen: true);
+            string? firstLine = reader.ReadLine();
+            if (string.IsNullOrWhiteSpace(firstLine))
+            {
+                return ";";
+            }
+
+            int semicolonCount = firstLine.Count(c => c == ';');
+            int commaCount = firstLine.Count(c => c == ',');
+            return semicolonCount >= commaCount ? ";" : ",";
+        }
+        finally
+        {
+            stream.Position = originalPosition;
+        }
     }
     
     private DateTime ParseCustomDate(string rawDate)
