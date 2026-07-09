@@ -34,8 +34,8 @@ export function ProjectDialog({
   const [prevItem, setPrevItem] = useState(item);
 
   const [isEditing, setIsEditing] = useState(isCreating);
-  const [name, setName] = useState(item?.name ?? "");
-  const [description, setDescription] = useState(item?.description ?? "");
+  const [name, setName] = useState<string>(item?.name ?? "");
+  const [description, setDescription] = useState<string>(item?.description ?? "");
   const [selectedTeams, setSelectedTeams] = useState<string[]>(item?.teamIds ?? []);
 
   const [teamSearch, setTeamSearch] = useState("");
@@ -112,12 +112,11 @@ export function ProjectDialog({
     }
 
     const updatedProject: ProjectDTO = {
-      ...item,
-      id: item?.id ?? null,
-      name,
-      description,
-      teamIds: selectedTeams,
-      projectLinks: item?.projectLinks || {},
+      id: typeof item?.id === "string" ? item.id : "",
+      name: name ?? "",
+      description: description ?? "",
+      teamIds: selectedTeams ?? [],
+      projectLinks: item?.projectLinks ?? {},
     };
 
     try {
@@ -136,7 +135,7 @@ export function ProjectDialog({
 
   const handleToggleTeam = (id: string) => {
     setSelectedTeams((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? [] : [id]
     );
   };
 

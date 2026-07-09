@@ -19,12 +19,20 @@ namespace evoNaplo.DAL.Repositories
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await _context.Projects.ToListAsync();
+            return await _context.Projects
+                .Include(p => p.Teams)
+                .Include(p => p.ProjectLinks)
+                .AsSplitQuery()
+                .ToListAsync();
         }
 
         public async Task<Project?> GetProjectByIdAsync(string id)
         {
-            return await _context.Projects.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Projects
+                .Include(p => p.Teams)
+                .Include(p => p.ProjectLinks)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Project> AddProjectAsync(Project project)
